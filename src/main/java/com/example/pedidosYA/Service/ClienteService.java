@@ -1,4 +1,4 @@
-package com.example.pedidosYA.services;
+package com.example.pedidosYA.Service;
 
 public class ClienteService {
     private String nome;
