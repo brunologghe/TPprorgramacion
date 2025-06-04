@@ -23,5 +23,4 @@ public class ClienteService {
         return new ResponseDTO(c.getId(), c.getUsuario(), c.getNombreYapellido());
     }
 
-    
 }
