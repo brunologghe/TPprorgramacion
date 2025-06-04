@@ -7,33 +7,18 @@ import java.util.Map;
 import java.util.Set;
 
 @Entity
-public class Restaurante {
+public class Restaurante extends Usuario{
 
-    Long id;
     @Column
     private String nombre;
 
-    @OneToMany
-    @JoinColumn(name = "producto_id")
-    private Map<Producto, Integer> menu;
+    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Producto> menu;
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Resenia> reseniasRestaurante;
 
     public Restaurante() {
-    }
-
-    public Restaurante(Long id, String nombre) {
-        this.id = getId();
-        this.nombre = nombre;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getNombre() {
@@ -44,11 +29,11 @@ public class Restaurante {
         this.nombre = nombre;
     }
 
-    public Map<Producto, Integer> getMenu() {
+    public Set<Producto> getMenu() {
         return menu;
     }
 
-    public void setMenu(Map<Producto, Integer> menu) {
+    public void setMenu(Set<Producto> menu) {
         this.menu = menu;
     }
 
