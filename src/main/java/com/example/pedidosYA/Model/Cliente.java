@@ -19,4 +19,39 @@ public class Cliente extends Usuario {
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pedido>pedidos;
+
+    public Cliente() {
+    }
+
+    public String getNombreYapellido() {
+        return nombreYapellido;
+    }
+
+    public void setNombreYapellido(String nombreYapellido) {
+        this.nombreYapellido = nombreYapellido;
+    }
+
+    public List<Direccion> getDirecciones() {
+        return direcciones;
+    }
+
+    public void setDirecciones(List<Direccion> direcciones) {
+        this.direcciones = direcciones;
+    }
+
+    public List<Pago> getMetodosPago() {
+        return metodosPago;
+    }
+
+    public void setMetodosPago(List<Pago> metodosPago) {
+        this.metodosPago = metodosPago;
+    }
+
+    public List<Pedido> getPedidos() {
+        return pedidos;
+    }
+
+    public void setPedidos(List<Pedido> pedidos) {
+        this.pedidos = pedidos;
+    }
 }
