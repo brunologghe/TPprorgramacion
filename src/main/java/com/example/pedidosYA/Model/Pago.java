@@ -1,9 +1,12 @@
 package com.example.pedidosYA.Model;
 
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
+@Entity
 public class Pago {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private MetodoDePago metodoDePago;
     @ManyToOne

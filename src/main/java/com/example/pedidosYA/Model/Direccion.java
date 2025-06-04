@@ -2,6 +2,7 @@ package com.example.pedidosYA.Model;
 
 import jakarta.persistence.*;
 
+@Entity
 public class Direccion {
 
     @Id

@@ -6,7 +6,9 @@ import com.example.pedidosYA.Model.Cliente;
 import com.example.pedidosYA.Model.Usuario;
 import com.example.pedidosYA.Repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ClienteService {
 
     @Autowired
