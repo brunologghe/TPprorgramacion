@@ -3,20 +3,17 @@ package com.example.pedidosYA.Model;
 import jakarta.persistence.*;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String usuario;
 
-    @Column(nullable = false)
     private String contrasenia;
 
-    @Column(nullable = false)
-    @Enumerated(value = EnumType.STRING)
     private TipoUsuario tipoUsuario;
 
 

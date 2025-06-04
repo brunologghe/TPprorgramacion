@@ -3,13 +3,17 @@ package com.example.pedidosYA.Model;
 import jakarta.persistence.*;
 
 @Entity
-public class Pago {
+public class ProductoPedido {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private MetodoDePago metodoDePago;
+
     @ManyToOne
-    @JoinColumn(name = "cliente_id")
-    private Cliente cliente;
+    private Producto producto;
+
+    private Integer cantidad;
+
+    @ManyToOne
+    private DetallePedido detallePedido;
 }
