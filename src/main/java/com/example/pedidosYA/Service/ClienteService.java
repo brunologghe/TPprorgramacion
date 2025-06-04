@@ -1,5 +1,11 @@
 package com.example.pedidosYA.Service;
 
+import com.example.pedidosYA.Repository.ClienteRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+
 public class ClienteService {
-    private String nome;
+
+    @Autowired
+    private ClienteRepository clienteRepository;
+    
 }
