@@ -7,9 +7,11 @@ import com.example.pedidosYA.Model.Direccion;
 import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Repository.DireccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Service
 public class DireccionService {
 
     @Autowired
@@ -36,4 +38,6 @@ public class DireccionService {
 
         return new DireccionDTO(direccionRetorno.getId(), direccionRetorno.getDireccion(), direccionRetorno.getCiudad(), direccionRetorno.getPais(), direccionRetorno.getCodigoPostal());
     }
+
+
 }
