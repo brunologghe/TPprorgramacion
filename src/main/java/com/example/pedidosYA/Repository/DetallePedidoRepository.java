@@ -1,4 +1,7 @@
 package com.example.pedidosYA.Repository;
 
-public class DetallePedidoRepository {
+import com.example.pedidosYA.Model.DetallePedido;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface DetallePedidoRepository extends JpaRepository<DetallePedido, Long> {
 }
