@@ -15,8 +15,6 @@ public abstract class Usuario {
 
     private String contrasenia;
 
-    private TipoUsuario tipoUsuario;
-
 
     public Long getId() {
         return id;
@@ -42,11 +40,4 @@ public abstract class Usuario {
         this.contrasenia = contrasenia;
     }
 
-    public TipoUsuario getTipoUsuario() {
-        return tipoUsuario;
-    }
-
-    public void setTipoUsuario(TipoUsuario tipoUsuario) {
-        this.tipoUsuario = tipoUsuario;
-    }
 }
