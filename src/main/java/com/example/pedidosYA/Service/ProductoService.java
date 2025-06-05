@@ -1,7 +1,5 @@
 package com.example.pedidosYA.Service;
 
-<<<<<<< Updated upstream
-=======
 import com.example.pedidosYA.DTO.ProductoDTO.ProductoResumenDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResumenDTO;
 import com.example.pedidosYA.Exceptions.BusinessException;
@@ -16,7 +14,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
->>>>>>> Stashed changes
 public class ProductoService {
 
     @Autowired
