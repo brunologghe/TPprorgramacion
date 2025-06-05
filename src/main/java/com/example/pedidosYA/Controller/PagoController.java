@@ -35,6 +35,6 @@ public class PagoController {
     @GetMapping("/{id}")
     public List<Pago>mostrarPagos(@PathVariable Long id)
     {
-        return
+        return pagoService.mostarPagos(id);
     }
 }
