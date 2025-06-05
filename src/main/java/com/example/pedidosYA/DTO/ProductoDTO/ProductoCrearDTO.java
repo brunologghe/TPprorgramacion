@@ -1,35 +1,28 @@
-package com.example.pedidosYA.Model;
+package com.example.pedidosYA.DTO.ProductoDTO;
 
-import jakarta.persistence.*;
+import com.example.pedidosYA.Model.Restaurante;
+import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-@Entity
-public class Producto {
+public class ProductoCrearDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Column
+    @NotBlank
     private String nombre;
-    @Column
+    @NotBlank
     private String caracteristicas;
-    @Column
+    @Min(value = 0, message = "El precio mínimo debe ser 0")
+    @Max(value = 400000, message = "El precio máximo debe ser 400000")
     private double precio;
-    @Column
+    @Min(value = 0, message = "El minimo de stock es 0")
     private int stock;
-    @ManyToOne
-    @JoinColumn(name = "restaurante_id")
-    private Restaurante restaurante;
 
-    public Producto() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @NotNull
+    private Long restaurante;
 
     public String getNombre() {
         return nombre;
@@ -47,6 +40,7 @@ public class Producto {
         this.caracteristicas = caracteristicas;
     }
 
+
     public double getPrecio() {
         return precio;
     }
@@ -54,6 +48,7 @@ public class Producto {
     public void setPrecio(double precio) {
         this.precio = precio;
     }
+
 
     public int getStock() {
         return stock;
@@ -63,11 +58,11 @@ public class Producto {
         this.stock = stock;
     }
 
-    public Restaurante getRestaurante() {
+    public Long getRestaurante() {
         return restaurante;
     }
 
-    public void setRestaurante(Restaurante restaurante) {
+    public void setRestaurante(Long restaurante) {
         this.restaurante = restaurante;
     }
 }

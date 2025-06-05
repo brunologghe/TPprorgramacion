@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "dtype")
 public abstract class Usuario {
 
     @Id
@@ -14,7 +13,6 @@ public abstract class Usuario {
     private String usuario;
 
     private String contrasenia;
-
 
     public Long getId() {
         return id;
@@ -39,5 +37,6 @@ public abstract class Usuario {
     public void setContrasenia(String contrasenia) {
         this.contrasenia = contrasenia;
     }
+
 
 }

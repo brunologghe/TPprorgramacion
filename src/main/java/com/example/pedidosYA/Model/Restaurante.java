@@ -7,18 +7,27 @@ import java.util.Map;
 import java.util.Set;
 
 @Entity
+@DiscriminatorValue("RESTAURANTE")
 public class Restaurante extends Usuario{
 
     @Column
     private String nombre;
 
-    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany
+    @JoinColumn(name = "producto_id")
     private Set<Producto> menu;
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Resenia> reseniasRestaurante;
 
+    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Pedido> pedidos;
+
     public Restaurante() {
+    }
+
+    public Restaurante( String nombre) {
+        this.nombre = nombre;
     }
 
     public String getNombre() {
@@ -43,5 +52,13 @@ public class Restaurante extends Usuario{
 
     public void setReseniasRestaurante(List<Resenia> reseniasRestaurante) {
         this.reseniasRestaurante = reseniasRestaurante;
+    }
+
+    public List<Pedido> getPedidos() {
+        return pedidos;
+    }
+
+    public void setPedidos(List<Pedido> pedidos) {
+        this.pedidos = pedidos;
     }
 }
