@@ -72,7 +72,7 @@ public class RestauranteService {
     }
 
     public void eliminarRestaurante (Long id){
-        restauranteValidations.validarExisteId(id);
-        restauranteRepository.deleteById(id);
+        Restaurante restaurante = restauranteValidations.validarExisteId(id);
+        restauranteRepository.delete(restaurante);
     }
 }

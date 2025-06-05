@@ -16,7 +16,6 @@ public class Producto {
     private double precio;
     @Column
     private int stock;
-
     @ManyToOne
     @JoinColumn(name = "restaurante_id")
     private Restaurante restaurante;

@@ -33,10 +33,8 @@ public void validarNombreNoDuplicado(Long id, String nombre)throws BusinessExcep
         }
     }
 
-    public void validarExisteId(Long id){
-    if(!restauranteRepository.existsById(id)){
-        throw new BusinessException("No existe restaurante con este id");
-    }
+    public Restaurante validarExisteId(Long id){
+        return restauranteRepository.findById(id).orElseThrow(()-> new BusinessException("No existe restaurante con este id"));
     }
 
 }
