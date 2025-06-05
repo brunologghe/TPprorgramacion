@@ -33,6 +33,6 @@ public class ClienteService {
     {
         Cliente cliente = clienteRepository.findById(id).orElseThrow(()-> new RuntimeException("No existe ningun cliente con ese id"));
 
-        return new ClienteDetailDto(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido(), cliente.getDirecciones());
+        return new ClienteDetailDto(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido(), cliente.getDirecciones(), cliente.getMetodosPago());
     }
 }
