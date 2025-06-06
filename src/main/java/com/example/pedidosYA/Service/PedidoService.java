@@ -33,7 +33,7 @@ public class PedidoService {
     @Autowired
     private ProductoRepository productoRepository;
 
-    public PedidoDetailDTO pedirPedido(Long idCliente, PedidoCreateDTO pedidoCreateDTO)
+    public PedidoDetailDTO hacerPedido(Long idCliente, PedidoCreateDTO pedidoCreateDTO)
     {
         Cliente cliente = clienteValidations.validarExistencia(idCliente);
         Restaurante restaurante =  restauranteValidations.validarExisteId(pedidoCreateDTO.getRestauranteId());
@@ -58,14 +58,30 @@ public class PedidoService {
             double subtotal = producto.getPrecio() * dpdto.getCantidad();
             total += subtotal;
         }
-        pedido.setDetalles();
         pedido.setTotal(total);
         pedido.setRestaurante(restaurante);
         pedido.setCliente(cliente);
+        pedido.setProductosPedidos(productosPedido);
 
         Pedido pedidohecho = pedidoRepository.save(pedido);
 
         return new PedidoDetailDTO(pedidohecho.getId(), pedidohecho.getFechaPedido(), pedidohecho.getEstado(),
                 pedidohecho.getTotal(), pedidohecho.getRestaurante().getNombre(), idCliente, pedidoCreateDTO.getDetalles());
+    }
+
+    public List<PedidoDetailDTO> verPedidosEnCurso(Long idCliente)
+    {
+        Cliente cliente = clienteValidations.validarExistencia(idCliente);
+
+        List<Pedido>listaPedidos = cliente.getPedidos();
+        List<PedidoDetailDTO>listaDetallePedidos = new ArrayList<>();
+
+        for(Pedido d : cliente.getPedidos())
+        {
+            if(d.getEstado().equals(EstadoPedido.ENVIADO) || d.getEstado().equals(EstadoPedido.PREPARACION))
+            {
+                listaDetallePedidos.add(new PedidoDetailDTO(d.getId(), d.getFechaPedido(), d.getEstado(), d.getTotal(), d.getRestaurante().getNombre(), d.getCliente().getId(), d.getProductosPedidos()));
+            }
+        }
     }
 }
