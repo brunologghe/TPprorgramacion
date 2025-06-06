@@ -31,8 +31,8 @@ public class Pedido {
     @JoinColumn(name = "restaurante_id")
     private Restaurante restaurante;
 
-    @OneToOne(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
-    private DetallePedido detalles;
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductoPedido> productosPedidos;
 
     public Pedido() {
     }
@@ -85,11 +85,11 @@ public class Pedido {
         this.restaurante = restaurante;
     }
 
-    public DetallePedido getDetalles() {
-        return detalles;
+    public List<ProductoPedido> getProductosPedidos() {
+        return productosPedidos;
     }
 
-    public void setDetalles(DetallePedido detalles) {
-        this.detalles = detalles;
+    public void setProductosPedidos(List<ProductoPedido> productosPedidos) {
+        this.productosPedidos = productosPedidos;
     }
 }

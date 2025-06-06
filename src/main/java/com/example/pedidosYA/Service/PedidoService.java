@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PedidoService {
@@ -41,14 +43,22 @@ public class PedidoService {
         pedido.setEstado(EstadoPedido.PREPARACION);
 
         double total = 0;
+        List<ProductoPedido> productosPedido = new ArrayList<>();
 
         for(DetallePedidoDTO dpdto : pedidoCreateDTO.getDetalles())
         {
             Producto producto = productoRepository.findById(dpdto.getProductoId())
                     .orElseThrow(() -> new RuntimeException("Producto con ID: " +dpdto.getProductoId()+ "no encontrado"));
+
+            ProductoPedido productoPedido = new ProductoPedido();
+            productoPedido.setProducto(producto);
+            productoPedido.setCantidad(dpdto.getCantidad());
+            productosPedido.add(productoPedido);
+
             double subtotal = producto.getPrecio() * dpdto.getCantidad();
             total += subtotal;
         }
+        pedido.setDetalles();
         pedido.setTotal(total);
         pedido.setRestaurante(restaurante);
         pedido.setCliente(cliente);
