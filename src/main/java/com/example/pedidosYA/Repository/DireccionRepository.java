@@ -5,4 +5,5 @@ import com.example.pedidosYA.Model.Direccion;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DireccionRepository extends JpaRepository<Direccion, Long> {
+    Boolean existsByIdAndClienteId(Long id, Long idd);
 }

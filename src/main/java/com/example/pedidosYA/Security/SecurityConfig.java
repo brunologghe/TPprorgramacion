@@ -23,7 +23,8 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable()) // Desactivamos CSRF (por ser API REST)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/**").permitAll()       // Registro público
+                        .requestMatchers("/admin/**").permitAll()
+                        .requestMatchers("/admin/cliente/**").permitAll()// Registro público
                         .requestMatchers("/cliente/**").permitAll()      // GET público
                         .requestMatchers("/api/products/**").authenticated() // Cualquier otra (ej. POST)
                         .anyRequest().authenticated()
