@@ -3,6 +3,7 @@ package com.example.pedidosYA.Service;
 import com.example.pedidosYA.DTO.PedidoDTO.DetallePedidoDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoCreateDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
+import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.*;
 import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Repository.PedidoRepository;
@@ -80,8 +81,64 @@ public class PedidoService {
         {
             if(d.getEstado().equals(EstadoPedido.ENVIADO) || d.getEstado().equals(EstadoPedido.PREPARACION))
             {
-                listaDetallePedidos.add(new PedidoDetailDTO(d.getId(), d.getFechaPedido(), d.getEstado(), d.getTotal(), d.getRestaurante().getNombre(), d.getCliente().getId(), d.getProductosPedidos()));
+                List<DetallePedidoDTO> detalles = new ArrayList<>();
+                for(ProductoPedido p : d.getProductosPedidos())
+                {
+                    DetallePedidoDTO detallePedidoDTO = new DetallePedidoDTO();
+                    detallePedidoDTO.setProductoId(p.getProducto().getId());
+                    detallePedidoDTO.setCantidad(p.getCantidad());
+                    detalles.add(detallePedidoDTO);
+                }
+                listaDetallePedidos.add(new PedidoDetailDTO(d.getId(), d.getFechaPedido(), d.getEstado(), d.getTotal(), d.getRestaurante().getNombre(), d.getCliente().getId(), detalles));
             }
         }
+
+        if(listaDetallePedidos.isEmpty())
+        {
+            throw new BusinessException("No hay pedidos en curso");
+        }
+
+        return listaDetallePedidos;
+    }
+
+    public List<PedidoDetailDTO> verHistorialPedidos(Long idCliente)
+    {
+        Cliente cliente = clienteValidations.validarExistencia(idCliente);
+
+        List<Pedido>listaPedidos = cliente.getPedidos();
+        List<PedidoDetailDTO>listaDetallePedidos = new ArrayList<>();
+
+        List<DetallePedidoDTO> detalles = new ArrayList<>();
+        for(Pedido d : cliente.getPedidos())
+        {
+                for(ProductoPedido p : d.getProductosPedidos())
+                {
+                    DetallePedidoDTO detallePedidoDTO = new DetallePedidoDTO();
+                    detallePedidoDTO.setProductoId(p.getProducto().getId());
+                    detallePedidoDTO.setCantidad(p.getCantidad());
+                    detalles.add(detallePedidoDTO);
+                }
+                listaDetallePedidos.add(new PedidoDetailDTO(d.getId(), d.getFechaPedido(), d.getEstado(), d.getTotal(), d.getRestaurante().getNombre(), d.getCliente().getId(), detalles));
+        }
+
+        if(listaDetallePedidos.isEmpty())
+        {
+            throw new BusinessException("No hay pedidos en el historial aun");
+        }
+
+        return listaDetallePedidos;
+    }
+
+    public PedidoDetailDTO verDetallesPedido(Long idPedido){
+
+        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(()-> new BusinessException("Ese pedido no existe"));
+
+        List<DetallePedidoDTO>detallePedido = new ArrayList<>();
+        for(ProductoPedido p : pedido.getProductosPedidos())
+        {
+            detallePedido.add(new DetallePedidoDTO(p.getProducto().getId(), p.getCantidad()));
+        }
+
+        return new PedidoDetailDTO(pedido.getId(), pedido.getFechaPedido(), pedido.getEstado(), pedido.getTotal(), pedido.getRestaurante().getNombre(), pedido.getCliente().getId(), detallePedido);
     }
 }

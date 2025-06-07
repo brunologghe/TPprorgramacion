@@ -11,6 +11,14 @@ public class DetallePedidoDTO {
         return productoId;
     }
 
+    public DetallePedidoDTO() {
+    }
+
+    public DetallePedidoDTO(Long productoId, Integer cantidad) {
+        this.productoId = productoId;
+        this.cantidad = cantidad;
+    }
+
     public void setProductoId(@NotNull(message = "El producto no puede ser nulo") Long productoId) {
         this.productoId = productoId;
     }
@@ -22,4 +30,5 @@ public class DetallePedidoDTO {
     public void setCantidad(@NotNull(message = "El pago no puede ser nula") Integer cantidad) {
         this.cantidad = cantidad;
     }
+
 }
