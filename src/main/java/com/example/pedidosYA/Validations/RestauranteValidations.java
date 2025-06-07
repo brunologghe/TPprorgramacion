@@ -10,12 +10,20 @@ import org.springframework.stereotype.Component;
 public class RestauranteValidations {
     @Autowired
     RestauranteRepository restauranteRepository;
-public void validarNombreNoDuplicado(Long id, String nombre)throws BusinessException{
+
+public void validarNombreNoDuplicado(String nombre)throws BusinessException{
     Restaurante r = restauranteRepository.findByNombre(nombre);
-    if (r != null && r.getId() != id) {
+    if (r != null && restauranteRepository.existsByNombre(nombre)) {
         throw new BusinessException("El nombre ya pertenece a otro restaurante.");
     }
 }
+
+    public void validarNombreNoDuplicadoConID(Long id, String nombre)throws BusinessException{
+        Restaurante r = restauranteRepository.findByNombre(nombre);
+        if (r != null && restauranteRepository.existsByNombre(nombre) && r.getId() != id ) {
+            throw new BusinessException("El nombre ya pertenece a otro restaurante.");
+        }
+    }
 
     public void validarNombreExistente(String nombre)throws BusinessException{
         if(!restauranteRepository.existsByNombre(nombre)){
@@ -33,10 +41,8 @@ public void validarNombreNoDuplicado(Long id, String nombre)throws BusinessExcep
         }
     }
 
-    public void validarExisteId(Long id){
-    if(!restauranteRepository.existsById(id)){
-        throw new BusinessException("No existe restaurante con este id");
-    }
+    public Restaurante validarExisteId(Long id){
+        return restauranteRepository.findById(id).orElseThrow(()-> new BusinessException("No existe restaurante con este id"));
     }
 
 }

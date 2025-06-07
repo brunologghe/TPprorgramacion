@@ -13,12 +13,14 @@ public class Restaurante extends Usuario{
     @Column
     private String nombre;
 
-    @OneToMany
-    @JoinColumn(name = "producto_id")
+    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Producto> menu;
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Resenia> reseniasRestaurante;
+
+    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Pedido> pedidos;
 
     public Restaurante() {
     }
@@ -49,5 +51,13 @@ public class Restaurante extends Usuario{
 
     public void setReseniasRestaurante(List<Resenia> reseniasRestaurante) {
         this.reseniasRestaurante = reseniasRestaurante;
+    }
+
+    public List<Pedido> getPedidos() {
+        return pedidos;
+    }
+
+    public void setPedidos(List<Pedido> pedidos) {
+        this.pedidos = pedidos;
     }
 }

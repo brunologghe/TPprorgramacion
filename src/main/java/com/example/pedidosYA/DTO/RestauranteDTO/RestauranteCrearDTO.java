@@ -1,8 +1,6 @@
 package com.example.pedidosYA.DTO.RestauranteDTO;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 public class RestauranteCrearDTO {
 
@@ -17,7 +15,6 @@ public class RestauranteCrearDTO {
     @NotBlank
     @Size(max = 25)
     private String nombre;
-
 
     public  String getUsuario() {
         return usuario;

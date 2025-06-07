@@ -25,9 +25,8 @@ public class RestauranteService {
 
 
         Restaurante restaurante = new Restaurante();
-        Restaurante restAux = restauranteRepository.findByNombre(dto.getNombre());
 
-        restauranteValidations.validarNombreNoDuplicado(restAux.getId(), dto.getNombre());
+        restauranteValidations.validarNombreNoDuplicado(dto.getNombre());
 
         restaurante.setNombre(dto.getNombre());
         restaurante.setUsuario(dto.getUsuario());
@@ -58,7 +57,7 @@ public class RestauranteService {
     public RestauranteResponseDTO modificarRestaurante (Long id, RestauranteModificarDTO restauranteNuevo){
 
         restauranteValidations.validarContraseniaActual(id, restauranteNuevo.getContraseniaActual());
-        restauranteValidations.validarNombreNoDuplicado(id, restauranteNuevo.getNombre());
+        restauranteValidations.validarNombreNoDuplicadoConID(id, restauranteNuevo.getNombre());
         Restaurante restaurante = restauranteRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Restaurante no encontrado"));
 
@@ -72,7 +71,7 @@ public class RestauranteService {
     }
 
     public void eliminarRestaurante (Long id){
-        restauranteValidations.validarExisteId(id);
-        restauranteRepository.deleteById(id);
+        Restaurante restaurante = restauranteValidations.validarExisteId(id);
+        restauranteRepository.delete(restaurante);
     }
 }
