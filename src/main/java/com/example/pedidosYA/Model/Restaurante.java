@@ -13,8 +13,7 @@ public class Restaurante extends Usuario{
     @Column
     private String nombre;
 
-    @OneToMany
-    @JoinColumn(name = "producto_id")
+    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Producto> menu;
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true)
