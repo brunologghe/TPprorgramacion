@@ -19,7 +19,7 @@ public class Producto {
 
     @ManyToOne
     @JoinColumn(name = "restaurante_id")
-    private Long restaurante;
+    private Restaurante restaurante;
 
     public Producto() {
     }
@@ -64,11 +64,11 @@ public class Producto {
         this.stock = stock;
     }
 
-    public Long getRestaurante() {
+    public Restaurante getRestaurante() {
         return restaurante;
     }
 
-    public void setRestaurante(Long restaurante) {
+    public void setRestaurante(Restaurante restaurante) {
         this.restaurante = restaurante;
     }
 }
