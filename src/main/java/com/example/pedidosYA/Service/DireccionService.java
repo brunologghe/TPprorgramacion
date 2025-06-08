@@ -7,6 +7,7 @@ import com.example.pedidosYA.Model.Cliente;
 import com.example.pedidosYA.Model.Direccion;
 import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Repository.DireccionRepository;
+import com.example.pedidosYA.Validations.ClienteValidations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,15 +23,11 @@ public class DireccionService {
     private DireccionRepository direccionRepository;
     @Autowired
     private ClienteRepository clienteRepository;
+    @Autowired
+    private ClienteValidations clienteValidations;
 
     public DireccionDTO crearDireccion(DireccionCrearDTO direccion){
-        Optional<Cliente>clienteOptional = clienteRepository.findById(direccion.getId());
-
-        if (clienteOptional.isEmpty()) {
-            throw new RuntimeException("Cliente no encontrado con ID: " + direccion.getId());
-        }
-
-        Cliente cliente = clienteOptional.get();
+        Cliente cliente = clienteValidations.validarExistencia(direccion.getId());
         Direccion direccionNueva = new Direccion();
         direccionNueva.setDireccion(direccion.getDireccion());
         direccionNueva.setCiudad(direccion.getCiudad());
@@ -65,7 +62,7 @@ public class DireccionService {
         direRetorno.setPais(direccion.getPais());
         direRetorno.setCiudad(direccion.getCiudad());
 
-        Cliente cliente = clienteRepository.findById(direccion.getId()).orElseThrow(()-> new RuntimeException("No existe un cliente con ese id"));
+        Cliente cliente = clienteValidations.validarExistencia(direccion.getId());
         direRetorno.setCliente(cliente);
 
         Direccion direccionRetorno = direccionRepository.save(direRetorno);
@@ -75,7 +72,7 @@ public class DireccionService {
 
     public List<DireccionDTO> listarDirecciones(Long id)
     {
-        Cliente cliente = clienteRepository.findById(id).orElseThrow(()-> new RuntimeException("No existe un cliente con ese id"));
+        Cliente cliente = clienteValidations.validarExistencia(id);
         List<Direccion> direcciones = direccionRepository.findByClienteId(id);
 
         if(direcciones == null)

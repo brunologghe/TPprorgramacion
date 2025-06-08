@@ -10,4 +10,5 @@ import java.util.List;
 public interface DireccionRepository extends JpaRepository<Direccion, Long> {
     Direccion findByClienteIdAndCodigoPostalAndDireccion(Long clienteId, String codigoPostal, String direccion);
     List<Direccion> findByClienteId(Long id);
+    Boolean existsByIdAndClienteId(Long idCliente, Long idDireccion);
 }
