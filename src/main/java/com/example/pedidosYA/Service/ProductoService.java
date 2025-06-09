@@ -47,7 +47,7 @@ public class ProductoService {
     public ProductoDetailDTO findProductoBynombreAndIdRestaurante (Long idRestaurante, String nombre){
 
         productoValidations.validarNombreProductoExistente(nombre);
-        Producto p =productoRepository.findByNombreAndByIdRestaurante(nombre, idRestaurante);
+        Producto p =productoRepository.findByNombreAndRestauranteId(nombre, idRestaurante);
 
         Restaurante restaurante = restauranteRepository.findById(idRestaurante).orElseThrow(() -> new BusinessException("No existe restaurante con ese id"));
         RestauranteResumenDTO restResumen = new RestauranteResumenDTO(idRestaurante, restaurante.getNombre());
@@ -128,15 +128,16 @@ public class ProductoService {
         );
     }
 
-    public void eliminarProducto (Long idProducto){
+    public void eliminarProducto (Long idRestaurante, Long idProducto){
 
         Producto producto = productoRepository.findById(idProducto)
                 .orElseThrow(() -> new BusinessException("NO existe ningún producto con ese id"));
 
-        Restaurante restaurante = restauranteRepository.findById(producto.getRestaurante().getId())
+        Restaurante restaurante = restauranteRepository.findById(idRestaurante)
                 .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese id"));
 
-        productoValidations.validarProductoEnRestaurante(restaurante.getId(), producto);
+        productoValidations.validarProductoPerteneceARestaurante(idRestaurante, producto);
+        productoValidations.validarProductoEnRestaurante(restaurante, producto);
 
         restaurante.getMenu().remove(producto);
 

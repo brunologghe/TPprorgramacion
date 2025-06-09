@@ -77,9 +77,9 @@ public class RestauranteController {
         return ResponseEntity.ok(productoService.modificarProducto(idRestaurante, idProducto, productoNuevo));
     }
 
-    @DeleteMapping ("/productos/{Long id}")
-    public ResponseEntity<?> eliminarProducto(@PathVariable Long idProducto){
-        productoService.eliminarProducto(idProducto);
+    @DeleteMapping ("/productos/{idRestaurante}/{idProducto}")
+    public ResponseEntity<?> eliminarProducto(@PathVariable Long idRestaurante, @PathVariable Long idProducto){
+        productoService.eliminarProducto(idRestaurante, idProducto);
         return ResponseEntity.noContent().build();
     }
 }
