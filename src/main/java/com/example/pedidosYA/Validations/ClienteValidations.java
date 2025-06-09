@@ -17,7 +17,7 @@ public class ClienteValidations {
 
     public Cliente validarExistencia(Long id)
     {
-        return clienteRepository.findById(id).orElseThrow(()-> new RuntimeException("No existe ningun cliente con ese id"));
+        return clienteRepository.findById(id).orElseThrow(()-> new BusinessException("No existe ningun cliente con ese id"));
     }
 
     public void validarDireccion(Long idDireccion, Long idCliente)
