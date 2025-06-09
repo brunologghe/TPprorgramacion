@@ -1,6 +1,7 @@
 package com.example.pedidosYA.Service;
 
 import com.example.pedidosYA.DTO.ClienteDTO.ClienteCrearDTO;
+import com.example.pedidosYA.DTO.ClienteDTO.ClienteDetailDto;
 import com.example.pedidosYA.DTO.ClienteDTO.ModificarDTO;
 import com.example.pedidosYA.DTO.ClienteDTO.ResponseDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteModificarDTO;
@@ -69,5 +70,14 @@ public class ClienteService {
         return new ResponseDTO(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido());
 
     }
+
+    public ClienteDetailDto verUsuario(Long id)
+    {
+        Cliente cliente = clienteValidations.validarExistencia(id);
+
+        return new ClienteDetailDto(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido(), cliente.getDirecciones(), cliente.getMetodosPago());
+    }
+
+
 
 }

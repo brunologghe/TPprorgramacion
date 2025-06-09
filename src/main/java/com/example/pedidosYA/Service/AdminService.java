@@ -50,7 +50,7 @@ public class AdminService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 admin.getUsuario(),
                 admin.getContrasenia(),
-                List.of(new SimpleGrantedAuthority("ROLE_USER"))
+                List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
         );
     }
 
