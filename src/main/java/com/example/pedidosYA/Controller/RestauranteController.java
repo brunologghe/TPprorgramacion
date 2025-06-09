@@ -2,6 +2,7 @@ package com.example.pedidosYA.Controller;
 
 import com.example.pedidosYA.DTO.ProductoDTO.ProductoCrearDTO;
 import com.example.pedidosYA.DTO.ProductoDTO.ProductoDetailDTO;
+import com.example.pedidosYA.DTO.ProductoDTO.ProductoModificarDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteCrearDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteDetailDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteModificarDTO;
@@ -56,15 +57,29 @@ public class RestauranteController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/producto")
+    @PostMapping("/productos")
     public ResponseEntity<ProductoDetailDTO> crearProducto (@Valid @RequestBody ProductoCrearDTO productoCrearDTO){
-
-        ProductoDetailDTO bodyProducto = productoService.crearProducto(productoCrearDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(bodyProducto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productoService.crearProducto(productoCrearDTO));
     }
 
-    @GetMapping ("/producto/{id}")
+    @GetMapping ("/productos/{id}")
     public ResponseEntity<?> findALlProducto(@PathVariable Long id){
         return ResponseEntity.ok(productoService.findAllProductosByRestauranteId(id));
+    }
+
+    @GetMapping ("/productos/{idRestaurante}/{nombre}")
+    public ResponseEntity<ProductoDetailDTO> findProductoBynombreAndIdRestaurante(@PathVariable Long idRestaurante, @PathVariable String nombre){
+        return ResponseEntity.ok(productoService.findProductoBynombreAndIdRestaurante(idRestaurante, nombre));
+    }
+
+    @PutMapping  ("/productos/{idRestaurante}/{idProducto}")
+    public ResponseEntity<ProductoDetailDTO> modificarProducto(@PathVariable Long idRestaurante, @PathVariable Long idProducto, @Valid @RequestBody ProductoModificarDTO productoNuevo){
+        return ResponseEntity.ok(productoService.modificarProducto(idRestaurante, idProducto, productoNuevo));
+    }
+
+    @DeleteMapping ("/productos/{Long id}")
+    public ResponseEntity<?> eliminarProducto(@PathVariable Long idProducto){
+        productoService.eliminarProducto(idProducto);
+        return ResponseEntity.noContent().build();
     }
 }
