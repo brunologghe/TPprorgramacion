@@ -15,7 +15,6 @@ import com.example.pedidosYA.Validations.RestauranteValidations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -47,7 +46,7 @@ public class ProductoService {
     public ProductoDetailDTO findProductoBynombreAndIdRestaurante (Long idRestaurante, String nombre){
 
         productoValidations.validarNombreProductoExistente(nombre);
-        Producto p =productoRepository.findByNombreAndByIdRestaurante(nombre, idRestaurante);
+        Producto p =productoRepository.findByNombreAndRestauranteId(nombre, idRestaurante);
 
         Restaurante restaurante = restauranteRepository.findById(idRestaurante).orElseThrow(() -> new BusinessException("No existe restaurante con ese id"));
         RestauranteResumenDTO restResumen = new RestauranteResumenDTO(idRestaurante, restaurante.getNombre());

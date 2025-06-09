@@ -22,7 +22,7 @@ public class ClienteValidations {
 
     public void validarDireccion(Long idDireccion, Long idCliente)
     {
-        if(!direccionRepository.existsByIdAndClienteId(idCliente, idDireccion)){
+        if(!direccionRepository.existsByIdAndClienteId(idDireccion, idCliente)){
             throw new BusinessException("No existe esa direccion ese cliente");
         }
     }

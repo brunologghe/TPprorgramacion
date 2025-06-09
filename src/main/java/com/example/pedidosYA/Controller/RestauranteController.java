@@ -1,5 +1,6 @@
 package com.example.pedidosYA.Controller;
 
+import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
 import com.example.pedidosYA.DTO.ProductoDTO.ProductoCrearDTO;
 import com.example.pedidosYA.DTO.ProductoDTO.ProductoDetailDTO;
 import com.example.pedidosYA.DTO.ProductoDTO.ProductoModificarDTO;
@@ -7,6 +8,7 @@ import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteCrearDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteDetailDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteModificarDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResponseDTO;
+import com.example.pedidosYA.Service.PedidoService;
 import com.example.pedidosYA.Service.ProductoService;
 import com.example.pedidosYA.Service.RestauranteService;
 import jakarta.validation.Valid;
@@ -24,6 +26,9 @@ public class RestauranteController {
 
     @Autowired
     ProductoService productoService;
+
+    @Autowired
+    PedidoService pedidoService;
 
     @GetMapping
     public ResponseEntity<?> findAll(){
@@ -77,9 +82,14 @@ public class RestauranteController {
         return ResponseEntity.ok(productoService.modificarProducto(idRestaurante, idProducto, productoNuevo));
     }
 
-    @DeleteMapping ("/productos/{Long id}")
+    @DeleteMapping ("/productos/{idProducto}")
     public ResponseEntity<?> eliminarProducto(@PathVariable Long idProducto){
         productoService.eliminarProducto(idProducto);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping ("/pedidos/{idPedido}/{estado}")
+    public ResponseEntity<PedidoDetailDTO>modificarEstadoPedido(@PathVariable Long idPedido, @PathVariable String estado){
+        return ResponseEntity.ok(pedidoService.modificarEstadoPedido(idPedido, estado));
     }
 }

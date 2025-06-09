@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/cliente")
 public class ClienteController {
@@ -42,5 +44,27 @@ public class ClienteController {
     {
         PedidoDetailDTO pedidoDetailDTO = pedidoService.hacerPedido(id, pedido);
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDetailDTO);
+    }
+
+    @GetMapping("/pedidosEnCurso/{idCliente}")
+    public List<PedidoDetailDTO> verPedidosEnCurso(@PathVariable Long idCliente)
+    {
+        return pedidoService.verPedidosEnCurso(idCliente);
+    }
+
+    @GetMapping("/historialPedidos/{idCliente}")
+    public List<PedidoDetailDTO> verHistorialPedidos(@PathVariable Long idCliente){
+        return pedidoService.verHistorialPedidos(idCliente);
+    }
+
+    @GetMapping("/verDetallesPedido/{idPedido}")
+    public PedidoDetailDTO verDetallesPedido(@PathVariable Long idPedido){
+        return pedidoService.verDetallesPedido(idPedido);
+    }
+
+    @DeleteMapping("/{idPedido}")
+    public ResponseEntity<?> cancelarPedido(@PathVariable Long idPedido){
+        pedidoService.cancelarPedido(idPedido);
+        return ResponseEntity.status(HttpStatus.OK).body("Pedido con id: "+idPedido+" eliminado");
     }
 }
