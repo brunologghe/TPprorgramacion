@@ -4,6 +4,7 @@ import com.example.pedidosYA.DTO.ClienteDTO.ClienteCrearDTO;
 import com.example.pedidosYA.DTO.ClienteDTO.ClienteDetailDto;
 import com.example.pedidosYA.DTO.ClienteDTO.ResponseDTO;
 import com.example.pedidosYA.Service.ClienteService;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/cliente")
-@PreAuthorize("hasRole('CLIENTE')")
+@DiscriminatorValue("CLIENTE")
 public class ClienteController {
 
     @Autowired

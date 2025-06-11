@@ -10,6 +10,7 @@ import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResumenDTO;
 import com.example.pedidosYA.Service.AdminService;
 import com.example.pedidosYA.Service.ClienteService;
 import com.example.pedidosYA.Service.RestauranteService;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/admin")
-@PreAuthorize("hasRole('ADMIN')")
+@DiscriminatorValue("ADMIN")
 public class AdminController {
 
     @Autowired
