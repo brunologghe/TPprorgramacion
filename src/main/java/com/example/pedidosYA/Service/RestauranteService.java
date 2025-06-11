@@ -74,4 +74,5 @@ public class RestauranteService {
         Restaurante restaurante = restauranteValidations.validarExisteId(id);
         restauranteRepository.delete(restaurante);
     }
+
 }
