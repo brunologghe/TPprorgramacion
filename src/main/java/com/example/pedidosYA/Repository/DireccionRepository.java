@@ -1,6 +1,5 @@
 package com.example.pedidosYA.Repository;
 
-import com.example.pedidosYA.DTO.DireccionDTO.DireccionDTO;
 import com.example.pedidosYA.Model.Cliente;
 import com.example.pedidosYA.Model.Direccion;
 import org.springframework.data.jpa.repository.JpaRepository;

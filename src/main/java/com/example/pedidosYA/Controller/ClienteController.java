@@ -7,16 +7,19 @@ import com.example.pedidosYA.DTO.PedidoDTO.PedidoCreateDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
 import com.example.pedidosYA.Service.ClienteService;
 import com.example.pedidosYA.Service.PedidoService;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/cliente")
+@DiscriminatorValue("CLIENTE")
 public class ClienteController {
 
     @Autowired

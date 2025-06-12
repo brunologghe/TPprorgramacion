@@ -1,6 +1,7 @@
 package com.example.pedidosYA.Validations;
 
 import com.example.pedidosYA.Model.Cliente;
+import com.example.pedidosYA.Model.Restaurante;
 import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Repository.DireccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,16 @@ public class ClienteValidations {
     {
         if(!direccionRepository.existsByIdAndClienteId(idDireccion, idCliente)){
             throw new BusinessException("No existe esa direccion ese cliente");
+        }
+    }
+
+    public void validarContraseniaActual(Long id, String contrasenia){
+
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Cliente no encontrado con id: " + id));
+
+        if (!cliente.getContrasenia().equals(contrasenia)) {
+            throw new BusinessException("La contraseña actual es incorrecta.");
         }
     }
 }

@@ -1,7 +1,9 @@
 package com.example.pedidosYA.Service;
 
+import com.example.pedidosYA.DTO.ClienteDTO.ResponseDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.*;
 import com.example.pedidosYA.Exceptions.BusinessException;
+import com.example.pedidosYA.Model.Cliente;
 import com.example.pedidosYA.Model.Restaurante;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Validations.RestauranteValidations;
@@ -70,8 +72,17 @@ public class RestauranteService {
         return new RestauranteResponseDTO(r.getId(), r.getUsuario(), r.getNombre());
     }
 
-    public void eliminarRestaurante (Long id){
+    public RestauranteResponseDTO eliminarRestaurante (Long id){
         Restaurante restaurante = restauranteValidations.validarExisteId(id);
+
+        RestauranteResponseDTO restauranteResponseDTO = new RestauranteResponseDTO(
+                restaurante.getId(),
+                restaurante.getUsuario(),
+                restaurante.getNombre()
+        );
+
         restauranteRepository.delete(restaurante);
+        return restauranteResponseDTO;
     }
+
 }
