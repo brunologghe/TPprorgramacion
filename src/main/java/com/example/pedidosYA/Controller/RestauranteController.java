@@ -1,5 +1,7 @@
 package com.example.pedidosYA.Controller;
 
+import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
+import com.example.pedidosYA.DTO.PedidoDTO.PedidoResumenDTO;
 import com.example.pedidosYA.DTO.ProductoDTO.ProductoCrearDTO;
 import com.example.pedidosYA.DTO.ProductoDTO.ProductoDetailDTO;
 import com.example.pedidosYA.DTO.ProductoDTO.ProductoModificarDTO;
