@@ -3,6 +3,7 @@ package com.example.pedidosYA.Service;
 import com.example.pedidosYA.DTO.PedidoDTO.DetallePedidoDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoCreateDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
+import com.example.pedidosYA.DTO.PedidoDTO.PedidoResumenDTO;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.*;
 import com.example.pedidosYA.Repository.ClienteRepository;
@@ -148,6 +149,7 @@ public class PedidoService {
         pedidoRepository.delete(pedido);
     }
 
+
     public PedidoDetailDTO modificarEstadoPedido (Long idPedido, String estado){
 
         EstadoPedido estadoPedido = EstadoPedido.valueOf(estado);
@@ -155,13 +157,34 @@ public class PedidoService {
 
         pedido.setEstado(estadoPedido);
 
+        pedidoRepository.save(pedido);
+
         List<DetallePedidoDTO>detallePedido = new ArrayList<>();
         for(ProductoPedido p : pedido.getProductosPedidos())
         {
             detallePedido.add(new DetallePedidoDTO(p.getProducto().getId(), p.getCantidad()));
         }
-        pedidoRepository.save(pedido);
 
         return new PedidoDetailDTO(pedido.getId(), pedido.getFechaPedido(), pedido.getEstado(), pedido.getTotal(), pedido.getRestaurante().getNombre(), pedido.getCliente().getId(), detallePedido);
+    }
+
+    public List<PedidoResumenDTO> verPedidosDeRestauranteEnCurso (Long idRestaurante){
+        Restaurante restaurante = restauranteRepository.findById(idRestaurante)
+                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese id"));
+
+        return pedidoRepository.findByRestauranteId(idRestaurante).stream()
+                .filter(pedido -> pedido.getEstado() == EstadoPedido.PREPARACION || pedido.getEstado() == EstadoPedido.ENVIADO)
+                .map(pedido -> new PedidoResumenDTO(pedido.getId(), pedido.getFechaPedido(),
+                        pedido.getEstado().toString(), pedido.getTotal())).toList();
+    }
+
+    public List<PedidoResumenDTO> verHistorialPedidosDeRestaurante (Long idRestaurante){
+        Restaurante restaurante = restauranteRepository.findById(idRestaurante)
+                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese id"));
+
+        return pedidoRepository.findByRestauranteId(idRestaurante).stream()
+                .filter(pedido -> pedido.getEstado() == EstadoPedido.ENTREGADO || pedido.getEstado() == EstadoPedido.PREPARACION || pedido.getEstado() == EstadoPedido.ENVIADO)
+                .map(pedido -> new PedidoResumenDTO(pedido.getId(), pedido.getFechaPedido(),
+                        pedido.getEstado().toString(), pedido.getTotal())).toList();
     }
 }

@@ -26,9 +26,15 @@ public class ProductoValidations {
         }
     }
 
-    public void validarProductoEnRestaurante(Long idRestaurante, Producto producto){
-        if (!producto.getRestaurante().equals(idRestaurante)) {
+    public void validarProductoPerteneceARestaurante(Long idRestaurante, Producto producto){
+        if (!producto.getRestaurante().getId().equals(idRestaurante)) {
             throw new BusinessException("El producto no pertenece al restaurante elegido");
+        }
+    }
+
+    public void validarProductoEnRestaurante(Restaurante restaurante, Producto producto){
+        if(!restaurante.getMenu().contains(producto)){
+            throw new BusinessException("El restaurante no contiene este producto");
         }
     }
 }
