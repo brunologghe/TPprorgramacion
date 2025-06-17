@@ -1,6 +1,8 @@
 package com.example.pedidosYA.Security;
 
-import com.example.pedidosYA.Service.AdminService;
+import com.example.pedidosYA.Service.CustomUserDetailsService;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import com.example.pedidosYA.Security.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,33 +16,35 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 @Configuration
 public class SecurityConfig {
 
-    private final AdminService adminService;
+    private final CustomUserDetailsService userDetailsService;
 
-    public SecurityConfig(AdminService adminService) {
-        this.adminService = adminService;
+    public SecurityConfig(CustomUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(csrf -> csrf.disable()) // Desactivamos CSRF (por ser API REST)
+        http
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/**").permitAll()
-                        .requestMatchers("/admin/cliente/**").authenticated()
-                        .requestMatchers("/cliente/**").permitAll()
-                        .requestMatchers("/api/products/**").authenticated()
-                        .anyRequest().permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .anyRequest().authenticated()
                 )
-                .userDetailsService(adminService)
-                .httpBasic() // Activamos autenticación básica
-                .and()
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .build();
+                .userDetailsService(userDetailsService)
+                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 
     // Necesario si más adelante se usa AuthenticationManager (opcional por ahora)
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public JwtAuthFilter jwtAuthFilter() {
+        return new JwtAuthFilter();
     }
 }

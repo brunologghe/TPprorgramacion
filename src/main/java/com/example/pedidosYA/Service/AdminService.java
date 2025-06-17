@@ -33,6 +33,7 @@ public class AdminService implements UserDetailsService {
         Admin a = new Admin();
         a.setUsuario(req.getUsuario());
         a.setContrasenia(passwordEncoder.encode(req.getContrasenia()));
+        a.setRoles(List.of("ADMIN"));
 
         Admin adminGuardado = adminRepository.save(a);
 

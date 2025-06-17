@@ -13,6 +13,7 @@ import com.example.pedidosYA.Model.Usuario;
 import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,12 +26,15 @@ public class ClienteService {
     private ClienteRepository clienteRepository;
     @Autowired
     private ClienteValidations clienteValidations;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public ResponseDTO crearUsuario(ClienteCrearDTO r) {
         Cliente c = new Cliente();
         c.setNombreYapellido(r.getNombreYapellido());
         c.setUsuario(r.getUsuario());
-        c.setContrasenia(r.getContrasenia());
+        c.setContrasenia(passwordEncoder.encode(r.getContrasenia()));
+        c.setRoles(List.of("CLIENTE"));
 
         Cliente cliente = clienteRepository.save(c);
 
@@ -63,7 +67,7 @@ public class ClienteService {
 
         cliente.setNombreYapellido(clienteNuevo.getNombreYapellido());
         cliente.setUsuario(clienteNuevo.getUsuario());
-        cliente.setContrasenia(clienteNuevo.getContraseniaNueva());
+        cliente.setContrasenia(passwordEncoder.encode(clienteNuevo.getContraseniaNueva()));
 
         clienteRepository.save(cliente);
 
