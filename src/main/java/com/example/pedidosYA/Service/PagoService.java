@@ -7,6 +7,7 @@ import com.example.pedidosYA.Model.MetodoDePago;
 import com.example.pedidosYA.Model.Pago;
 import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Repository.PagoRepository;
+import com.example.pedidosYA.Validations.ClienteValidations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,13 +17,14 @@ import java.util.List;
 public class PagoService {
     @Autowired
     private ClienteRepository clienteRepository;
-
+    @Autowired
+    private ClienteValidations clienteValidations;
     @Autowired
     private PagoRepository pagoRepository;
 
     public PagoMuestraDTO agregarPago(Long id, PagoRequestDTO metodoDePago)
     {
-        Cliente cliente = clienteRepository.findById(id).orElseThrow(()-> new RuntimeException("No existe un cliente con ese id"));
+        Cliente cliente = clienteValidations.validarExistencia(id);
 
         Pago pago = new Pago(metodoDePago.getMetodoDePago(), cliente);
         Pago pagoRetorno = pagoRepository.save(pago);
@@ -32,8 +34,7 @@ public class PagoService {
     }
 
     public void eliminarPago(Long idCliente, Long idPago) {
-        Cliente cliente = clienteRepository.findById(idCliente)
-                .orElseThrow(() -> new RuntimeException("No existe un cliente con ese id"));
+        Cliente cliente = clienteValidations.validarExistencia(idCliente);
 
         Pago pago = pagoRepository.findById(idPago)
                 .orElseThrow(() -> new RuntimeException("No existe un método de pago con ese id"));

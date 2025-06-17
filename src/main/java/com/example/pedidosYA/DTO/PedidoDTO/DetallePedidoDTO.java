@@ -7,4 +7,28 @@ public class DetallePedidoDTO {
     private Long productoId;
     @NotNull(message = "El pago no puede ser nula")
     private Integer cantidad;
+    public @NotNull(message = "El producto no puede ser nulo") Long getProductoId() {
+        return productoId;
+    }
+
+    public DetallePedidoDTO() {
+    }
+
+    public DetallePedidoDTO(Long productoId, Integer cantidad) {
+        this.productoId = productoId;
+        this.cantidad = cantidad;
+    }
+
+    public void setProductoId(@NotNull(message = "El producto no puede ser nulo") Long productoId) {
+        this.productoId = productoId;
+    }
+
+    public @NotNull(message = "El pago no puede ser nula") Integer getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(@NotNull(message = "El pago no puede ser nula") Integer cantidad) {
+        this.cantidad = cantidad;
+    }
+
 }
