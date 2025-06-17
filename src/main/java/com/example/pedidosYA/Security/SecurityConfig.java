@@ -29,7 +29,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/cliente/**").authenticated()
                         .requestMatchers("/cliente/**").permitAll()
                         .requestMatchers("/api/products/**").authenticated()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .userDetailsService(adminService)
                 .httpBasic() // Activamos autenticación básica

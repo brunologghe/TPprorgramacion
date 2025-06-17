@@ -5,8 +5,11 @@ import com.example.pedidosYA.DTO.ClienteDTO.ClienteDetailDto;
 import com.example.pedidosYA.DTO.ClienteDTO.ResponseDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoCreateDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
+import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaCreateDTO;
+import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaDetailDTO;
 import com.example.pedidosYA.Service.ClienteService;
 import com.example.pedidosYA.Service.PedidoService;
+import com.example.pedidosYA.Service.ReseniaService;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,9 @@ public class ClienteController {
     @Autowired
     private PedidoService pedidoService;
 
+    @Autowired
+    private ReseniaService reseniaService;
+
     @PostMapping
     public ResponseEntity<ResponseDTO> crear (@Valid @RequestBody ClienteCrearDTO cliente)
     {
@@ -47,6 +53,13 @@ public class ClienteController {
     {
         PedidoDetailDTO pedidoDetailDTO = pedidoService.hacerPedido(id, pedido);
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDetailDTO);
+    }
+
+    @PostMapping("/resenia/{id}")
+    public ResponseEntity<ReseniaDetailDTO> hacerResenia(@PathVariable Long id, @Valid @RequestBody ReseniaCreateDTO reseniaCreateDTO)
+    {
+        ReseniaDetailDTO reseniaDetailDTO = reseniaService.crearResenia(id, reseniaCreateDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(reseniaDetailDTO);
     }
 
     @GetMapping("/pedidosEnCurso/{idCliente}")
