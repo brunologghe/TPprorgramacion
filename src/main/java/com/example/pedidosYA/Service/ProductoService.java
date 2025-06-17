@@ -77,9 +77,14 @@ public class ProductoService {
 
         restauranteRepository.save(rest);
 
+        Producto uProd = rest.getMenu().stream()
+                .filter(prod -> prod.getNombre().equals(producto.getNombre()))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException("No se encontró el producto recién agregado"));
+
         RestauranteResumenDTO restauranteResumenDTO = new RestauranteResumenDTO(rest.getId(), rest.getNombre());
 
-        return new ProductoDetailDTO(p.getId(), p.getNombre(), p.getCaracteristicas(), p.getPrecio(), p.getStock(), restauranteResumenDTO);
+        return new ProductoDetailDTO(uProd.getId(), p.getNombre(), p.getCaracteristicas(), p.getPrecio(), p.getStock(), restauranteResumenDTO);
     }
 
 
