@@ -64,12 +64,6 @@ public class RestauranteController {
         return ResponseEntity.ok(bodyRestaurante);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<RestauranteDetailDTO> eliminarRestaurante(@PathVariable Long id){
-        restauranteService.eliminarRestaurante(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @PostMapping("/productos")
     public ResponseEntity<ProductoDetailDTO> crearProducto (@Valid @RequestBody ProductoCrearDTO productoCrearDTO){
         return ResponseEntity.status(HttpStatus.CREATED).body(productoService.crearProducto(productoCrearDTO));
@@ -85,7 +79,7 @@ public class RestauranteController {
         return ResponseEntity.ok(productoService.findProductoBynombreAndIdRestaurante(idRestaurante, nombre));
     }
 
-    @PutMapping ("/productos/{idRestaurante}/{idProducto}")
+    @PutMapping  ("/productos/{idRestaurante}/{idProducto}")
     public ResponseEntity<ProductoDetailDTO> modificarProducto(@PathVariable Long idRestaurante, @PathVariable Long idProducto, @Valid @RequestBody ProductoModificarDTO productoNuevo){
         return ResponseEntity.ok(productoService.modificarProducto(idRestaurante, idProducto, productoNuevo));
     }

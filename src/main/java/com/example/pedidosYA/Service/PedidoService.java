@@ -143,6 +143,13 @@ public class PedidoService {
         return new PedidoDetailDTO(pedido.getId(), pedido.getFechaPedido(), pedido.getEstado(), pedido.getTotal(), pedido.getRestaurante().getNombre(), pedido.getCliente().getId(), detallePedido);
     }
 
+    public void cancelarPedido(Long idPedido){
+        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(()-> new BusinessException("Ese pedido no existe"));
+
+        pedidoRepository.delete(pedido);
+    }
+
+
     public PedidoDetailDTO modificarEstadoPedido (Long idPedido, String estado){
 
         EstadoPedido estadoPedido = EstadoPedido.valueOf(estado);

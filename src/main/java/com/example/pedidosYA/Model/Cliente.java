@@ -1,12 +1,14 @@
 package com.example.pedidosYA.Model;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 
 import java.util.List;
 
 @Entity
+@DiscriminatorValue("CLIENTE")
 public class Cliente extends Usuario {
 
     private String nombreYapellido;
