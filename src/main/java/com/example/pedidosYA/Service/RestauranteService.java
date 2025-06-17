@@ -18,10 +18,9 @@ import java.util.stream.Collectors;
 public class RestauranteService {
 
     @Autowired
-    RestauranteRepository restauranteRepository;
-
+    private RestauranteRepository restauranteRepository;
     @Autowired
-    RestauranteValidations restauranteValidations;
+    private RestauranteValidations restauranteValidations;
     @Autowired
     private PasswordEncoder passwordEncoder;
 

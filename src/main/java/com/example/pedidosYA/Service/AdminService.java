@@ -15,18 +15,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class AdminService implements UserDetailsService {
+public class AdminService {
 
     @Autowired
     private AdminRepository adminRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    public AdminService(AdminRepository adminRepository, PasswordEncoder passwordEncoder) {
-        this.adminRepository = adminRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     public AdminDetailDTO crearAdmin(AdminRequestDTO req) {
 
@@ -42,17 +37,6 @@ public class AdminService implements UserDetailsService {
         );
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username)
-            throws UsernameNotFoundException {
-        Admin admin = adminRepository.findByUsuario(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-
-        return new org.springframework.security.core.userdetails.User(
-                admin.getUsuario(),
-                admin.getContrasenia(),
-                List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
-        );
     }
 
-}
+
