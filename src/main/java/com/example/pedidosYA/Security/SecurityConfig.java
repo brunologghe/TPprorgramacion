@@ -1,6 +1,7 @@
 package com.example.pedidosYA.Security;
 
 import com.example.pedidosYA.Service.CustomUserDetailsService;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.example.pedidosYA.Security.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
 @EnableMethodSecurity
+@EnableWebSecurity
 @Configuration
 public class SecurityConfig {
 
@@ -29,6 +31,9 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/admin/**").permitAll()
+                        .requestMatchers("/cliente/**").permitAll()
+                        .requestMatchers("/restaurante/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)
