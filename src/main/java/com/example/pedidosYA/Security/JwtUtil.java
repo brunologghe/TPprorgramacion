@@ -4,7 +4,8 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-import javax.crypto.SecretKey;
+    private static final long EXPIRATION = Long.parseLong(
+            System.getenv().getOrDefault("JWT_EXP", "3600000")); // 1 hora por defecto
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 import java.util.Date;
