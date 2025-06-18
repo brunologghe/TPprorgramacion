@@ -1,6 +1,8 @@
 package com.example.pedidosYA.Security;
 
 import com.example.pedidosYA.Service.CustomUserDetailsService;
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.example.pedidosYA.Security.JwtAuthFilter;
