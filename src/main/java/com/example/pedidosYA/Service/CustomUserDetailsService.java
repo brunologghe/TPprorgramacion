@@ -22,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String usuario) throws UsernameNotFoundException {
         Usuario user = usuarioRepo.findByUsuario(usuario)
                 .orElseThrow(() -> new UsernameNotFoundException("No existe el usuario"));
-
+/*
         String rolConPrefijo = "ROLE_" + user.getRol().name();
 
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(rolConPrefijo));
@@ -32,7 +32,12 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getUsername(),
                 user.getPassword(),
                 user.getAuthorities() // debe implementar roles como GrantedAuthority
-        );
+        );*/
+        System.out.println("Usuario encontrado: " + user.getUsername());
+        System.out.println("Rol: " + user.getRol());
+        System.out.println("Authorities: " + user.getAuthorities());
+
+        return user;
     }
 
     public Usuario findByEmail(String usuario) {
