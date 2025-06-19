@@ -4,7 +4,9 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -55,5 +57,20 @@ public class Cliente extends Usuario {
 
     public void setPedidos(List<Pedido> pedidos) {
         this.pedidos = pedidos;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.getAuthorities();
+    }
+
+    @Override
+    public String getPassword() {
+        return this.getContrasenia();
+    }
+
+    @Override
+    public String getUsername() {
+        return this.getUsuario();
     }
 }
