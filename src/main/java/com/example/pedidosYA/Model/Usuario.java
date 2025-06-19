@@ -1,7 +1,8 @@
 package com.example.pedidosYA.Model;
 
 import jakarta.persistence.*;
-import org.springframework.security.core.userdetails.UserDetails;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -15,6 +16,9 @@ public abstract class Usuario{
     private String usuario;
 
     private String contrasenia;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> roles = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -38,6 +42,14 @@ public abstract class Usuario{
 
     public void setContrasenia(String contrasenia) {
         this.contrasenia = contrasenia;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 
 

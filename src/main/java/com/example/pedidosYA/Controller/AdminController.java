@@ -42,16 +42,19 @@ public class AdminController {
     }
 
     @GetMapping("/cliente")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ResponseDTO>> listAllClientes(){
         return ResponseEntity.ok(clienteService.listAll());
     }
 
     @DeleteMapping("/cliente/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseDTO> deleteCliente(@PathVariable Long id){
         return ResponseEntity.ok(clienteService.eliminar(id));
     }
 
     @PutMapping ("/cliente/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseDTO> modificarCliente (@PathVariable Long id, @Valid @RequestBody ModificarDTO modificarDTO){
 
         ResponseDTO cliente = clienteService.modificar(id, modificarDTO);
@@ -60,16 +63,19 @@ public class AdminController {
     }
 
     @GetMapping("/restaurante")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Set<RestauranteResumenDTO>> listAllRestaurantes(){
         return ResponseEntity.ok(restauranteService.findAllRestaurantes());
     }
 
     @DeleteMapping("/restaurante/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RestauranteResponseDTO> deleteRestaurante(@PathVariable Long id){
         return ResponseEntity.ok(restauranteService.eliminarRestaurante(id));
     }
 
     @PutMapping ("/restaurante/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RestauranteResponseDTO> modificarRestaurante (@PathVariable Long id, @Valid @RequestBody RestauranteModificarDTO restauranteModificarDTO){
 
         RestauranteResponseDTO bodyRestaurante = restauranteService.modificarRestaurante(id, restauranteModificarDTO);

@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class PagoController {
     private PagoService pagoService;
 
     @PostMapping("/{idCliente}")
+    @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<PagoMuestraDTO>crearPago(@PathVariable Long idCliente, @Valid @RequestBody PagoRequestDTO metodo)
     {
         PagoMuestraDTO pago = pagoService.agregarPago(idCliente, metodo);
@@ -28,11 +30,13 @@ public class PagoController {
     }
 
     @DeleteMapping("/{idCliente}/pago/{idPago}")
+    @PreAuthorize("hasRole('CLIENTE')")
     public void eliminarPago(@PathVariable Long idCliente, @PathVariable Long idPago) {
         pagoService.eliminarPago(idCliente, idPago);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('CLIENTE')")
     public List<Pago>mostrarPagos(@PathVariable Long id)
     {
         return pagoService.mostarPagos(id);

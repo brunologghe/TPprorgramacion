@@ -3,11 +3,11 @@ package com.example.pedidosYA.Service;
 import com.example.pedidosYA.DTO.ClienteDTO.ResponseDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.*;
 import com.example.pedidosYA.Exceptions.BusinessException;
-import com.example.pedidosYA.Model.Cliente;
 import com.example.pedidosYA.Model.Restaurante;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Validations.RestauranteValidations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,10 +18,11 @@ import java.util.stream.Collectors;
 public class RestauranteService {
 
     @Autowired
-    RestauranteRepository restauranteRepository;
-
+    private RestauranteRepository restauranteRepository;
     @Autowired
-    RestauranteValidations restauranteValidations;
+    private RestauranteValidations restauranteValidations;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public RestauranteResponseDTO crearRestaurante(RestauranteCrearDTO dto) {
 
@@ -32,7 +33,8 @@ public class RestauranteService {
 
         restaurante.setNombre(dto.getNombre());
         restaurante.setUsuario(dto.getUsuario());
-        restaurante.setContrasenia(dto.getContrasenia());
+        restaurante.setContrasenia(passwordEncoder.encode(dto.getContrasenia()));
+        restaurante.setRoles(List.of("RESTAURANTE"));
 
         Restaurante r = restauranteRepository.save(restaurante);
 
@@ -65,7 +67,7 @@ public class RestauranteService {
 
         restaurante.setNombre(restauranteNuevo.getNombre());
         restaurante.setUsuario(restauranteNuevo.getUsuario());
-        restaurante.setContrasenia(restauranteNuevo.getContraseniaNueva());
+        restaurante.setContrasenia(passwordEncoder.encode(restauranteNuevo.getContraseniaNueva()));
 
         Restaurante r = restauranteRepository.save(restaurante);
 

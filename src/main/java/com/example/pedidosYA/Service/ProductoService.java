@@ -22,16 +22,16 @@ import java.util.stream.Collectors;
 public class ProductoService {
 
     @Autowired
-    ProductoRepository productoRepository;
+    private ProductoRepository productoRepository;
 
     @Autowired
-    ProductoValidations productoValidations;
+    private ProductoValidations productoValidations;
 
     @Autowired
-    RestauranteRepository restauranteRepository;
+    private RestauranteRepository restauranteRepository;
 
     @Autowired
-    RestauranteValidations restauranteValidations;
+    private RestauranteValidations restauranteValidations;
 
     public Set<ProductoResumenDTO> findAllProductosByRestauranteId(Long id){
 

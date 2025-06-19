@@ -43,12 +43,14 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('CLIENTE')")
     public ClienteDetailDto verCliente(@PathVariable Long id)
     {
         return clienteService.verUsuario(id);
     }
 
     @PostMapping("/pedir/{id}")
+    @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<PedidoDetailDTO> hacerPedido(@PathVariable Long id, @Valid @RequestBody PedidoCreateDTO pedido)
     {
         PedidoDetailDTO pedidoDetailDTO = pedidoService.hacerPedido(id, pedido);
@@ -56,6 +58,7 @@ public class ClienteController {
     }
 
     @PostMapping("/resenia/{id}")
+    @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<ReseniaDetailDTO> hacerResenia(@PathVariable Long id, @Valid @RequestBody ReseniaCreateDTO reseniaCreateDTO)
     {
         ReseniaDetailDTO reseniaDetailDTO = reseniaService.crearResenia(id, reseniaCreateDTO);
@@ -63,22 +66,26 @@ public class ClienteController {
     }
 
     @GetMapping("/pedidosEnCurso/{idCliente}")
+    @PreAuthorize("hasRole('CLIENTE')")
     public List<PedidoDetailDTO> verPedidosEnCurso(@PathVariable Long idCliente)
     {
         return pedidoService.verPedidosEnCurso(idCliente);
     }
 
     @GetMapping("/historialPedidos/{idCliente}")
+    @PreAuthorize("hasRole('CLIENTE')")
     public List<PedidoDetailDTO> verHistorialPedidos(@PathVariable Long idCliente){
         return pedidoService.verHistorialPedidos(idCliente);
     }
 
     @GetMapping("/verDetallesPedido/{idPedido}")
+    @PreAuthorize("hasRole('CLIENTE')")
     public PedidoDetailDTO verDetallesPedido(@PathVariable Long idPedido){
         return pedidoService.verDetallesPedido(idPedido);
     }
 
     @DeleteMapping("/{idPedido}")
+    @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<?> cancelarPedido(@PathVariable Long idPedido){
         pedidoService.cancelarPedido(idPedido);
         return ResponseEntity.status(HttpStatus.OK).body("Pedido con id: "+idPedido+" eliminado");

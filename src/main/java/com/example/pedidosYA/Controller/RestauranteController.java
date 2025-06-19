@@ -15,6 +15,7 @@ import com.example.pedidosYA.Service.ProductoService;
 import com.example.pedidosYA.Service.ReseniaService;
 import com.example.pedidosYA.Service.RestauranteService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +58,7 @@ public class RestauranteController {
     }
 
     @PutMapping ("/{id}")
+    @PreAuthorize("hasRole('RESTAURANTE')")
     public ResponseEntity<RestauranteResponseDTO> modificarRestaurante (@PathVariable Long id, @Valid @RequestBody RestauranteModificarDTO restauranteModificarDTO){
 
         RestauranteResponseDTO bodyRestaurante = restauranteService.modificarRestaurante(id, restauranteModificarDTO);
@@ -65,6 +67,7 @@ public class RestauranteController {
     }
 
     @PostMapping("/productos")
+    @PreAuthorize("hasRole('RESTAURANTE')")
     public ResponseEntity<ProductoDetailDTO> crearProducto (@Valid @RequestBody ProductoCrearDTO productoCrearDTO){
         return ResponseEntity.status(HttpStatus.CREATED).body(productoService.crearProducto(productoCrearDTO));
     }
@@ -80,17 +83,20 @@ public class RestauranteController {
     }
 
     @PutMapping  ("/productos/{idRestaurante}/{idProducto}")
+    @PreAuthorize("hasRole('RESTAURANTE')")
     public ResponseEntity<ProductoDetailDTO> modificarProducto(@PathVariable Long idRestaurante, @PathVariable Long idProducto, @Valid @RequestBody ProductoModificarDTO productoNuevo){
         return ResponseEntity.ok(productoService.modificarProducto(idRestaurante, idProducto, productoNuevo));
     }
 
     @DeleteMapping ("/productos/{idRestaurante}/{idProducto}")
+    @PreAuthorize("hasRole('RESTAURANTE')")
     public ResponseEntity<?> eliminarProducto(@PathVariable Long idRestaurante, @PathVariable Long idProducto){
         productoService.eliminarProducto(idRestaurante, idProducto);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping ("/pedidos/{idPedido}/{estado}")
+    @PreAuthorize("hasRole('RESTAURANTE')")
     public ResponseEntity<PedidoDetailDTO>modificarEstadoPedido(@PathVariable Long idPedido, @PathVariable String estado){
         return ResponseEntity.ok(pedidoService.modificarEstadoPedido(idPedido, estado));
     }

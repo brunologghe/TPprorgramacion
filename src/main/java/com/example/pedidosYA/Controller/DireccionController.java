@@ -8,6 +8,7 @@ import com.example.pedidosYA.Service.DireccionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class DireccionController {
     private DireccionService direccionService;
 
     @PostMapping
+    @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<DireccionDTO> crearDireccion(@RequestBody DireccionCrearDTO dire)
     {
         DireccionDTO diredto = direccionService.crearDireccion(dire);
@@ -27,17 +29,20 @@ public class DireccionController {
     }
 
     @DeleteMapping
+    @PreAuthorize("hasRole('CLIENTE')")
     public void eliminarDireccion(@RequestBody DireccionEliminarDTO dire)
     {
         direccionService.eliminarDireccion(dire);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<DireccionDTO> modificar(@PathVariable Long id, @RequestBody DireccionCrearDTO dto) {
         return ResponseEntity.ok(direccionService.modificarDireccion(id, dto));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('CLIENTE')")
     public List<DireccionDTO>listarDirecciones(@PathVariable Long id){
         return direccionService.listarDirecciones(id);
     }
