@@ -57,7 +57,7 @@ public class AdminController {
         ResponseDTO cliente = clienteService.modificar(id, modificarDTO);
 
         return ResponseEntity.ok(cliente);
-    }
+    }      
 
     @GetMapping("/restaurante")
     public ResponseEntity<Set<RestauranteResumenDTO>> listAllRestaurantes(){
