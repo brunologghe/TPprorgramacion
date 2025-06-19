@@ -1,22 +1,22 @@
 package com.example.pedidosYA.DTO.AuthDTO;
 
 public class LoginRequest {
-    private String username;
-    private String password;
+    private String usuario;
+    private String contrasenia;
 
     public String getUsername() {
-        return username;
+        return usuario;
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.usuario = username;
     }
 
     public String getPassword() {
-        return password;
+        return contrasenia;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword(String contrasenia) {
+        this.contrasenia = contrasenia;
     }
 }

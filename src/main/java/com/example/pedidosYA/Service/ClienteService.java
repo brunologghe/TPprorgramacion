@@ -9,6 +9,7 @@ import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResponseDTO;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.Cliente;
 import com.example.pedidosYA.Model.Restaurante;
+import com.example.pedidosYA.Model.RolUsuario;
 import com.example.pedidosYA.Model.Usuario;
 import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
@@ -34,8 +35,7 @@ public class ClienteService {
         c.setNombreYapellido(r.getNombreYapellido());
         c.setUsuario(r.getUsuario());
         c.setContrasenia(passwordEncoder.encode(r.getContrasenia()));
-        c.setRoles(List.of("CLIENTE"));
-
+        c.setRol(RolUsuario.CLIENTE);
         Cliente cliente = clienteRepository.save(c);
 
         return new ResponseDTO(c.getId(), c.getUsuario(), c.getNombreYapellido());

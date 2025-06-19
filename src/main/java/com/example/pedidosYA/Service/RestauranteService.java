@@ -4,6 +4,7 @@ import com.example.pedidosYA.DTO.ClienteDTO.ResponseDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.*;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.Restaurante;
+import com.example.pedidosYA.Model.RolUsuario;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Validations.RestauranteValidations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class RestauranteService {
         restaurante.setNombre(dto.getNombre());
         restaurante.setUsuario(dto.getUsuario());
         restaurante.setContrasenia(passwordEncoder.encode(dto.getContrasenia()));
-        restaurante.setRoles(List.of("RESTAURANTE"));
+        restaurante.setRol(RolUsuario.RESTAURANTE);
 
         Restaurante r = restauranteRepository.save(restaurante);
 

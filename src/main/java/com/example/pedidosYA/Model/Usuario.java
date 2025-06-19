@@ -2,6 +2,7 @@ package com.example.pedidosYA.Model;
 
 import jakarta.persistence.*;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.example.pedidosYA.Model.RolUsuario;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +20,14 @@ public abstract class Usuario implements UserDetails {
 
     private String contrasenia;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> roles = new ArrayList<>();
+    /*@ElementCollection(fetch = FetchType.EAGER)
+    private List<String> roles = new ArrayList<>();*/
+
+    @Enumerated(EnumType.STRING)
+    private RolUsuario rol;
+
+    public Usuario() {
+    }
 
     public Long getId() {
         return id;
@@ -46,13 +53,11 @@ public abstract class Usuario implements UserDetails {
         this.contrasenia = contrasenia;
     }
 
-    public List<String> getRoles() {
-        return roles;
+    public RolUsuario getRol() {
+        return rol;
     }
 
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
+    public void setRol(RolUsuario rol) {
+        this.rol = rol;
     }
-
-
 }
