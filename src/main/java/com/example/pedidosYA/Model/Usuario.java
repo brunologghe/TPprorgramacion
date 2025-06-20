@@ -2,6 +2,7 @@ package com.example.pedidosYA.Model;
 
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.example.pedidosYA.Model.RolUsuario;
 
@@ -65,17 +66,17 @@ public abstract class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority("ROLE_" + rol.name()));
     }
 
     @Override
     public String getPassword() {
-        return "";
+        return this.contrasenia;
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return this.usuario;
     }
 
     @Override

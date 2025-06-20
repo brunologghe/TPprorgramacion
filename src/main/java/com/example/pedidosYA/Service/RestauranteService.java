@@ -5,9 +5,13 @@ import com.example.pedidosYA.DTO.RestauranteDTO.*;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.Restaurante;
 import com.example.pedidosYA.Model.RolUsuario;
+import com.example.pedidosYA.Model.Usuario;
 import com.example.pedidosYA.Repository.RestauranteRepository;
+import com.example.pedidosYA.Repository.UsuarioRepository;
 import com.example.pedidosYA.Validations.RestauranteValidations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +28,8 @@ public class RestauranteService {
     private RestauranteValidations restauranteValidations;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     public RestauranteResponseDTO crearRestaurante(RestauranteCrearDTO dto) {
 
@@ -88,4 +94,12 @@ public class RestauranteService {
         return restauranteResponseDTO;
     }
 
+    public Restaurante getRestauranteDesdeToken() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        Usuario usuario = usuarioRepository.findByUsuario(username);
+
+        return (Restaurante) usuario;
+    }
 }

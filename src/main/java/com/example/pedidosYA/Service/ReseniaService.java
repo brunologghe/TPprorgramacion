@@ -6,6 +6,7 @@ import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaResumenDTO;
 import com.example.pedidosYA.Model.Cliente;
 import com.example.pedidosYA.Model.Resenia;
 import com.example.pedidosYA.Model.Restaurante;
+import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Repository.ReseniaRepository;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
@@ -22,14 +23,18 @@ public class ReseniaService {
 
     @Autowired
     private ReseniaRepository reseniaRepository;
+
+    @Autowired
+    private ClienteRepository clienteRepository;
     @Autowired
     private ClienteValidations clienteValidations;
     @Autowired
     private RestauranteValidations restauranteValidations;
 
-    public ReseniaDetailDTO crearResenia(Long idCliente, ReseniaCreateDTO reseniaCreateDTO)
-    {
-        Cliente cliente = clienteValidations.validarExistencia(idCliente);
+
+    public ReseniaDetailDTO crearResenia(String usuario, ReseniaCreateDTO reseniaCreateDTO) {
+        Cliente cliente = clienteRepository.findByUsuario(usuario);
+
         Restaurante restaurante = restauranteValidations.validarExisteId(reseniaCreateDTO.getRestauranteId());
 
         Resenia resenia = new Resenia();
@@ -41,6 +46,7 @@ public class ReseniaService {
         Resenia retorno = reseniaRepository.save(resenia);
         return new ReseniaDetailDTO(retorno.getId(), retorno.getCliente().getId(), retorno.getRestaurante().getId(), retorno.getDescripcion(), retorno.getPuntuacion());
     }
+
 
     public List<ReseniaResumenDTO> verReseniasRestaurante(Long idRestaurante){
 

@@ -46,7 +46,7 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(request.getUsuario(), request.getContrasenia())
         );
 
-        UserDetails userDetails = usuarioService.loadUserByUsername(request.getUsername());
+        UserDetails userDetails = usuarioService.loadUserByUsername(request.getUsuario());
 
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(auth -> auth.getAuthority())

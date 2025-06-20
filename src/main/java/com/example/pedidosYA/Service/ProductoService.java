@@ -10,6 +10,7 @@ import com.example.pedidosYA.Model.Producto;
 import com.example.pedidosYA.Model.Restaurante;
 import com.example.pedidosYA.Repository.ProductoRepository;
 import com.example.pedidosYA.Repository.RestauranteRepository;
+import com.example.pedidosYA.Security.AuthUtil;
 import com.example.pedidosYA.Validations.ProductoValidations;
 import com.example.pedidosYA.Validations.RestauranteValidations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ public class ProductoService {
 
     @Autowired
     private RestauranteValidations restauranteValidations;
+    @Autowired
+    private RestauranteService restauranteService;
 
     public Set<ProductoResumenDTO> findAllProductosByRestauranteId(Long id){
 
@@ -53,31 +56,29 @@ public class ProductoService {
         return new ProductoDetailDTO(p.getId(), p.getNombre(), p.getCaracteristicas(), p.getPrecio(), p.getStock(), restResumen);
     }
 
-    public ProductoDetailDTO crearProducto(ProductoCrearDTO producto){
-
-        Producto pAux = productoRepository.findByNombre(producto.getNombre());
+    public ProductoDetailDTO crearProducto(ProductoCrearDTO productoDTO){
+        Producto pAux = productoRepository.findByNombre(productoDTO.getNombre());
         if (pAux != null) {
-            productoValidations.validarNombreProductoNoDuplicado(pAux.getId(), producto.getNombre());
+            productoValidations.validarNombreProductoNoDuplicado(pAux.getId(), productoDTO.getNombre());
         }
-        if (producto.getPrecio() < 0) {
+        if (productoDTO.getPrecio() < 0) {
             throw new BusinessException("El precio no puede ser negativo.");
         }
 
-        Producto p = new Producto();
-        Restaurante rest = restauranteRepository.findById(producto.getRestaurante()).orElseThrow(() -> new BusinessException("No se encontro el id de restaurante"));
+        Restaurante rest = restauranteService.getRestauranteDesdeToken();
 
-        p.setNombre(producto.getNombre());
-        p.setCaracteristicas(producto.getCaracteristicas());
-        p.setPrecio(producto.getPrecio());
-        p.setStock(producto.getStock());
+        Producto p = new Producto();
+        p.setNombre(productoDTO.getNombre());
+        p.setCaracteristicas(productoDTO.getCaracteristicas());
+        p.setPrecio(productoDTO.getPrecio());
+        p.setStock(productoDTO.getStock());
         p.setRestaurante(rest);
 
         rest.getMenu().add(p);
-
         restauranteRepository.save(rest);
 
         Producto uProd = rest.getMenu().stream()
-                .filter(prod -> prod.getNombre().equals(producto.getNombre()))
+                .filter(prod -> prod.getNombre().equals(productoDTO.getNombre()))
                 .findFirst()
                 .orElseThrow(() -> new BusinessException("No se encontró el producto recién agregado"));
 

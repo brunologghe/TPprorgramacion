@@ -8,4 +8,6 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
 
     public boolean existsByNombre(String nombre);
     public Restaurante findByNombre(String nombre);
+    Restaurante findByUsuario (String nombreUsuario);
+
 }

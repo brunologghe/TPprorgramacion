@@ -35,11 +35,10 @@ public class PedidoService {
     @Autowired
     private ProductoRepository productoRepository;
 
-    public PedidoDetailDTO hacerPedido(Long idCliente, PedidoCreateDTO pedidoCreateDTO)
-    {
-        Cliente cliente = clienteValidations.validarExistencia(idCliente);
+    public PedidoDetailDTO hacerPedido(String usuario, PedidoCreateDTO pedidoCreateDTO) {
+        Cliente cliente = clienteRepository.findByUsuario(usuario);
         Restaurante restaurante =  restauranteValidations.validarExisteId(pedidoCreateDTO.getRestauranteId());
-        clienteValidations.validarDireccion(pedidoCreateDTO.getDireccionId(), idCliente);
+        clienteValidations.validarDireccion(pedidoCreateDTO.getDireccionId(), cliente.getId());
         Pedido pedido = new Pedido();
         pedido.setFechaPedido(LocalDateTime.now());
         pedido.setEstado(EstadoPedido.PREPARACION);
@@ -68,12 +67,11 @@ public class PedidoService {
         Pedido pedidohecho = pedidoRepository.save(pedido);
 
         return new PedidoDetailDTO(pedidohecho.getId(), pedidohecho.getFechaPedido(), pedidohecho.getEstado(),
-                pedidohecho.getTotal(), pedidohecho.getRestaurante().getNombre(), idCliente, pedidoCreateDTO.getDetalles());
+                pedidohecho.getTotal(), pedidohecho.getRestaurante().getNombre(), cliente.getId(), pedidoCreateDTO.getDetalles());
     }
 
-    public List<PedidoDetailDTO> verPedidosEnCurso(Long idCliente)
-    {
-        Cliente cliente = clienteValidations.validarExistencia(idCliente);
+    public List<PedidoDetailDTO> verPedidosEnCurso(String usuario) {
+        Cliente cliente = clienteRepository.findByUsuario(usuario);
 
         List<Pedido>listaPedidos = cliente.getPedidos();
         List<PedidoDetailDTO>listaDetallePedidos = new ArrayList<>();
@@ -102,9 +100,8 @@ public class PedidoService {
         return listaDetallePedidos;
     }
 
-    public List<PedidoDetailDTO> verHistorialPedidos(Long idCliente)
-    {
-        Cliente cliente = clienteValidations.validarExistencia(idCliente);
+    public List<PedidoDetailDTO> verHistorialPedidos(String usuario) {
+        Cliente cliente = clienteRepository.findByUsuario(usuario);
 
         List<Pedido>listaPedidos = cliente.getPedidos();
         List<PedidoDetailDTO>listaDetallePedidos = new ArrayList<>();
