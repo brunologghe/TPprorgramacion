@@ -3,6 +3,7 @@ package com.example.pedidosYA.Service;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaCreateDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaDetailDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaResumenDTO;
+import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.Cliente;
 import com.example.pedidosYA.Model.Resenia;
 import com.example.pedidosYA.Model.Restaurante;
@@ -30,6 +31,8 @@ public class ReseniaService {
     private ClienteValidations clienteValidations;
     @Autowired
     private RestauranteValidations restauranteValidations;
+    @Autowired
+    private RestauranteRepository restauranteRepository;
 
 
     public ReseniaDetailDTO crearResenia(String usuario, ReseniaCreateDTO reseniaCreateDTO) {
@@ -48,9 +51,12 @@ public class ReseniaService {
     }
 
 
-    public List<ReseniaResumenDTO> verReseniasRestaurante(Long idRestaurante){
+    public List<ReseniaResumenDTO> verReseniasRestaurante(String usuario){
 
-        return reseniaRepository.findByRestauranteId(idRestaurante).stream()
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese nombre"));
+
+        return reseniaRepository.findByRestauranteId(restaurante.getId()).stream()
                 .sorted(Comparator.comparingDouble(Resenia::getPuntuacion).reversed()
                         .thenComparing(resenia -> resenia.getCliente().getId()))
                 .map(resenia -> new ReseniaResumenDTO

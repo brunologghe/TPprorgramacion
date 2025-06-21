@@ -38,9 +38,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         if(usuarioRepo.findByUsuario(username) == null)
         {
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     public void save(Usuario usuario) {

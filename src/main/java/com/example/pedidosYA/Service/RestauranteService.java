@@ -65,7 +65,9 @@ public class RestauranteService {
         return restauranteRepository.findAll().stream().map(r -> new RestauranteResumenDTO(r.getId(), r.getNombre())).collect(Collectors.toSet());
     }
 
-    public RestauranteResponseDTO modificarRestaurante (Long id, RestauranteModificarDTO restauranteNuevo){
+    public RestauranteResponseDTO modificarRestaurante (String usuario, RestauranteModificarDTO restauranteNuevo){
+
+        Long id = restauranteRepository.findByUsuario(usuario).get().getId();
 
         restauranteValidations.validarContraseniaActual(id, restauranteNuevo.getContraseniaActual());
         restauranteValidations.validarNombreNoDuplicadoConID(id, restauranteNuevo.getNombre());

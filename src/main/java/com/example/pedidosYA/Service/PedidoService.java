@@ -165,21 +165,21 @@ public class PedidoService {
         return new PedidoDetailDTO(pedido.getId(), pedido.getFechaPedido(), pedido.getEstado(), pedido.getTotal(), pedido.getRestaurante().getNombre(), pedido.getCliente().getId(), detallePedido);
     }
 
-    public List<PedidoResumenDTO> verPedidosDeRestauranteEnCurso (Long idRestaurante){
-        Restaurante restaurante = restauranteRepository.findById(idRestaurante)
-                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese id"));
+    public List<PedidoResumenDTO> verPedidosDeRestauranteEnCurso (String usuario){
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese nombre"));
 
-        return pedidoRepository.findByRestauranteId(idRestaurante).stream()
+        return pedidoRepository.findByRestauranteId(restaurante.getId()).stream()
                 .filter(pedido -> pedido.getEstado() == EstadoPedido.PREPARACION || pedido.getEstado() == EstadoPedido.ENVIADO)
                 .map(pedido -> new PedidoResumenDTO(pedido.getId(), pedido.getFechaPedido(),
                         pedido.getEstado().toString(), pedido.getTotal())).toList();
     }
 
-    public List<PedidoResumenDTO> verHistorialPedidosDeRestaurante (Long idRestaurante){
-        Restaurante restaurante = restauranteRepository.findById(idRestaurante)
-                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese id"));
+    public List<PedidoResumenDTO> verHistorialPedidosDeRestaurante (String usuario){
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese nombre"));
 
-        return pedidoRepository.findByRestauranteId(idRestaurante).stream()
+        return pedidoRepository.findByRestauranteId(restaurante.getId()).stream()
                 .filter(pedido -> pedido.getEstado() == EstadoPedido.ENTREGADO || pedido.getEstado() == EstadoPedido.PREPARACION || pedido.getEstado() == EstadoPedido.ENVIADO)
                 .map(pedido -> new PedidoResumenDTO(pedido.getId(), pedido.getFechaPedido(),
                         pedido.getEstado().toString(), pedido.getTotal())).toList();

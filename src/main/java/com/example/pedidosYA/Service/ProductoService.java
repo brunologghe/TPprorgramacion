@@ -36,9 +36,9 @@ public class ProductoService {
     @Autowired
     private RestauranteService restauranteService;
 
-    public Set<ProductoResumenDTO> findAllProductosByRestauranteId(Long id){
+    public Set<ProductoResumenDTO> findAllProductosByRestaurante(String usuario){
 
-        Restaurante restaurante = restauranteRepository.findById(id).orElseThrow(() -> new BusinessException("No existe restaurante con ese id"));
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("No existe restaurante con ese nombre"));
         Set<Producto> lista = restaurante.getMenu();
         if (lista.isEmpty()) {
             throw new BusinessException("No hay productos cargados actualmente");
@@ -56,7 +56,7 @@ public class ProductoService {
         return new ProductoDetailDTO(p.getId(), p.getNombre(), p.getCaracteristicas(), p.getPrecio(), p.getStock(), restResumen);
     }
 
-    public ProductoDetailDTO crearProducto(ProductoCrearDTO productoDTO){
+    public ProductoDetailDTO crearProducto(String usuario, ProductoCrearDTO productoDTO){
         Producto pAux = productoRepository.findByNombre(productoDTO.getNombre());
         if (pAux != null) {
             productoValidations.validarNombreProductoNoDuplicado(pAux.getId(), productoDTO.getNombre());
@@ -65,7 +65,7 @@ public class ProductoService {
             throw new BusinessException("El precio no puede ser negativo.");
         }
 
-        Restaurante rest = restauranteService.getRestauranteDesdeToken();
+        Restaurante rest = restauranteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("No existe restaurante con ese nombre"));
 
         Producto p = new Producto();
         p.setNombre(productoDTO.getNombre());
@@ -88,17 +88,17 @@ public class ProductoService {
     }
 
 
-    public ProductoDetailDTO modificarProducto(Long idRestaurante, Long idProducto, ProductoModificarDTO productoNuevo) {
+    public ProductoDetailDTO modificarProducto(String usuario, Long idProducto, ProductoModificarDTO productoNuevo) {
 
-        Restaurante restaurante = restauranteRepository.findById(idRestaurante)
-                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese id"));
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese nombre"));
 
         Producto producto = restaurante.getMenu().stream()
                 .filter(p -> p.getId().equals(idProducto))
                 .findFirst()
                 .orElseThrow(() -> new BusinessException("No existe ningún producto con ese id en este restaurante"));
 
-        if (!producto.getRestaurante().getId().equals(idRestaurante)) {
+        if (!producto.getRestaurante().getUsuario().equals(usuario)) {
             throw new BusinessException("El producto no pertenece al restaurante elegido");
         }
 
@@ -133,15 +133,15 @@ public class ProductoService {
         );
     }
 
-    public void eliminarProducto (Long idRestaurante, Long idProducto){
+    public void eliminarProducto (String usuario, Long idProducto){
 
         Producto producto = productoRepository.findById(idProducto)
                 .orElseThrow(() -> new BusinessException("NO existe ningún producto con ese id"));
 
-        Restaurante restaurante = restauranteRepository.findById(idRestaurante)
-                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese id"));
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese nombre"));
 
-        productoValidations.validarProductoPerteneceARestaurante(idRestaurante, producto);
+        productoValidations.validarProductoPerteneceARestaurante(restaurante.getId(), producto);
         productoValidations.validarProductoEnRestaurante(restaurante, producto);
 
         restaurante.getMenu().remove(producto);
