@@ -4,63 +4,46 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-    private static final long EXPIRATION = Long.parseLong(
-            System.getenv().getOrDefault("JWT_EXP", "3600000")); // 1 hora por defecto
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
+import javax.crypto.SecretKey;
+
 public class JwtUtil {
-    private static final long EXPIRATION = 3600000L; // 1 hora
 
-    // Usá un valor fijo o sacalo de env si lo configuraste bien (ver más abajo)
-    private static final String BASE64_SECRET = "LhQx5N2R+IoN9T7VxM5B0rJL4GyXZWdt9h5C5eT4EyI=";
-
-    // Generamos la clave desde el base64
+    private static final String SECRET = "clave_super_segura_para_token";
+    private static final long EXPIRATION = 3600000; // 1 hora
     private static final SecretKey SECRET_KEY = new SecretKeySpec(
-            Base64.getDecoder().decode(BASE64_SECRET),
+            Base64.getEncoder().encode(SECRET.getBytes()),
             SignatureAlgorithm.HS256.getJcaName()
     );
 
-    public static String createToken(String username, List<String> roles) {
+    public static String generarToken(String email, List<String> roles) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(email)
                 .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .signWith(SECRET_KEY)
                 .compact();
     }
 
-    public static boolean validateToken(String token) {
+    public static String extraerEmail(String token) {
+        return Jwts.parserBuilder().setSigningKey(SECRET_KEY).build()
+                .parseClaimsJws(token).getBody().getSubject();
+    }
+
+    public static boolean esValido(String token) {
         try {
-            Jwts.parser()
-                    .setSigningKey(SECRET_KEY)
-                    .parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parseClaimsJws(token);
             return true;
-        } catch (ExpiredJwtException e) {
-            System.err.println("JWT expirado: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("JWT inválido: " + e.getMessage());
+            return false;
         }
-        return false;
-    }
-
-    public static String getUsername(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
-
-    @SuppressWarnings("unchecked")
-    public static List<String> getRoles(String token) {
-        return (List<String>) Jwts.parser()
-                .setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token)
-                .getBody()
-                .get("roles");
     }
 }

@@ -1,8 +1,7 @@
 package com.example.pedidosYA.Security;
 
 import com.example.pedidosYA.Service.CustomUserDetailsService;
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
+
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.example.pedidosYA.Security.JwtAuthFilter;
@@ -27,22 +26,20 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/admin/**").authenticated()
-                        .requestMatchers("/cliente/**").permitAll()
-                        .requestMatchers("/restaurante/**").permitAll()
+                        .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers("/admin/").hasRole("ADMIN")
+                        .requestMatchers("/cliente/").hasRole("CLIENTE")
                         .anyRequest().authenticated()
                 )
-                .userDetailsService(userDetailsService)
-                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(new JwtAuthFilter(userDetailsService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 
     // Necesario si más adelante se usa AuthenticationManager (opcional por ahora)
     @Bean
@@ -50,8 +47,4 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    @Bean
-    public JwtAuthFilter jwtAuthFilter() {
-        return new JwtAuthFilter();
-    }
 }
