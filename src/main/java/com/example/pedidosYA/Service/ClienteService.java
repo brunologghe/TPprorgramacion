@@ -50,7 +50,9 @@ public class ClienteService {
     }
 
     public ResponseDTO modificar (Long id, ModificarDTO clienteNuevo){
+
         clienteValidations.validarContraseniaActual(id, clienteNuevo.getContraseniaActual());
+        clienteValidations.validarNombreNoDuplicadoConID(id, clienteNuevo.getNombreYapellido());
 
         Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
@@ -58,13 +60,16 @@ public class ClienteService {
         cliente.setUsuario(clienteNuevo.getUsuario());
         cliente.setContrasenia(passwordEncoder.encode(clienteNuevo.getContraseniaNueva()));
 
-        clienteRepository.save(cliente);
+        Cliente c = clienteRepository.save(cliente);
 
-        return new ResponseDTO(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido());
+        return new ResponseDTO(c.getId(), c.getUsuario(), c.getNombreYapellido());
 
     }
 
     public ClienteDetailDto verUsuarioPorNombre(String nombreUsuario) {
+
+        clienteValidations.validarNombreExistente(nombreUsuario);
+
         Cliente cliente = clienteRepository.findByUsuario(nombreUsuario);
 
         return new ClienteDetailDto(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido(), cliente.getDirecciones(), cliente.getMetodosPago());

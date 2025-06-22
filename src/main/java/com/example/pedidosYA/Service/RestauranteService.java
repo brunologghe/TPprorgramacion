@@ -55,6 +55,7 @@ public class RestauranteService {
 
         restauranteValidations.validarContraseniaActual(id, restauranteNuevo.getContraseniaActual());
         restauranteValidations.validarNombreNoDuplicadoConID(id, restauranteNuevo.getNombre());
+
         Restaurante restaurante = restauranteRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Restaurante no encontrado"));
 
@@ -70,14 +71,14 @@ public class RestauranteService {
     public RestauranteResponseDTO eliminarRestaurante (Long id){
         Restaurante restaurante = restauranteValidations.validarExisteId(id);
 
-        RestauranteResponseDTO restauranteResponseDTO = new RestauranteResponseDTO(
+        RestauranteResponseDTO restauranteDTO = new RestauranteResponseDTO(
                 restaurante.getId(),
                 restaurante.getUsuario(),
                 restaurante.getNombre()
         );
 
         restauranteRepository.delete(restaurante);
-        return restauranteResponseDTO;
+        return restauranteDTO;
     }
 
 }

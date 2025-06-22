@@ -1,6 +1,8 @@
 package com.example.pedidosYA.DTO.ReseniaDTO;
 
 import com.example.pedidosYA.DTO.PedidoDTO.DetallePedidoDTO;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -12,6 +14,8 @@ public class ReseniaCreateDTO {
     @NotBlank(message = "La resenia no puede ser nula")
     private String resenia;
     @NotNull(message = "La puntuacion no puede ser nula")
+    @DecimalMin(value = "0.1", inclusive = true, message = "La puntuación debe ser al menos 0.1")
+    @DecimalMax(value = "5.0", inclusive = true, message = "La puntuación no puede ser mayor a 5")
     private Double puntuacion;
 
 

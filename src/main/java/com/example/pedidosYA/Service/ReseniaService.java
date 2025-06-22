@@ -11,6 +11,7 @@ import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Repository.ReseniaRepository;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
+import com.example.pedidosYA.Validations.ReseniaValidations;
 import com.example.pedidosYA.Validations.RestauranteValidations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,8 @@ public class ReseniaService {
     private RestauranteValidations restauranteValidations;
     @Autowired
     private RestauranteRepository restauranteRepository;
+    @Autowired
+    private ReseniaValidations reseniaValidations;
 
 
     public ReseniaDetailDTO crearResenia(String usuario, ReseniaCreateDTO reseniaCreateDTO) {
@@ -52,10 +55,14 @@ public class ReseniaService {
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese nombre"));
 
-        return reseniaRepository.findByRestauranteId(restaurante.getId()).stream()
+        List<ReseniaResumenDTO> resenias = reseniaRepository.findByRestauranteId(restaurante.getId()).stream()
                 .sorted(Comparator.comparingDouble(Resenia::getPuntuacion).reversed()
                         .thenComparing(resenia -> resenia.getCliente().getId()))
                 .map(resenia -> new ReseniaResumenDTO
-                (resenia.getCliente().getId(), resenia.getDescripcion(), resenia.getPuntuacion())).toList();
+                        (resenia.getCliente().getId(), resenia.getDescripcion(), resenia.getPuntuacion())).toList();
+
+        reseniaValidations.validarResenia(resenias);
+
+        return resenias;
     }
 }

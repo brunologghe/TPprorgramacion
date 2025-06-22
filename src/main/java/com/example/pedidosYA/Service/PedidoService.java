@@ -11,6 +11,7 @@ import com.example.pedidosYA.Repository.PedidoRepository;
 import com.example.pedidosYA.Repository.ProductoRepository;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
+import com.example.pedidosYA.Validations.PedidoValidations;
 import com.example.pedidosYA.Validations.RestauranteValidations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,8 @@ public class PedidoService {
     private RestauranteValidations restauranteValidations;
     @Autowired
     private ProductoRepository productoRepository;
+    @Autowired
+    private PedidoValidations pedidoValidations;
 
     public PedidoDetailDTO hacerPedido(String usuario, PedidoCreateDTO pedidoCreateDTO) {
         Cliente cliente = clienteRepository.findByUsuario(usuario);
@@ -72,8 +75,8 @@ public class PedidoService {
 
     public List<PedidoDetailDTO> verPedidosEnCurso(String usuario) {
         Cliente cliente = clienteRepository.findByUsuario(usuario);
+        clienteValidations.validarExistencia(cliente.getId());
 
-        List<Pedido>listaPedidos = cliente.getPedidos();
         List<PedidoDetailDTO>listaDetallePedidos = new ArrayList<>();
 
         for(Pedido d : cliente.getPedidos())
@@ -92,18 +95,16 @@ public class PedidoService {
             }
         }
 
-        if(listaDetallePedidos.isEmpty())
-        {
-            throw new BusinessException("No hay pedidos en curso");
-        }
+        pedidoValidations.verificarPedidoDetailDTO(listaDetallePedidos);
 
         return listaDetallePedidos;
     }
 
     public List<PedidoDetailDTO> verHistorialPedidos(String usuario) {
         Cliente cliente = clienteRepository.findByUsuario(usuario);
+        clienteValidations.validarExistencia(cliente.getId());
 
-        List<Pedido>listaPedidos = cliente.getPedidos();
+
         List<PedidoDetailDTO>listaDetallePedidos = new ArrayList<>();
 
         List<DetallePedidoDTO> detalles = new ArrayList<>();
@@ -119,10 +120,8 @@ public class PedidoService {
                 listaDetallePedidos.add(new PedidoDetailDTO(d.getId(), d.getFechaPedido(), d.getEstado(), d.getTotal(), d.getRestaurante().getNombre(), d.getCliente().getId(), detalles));
         }
 
-        if(listaDetallePedidos.isEmpty())
-        {
-            throw new BusinessException("No hay pedidos en el historial aun");
-        }
+        pedidoValidations.verificarPedidoDetailDTO(listaDetallePedidos);
+
 
         return listaDetallePedidos;
     }
@@ -136,6 +135,8 @@ public class PedidoService {
         {
             detallePedido.add(new DetallePedidoDTO(p.getProducto().getId(), p.getCantidad()));
         }
+
+        pedidoValidations.verificarDetallesPedido(detallePedido);
 
         return new PedidoDetailDTO(pedido.getId(), pedido.getFechaPedido(), pedido.getEstado(), pedido.getTotal(), pedido.getRestaurante().getNombre(), pedido.getCliente().getId(), detallePedido);
     }

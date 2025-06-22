@@ -35,9 +35,7 @@ public class ProductoService {
 
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("No existe restaurante con ese nombre"));
         Set<Producto> lista = restaurante.getMenu();
-        if (lista.isEmpty()) {
-            throw new BusinessException("No hay productos cargados actualmente");
-        }
+        productoValidations.validarListaVacia(lista);
         return lista.stream().map(p -> new ProductoResumenDTO(p.getId(), p.getNombre(), p.getPrecio())).collect(Collectors.toSet());
     }
 
@@ -52,15 +50,11 @@ public class ProductoService {
     }
 
     public ProductoDetailDTO crearProducto(String usuario, ProductoCrearDTO productoDTO){
-        Producto pAux = productoRepository.findByNombre(productoDTO.getNombre());
-        if (pAux != null) {
-            productoValidations.validarNombreProductoNoDuplicado(pAux.getId(), productoDTO.getNombre());
-        }
-        if (productoDTO.getPrecio() < 0) {
-            throw new BusinessException("El precio no puede ser negativo.");
-        }
 
-        Restaurante rest = restauranteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("No existe restaurante con ese nombre"));
+        Restaurante rest = restauranteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("No existe restaurante con ese nombre"));
+
+        productoValidations.validarProductoContieneRestaurante(rest.getMenu(), productoDTO.getNombre());
 
         Producto p = new Producto();
         p.setNombre(productoDTO.getNombre());
@@ -97,7 +91,7 @@ public class ProductoService {
             throw new BusinessException("El producto no pertenece al restaurante elegido");
         }
 
-        if (productoNuevo.precio() < 0) {
+        if (productoNuevo.precio() < 0 || productoNuevo.precio() > 400000) {
             throw new BusinessException("El precio no puede ser negativo.");
         }
         if (productoNuevo.stock() < 0) {
@@ -106,6 +100,8 @@ public class ProductoService {
         if (productoNuevo.nombre() == null || productoNuevo.nombre().isBlank()) {
             throw new BusinessException("El nombre del producto no puede estar vacío.");
         }
+
+        productoValidations.validarProductoContieneRestaurante(restaurante.getMenu(), productoNuevo.nombre());
 
         restaurante.getMenu().remove(producto);
 

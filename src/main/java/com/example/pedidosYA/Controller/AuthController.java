@@ -5,8 +5,10 @@ import com.example.pedidosYA.DTO.AuthDTO.LoginRequest;
 import com.example.pedidosYA.DTO.AuthDTO.RegisterRequest;
 import com.example.pedidosYA.Model.*;
 import com.example.pedidosYA.Security.JwtUtil;
+import com.example.pedidosYA.Service.AuthService;
 import com.example.pedidosYA.Service.CustomUserDetailsService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -28,13 +30,11 @@ import java.util.stream.Collectors;
 public class AuthController {
 
     private final AuthenticationManager authManager;
-    private final CustomUserDetailsService usuarioService;
-    private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
-    public AuthController(AuthenticationManager authManager, CustomUserDetailsService usuarioService,  PasswordEncoder passwordEncoder) {
+    public AuthController(AuthenticationManager authManager, AuthService authService) {
         this.authManager = authManager;
-        this.usuarioService = usuarioService;
-        this.passwordEncoder = passwordEncoder;
+        this.authService = authService;
     }
 
     @PostMapping("/login")
@@ -43,49 +43,14 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(request.getUsuario(), request.getContrasenia())
         );
 
-        UserDetails userDetails = usuarioService.loadUserByUsername(request.getUsuario());
-
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(auth -> auth.getAuthority())
-                .collect(Collectors.toList());
-
-        String token = JwtUtil.generarToken(userDetails.getUsername(), roles);
-
+        String token = authService.login(request.getUsuario());
         return ResponseEntity.ok().body(token);
     }
 
 
     @PostMapping("/registro")
     public ResponseEntity<?> registro(@RequestBody RegisterRequest request) {
-        if (usuarioService.existsByUsername(request.getUsuario())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario ya existe");
-        }
-
-        if (request.getRol().equalsIgnoreCase("CLIENTE")) {
-            Cliente cliente = new Cliente();
-            cliente.setUsuario(request.getUsuario());
-            cliente.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
-            cliente.setNombreYapellido(request.getNombreYapellido());
-            cliente.setRol(RolUsuario.CLIENTE);
-            usuarioService.save(cliente);
-            return ResponseEntity.ok("Cliente creado");
-        } else if (request.getRol().equalsIgnoreCase("RESTAURANTE")) {
-            Restaurante restaurante = new Restaurante();
-            restaurante.setUsuario(request.getUsuario());
-            restaurante.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
-            restaurante.setNombre(request.getNombreRestaurante());
-            restaurante.setRol(RolUsuario.RESTAURANTE);
-            usuarioService.save(restaurante);
-            return ResponseEntity.ok("Restaurante creado");
-        } else {
-            // admin o usuario normal
-            Usuario usuario = new Admin();
-            usuario.setUsuario(request.getUsuario());
-            usuario.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
-            usuario.setRol(RolUsuario.ADMIN);
-            usuarioService.save(usuario);
-            return ResponseEntity.ok("Admin creado");
-        }
-
+            String mensaje = authService.registro(request);
+            return ResponseEntity.ok(mensaje);
     }
 }
