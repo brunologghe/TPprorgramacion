@@ -8,8 +8,8 @@ public class LoginRequest {
         return usuario;
     }
 
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
+    public void setUsuario(String username) {
+        this.usuario = username;
     }
 
     public String getContrasenia() {
@@ -17,22 +17,6 @@ public class LoginRequest {
     }
 
     public void setContrasenia(String contrasenia) {
-        this.contrasenia = contrasenia;
-    }
-
-    public String getUsername() {
-        return usuario;
-    }
-
-    public void setUsername(String username) {
-        this.usuario = username;
-    }
-
-    public String getPassword() {
-        return contrasenia;
-    }
-
-    public void setPassword(String contrasenia) {
         this.contrasenia = contrasenia;
     }
 }
