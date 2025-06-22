@@ -1,3 +1,4 @@
+
 package com.example.pedidosYA.Controller;
 
 import com.example.pedidosYA.DTO.ClienteDTO.ClienteCrearDTO;
@@ -7,6 +8,7 @@ import com.example.pedidosYA.DTO.PedidoDTO.PedidoCreateDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaCreateDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaDetailDTO;
+import com.example.pedidosYA.Security.AuthUtil;
 import com.example.pedidosYA.Service.ClienteService;
 import com.example.pedidosYA.Service.PedidoService;
 import com.example.pedidosYA.Service.ReseniaService;
@@ -35,59 +37,58 @@ public class ClienteController {
     private ReseniaService reseniaService;
 
     @PostMapping
-    public ResponseEntity<ResponseDTO> crear (@Valid @RequestBody ClienteCrearDTO cliente)
-    {
+    public ResponseEntity<ResponseDTO> crear (@Valid @RequestBody ClienteCrearDTO cliente) {
         ResponseDTO bodyCliente = clienteService.crearUsuario(cliente);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(bodyCliente);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/perfil")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ClienteDetailDto verCliente(@PathVariable Long id)
-    {
-        return clienteService.verUsuario(id);
+    public ClienteDetailDto verCliente() {
+        String usuario = AuthUtil.getUsuarioLogueado();
+        return clienteService.verUsuarioPorNombre(usuario);
     }
 
-    @PostMapping("/pedir/{id}")
+    @PostMapping("/pedir")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<PedidoDetailDTO> hacerPedido(@PathVariable Long id, @Valid @RequestBody PedidoCreateDTO pedido)
-    {
-        PedidoDetailDTO pedidoDetailDTO = pedidoService.hacerPedido(id, pedido);
+    public ResponseEntity<PedidoDetailDTO> hacerPedido(@Valid @RequestBody PedidoCreateDTO pedido) {
+        String usuario = AuthUtil.getUsuarioLogueado();
+        PedidoDetailDTO pedidoDetailDTO = pedidoService.hacerPedido(usuario, pedido);
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDetailDTO);
     }
 
-    @PostMapping("/resenia/{id}")
+    @PostMapping("/resenia")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<ReseniaDetailDTO> hacerResenia(@PathVariable Long id, @Valid @RequestBody ReseniaCreateDTO reseniaCreateDTO)
-    {
-        ReseniaDetailDTO reseniaDetailDTO = reseniaService.crearResenia(id, reseniaCreateDTO);
+    public ResponseEntity<ReseniaDetailDTO> hacerResenia(@Valid @RequestBody ReseniaCreateDTO reseniaCreateDTO) {
+        String usuario = AuthUtil.getUsuarioLogueado();
+        ReseniaDetailDTO reseniaDetailDTO = reseniaService.crearResenia(usuario, reseniaCreateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(reseniaDetailDTO);
     }
 
-    @GetMapping("/pedidosEnCurso/{idCliente}")
+    @GetMapping("/pedidosEnCurso")
     @PreAuthorize("hasRole('CLIENTE')")
-    public List<PedidoDetailDTO> verPedidosEnCurso(@PathVariable Long idCliente)
-    {
-        return pedidoService.verPedidosEnCurso(idCliente);
+    public List<PedidoDetailDTO> verPedidosEnCurso() {
+        String usuario = AuthUtil.getUsuarioLogueado();
+        return pedidoService.verPedidosEnCurso(usuario);
     }
 
-    @GetMapping("/historialPedidos/{idCliente}")
+    @GetMapping("/historialPedidos")
     @PreAuthorize("hasRole('CLIENTE')")
-    public List<PedidoDetailDTO> verHistorialPedidos(@PathVariable Long idCliente){
-        return pedidoService.verHistorialPedidos(idCliente);
+    public List<PedidoDetailDTO> verHistorialPedidos() {
+        String usuario = AuthUtil.getUsuarioLogueado();
+        return pedidoService.verHistorialPedidos(usuario);
     }
 
     @GetMapping("/verDetallesPedido/{idPedido}")
     @PreAuthorize("hasRole('CLIENTE')")
-    public PedidoDetailDTO verDetallesPedido(@PathVariable Long idPedido){
+    public PedidoDetailDTO verDetallesPedido(@PathVariable Long idPedido) {
         return pedidoService.verDetallesPedido(idPedido);
     }
 
     @DeleteMapping("/{idPedido}")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<?> cancelarPedido(@PathVariable Long idPedido){
-        pedidoService.cancelarPedido(idPedido);
+    public ResponseEntity<?> cancelarPedido(@PathVariable Long idPedido) {
+        pedidoService.cancelarPedido(AuthUtil.getUsuarioLogueado(),idPedido);
         return ResponseEntity.status(HttpStatus.OK).body("Pedido con id: "+idPedido+" eliminado");
     }
 }

@@ -3,10 +3,7 @@ package com.example.pedidosYA.Controller;
 
 import com.example.pedidosYA.DTO.AuthDTO.LoginRequest;
 import com.example.pedidosYA.DTO.AuthDTO.RegisterRequest;
-import com.example.pedidosYA.Model.Cliente;
-import com.example.pedidosYA.Model.Restaurante;
-import com.example.pedidosYA.Model.RolUsuario;
-import com.example.pedidosYA.Model.Usuario;
+import com.example.pedidosYA.Model.*;
 import com.example.pedidosYA.Security.JwtUtil;
 import com.example.pedidosYA.Service.CustomUserDetailsService;
 
@@ -60,31 +57,35 @@ public class AuthController {
 
     @PostMapping("/registro")
     public ResponseEntity<?> registro(@RequestBody RegisterRequest request) {
-        if (usuarioService.existsByUsername(request.getUsername())) {
+        if (usuarioService.existsByUsername(request.getUsuario())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario ya existe");
         }
 
-        Usuario nuevo;
-
-        switch (request.getRol().toUpperCase()) {
-            case "CLIENTE" -> nuevo = new Cliente();
-            case "RESTAURANTE" -> nuevo = new Restaurante();
-            default -> {
-                return ResponseEntity.badRequest().body("Rol inválido. Usar: CLIENTE o RESTAURANTE.");
-            }
+        if (request.getRol().equalsIgnoreCase("CLIENTE")) {
+            Cliente cliente = new Cliente();
+            cliente.setUsuario(request.getUsuario());
+            cliente.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
+            cliente.setNombreYapellido(request.getNombreYapellido());
+            cliente.setRol(RolUsuario.CLIENTE);
+            usuarioService.save(cliente);
+            return ResponseEntity.ok("Cliente creado");
+        } else if (request.getRol().equalsIgnoreCase("RESTAURANTE")) {
+            Restaurante restaurante = new Restaurante();
+            restaurante.setUsuario(request.getUsuario());
+            restaurante.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
+            restaurante.setNombre(request.getNombreRestaurante());
+            restaurante.setRol(RolUsuario.RESTAURANTE);
+            usuarioService.save(restaurante);
+            return ResponseEntity.ok("Restaurante creado");
+        } else {
+            // admin o usuario normal
+            Usuario usuario = new Admin();
+            usuario.setUsuario(request.getUsuario());
+            usuario.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
+            usuario.setRol(RolUsuario.ADMIN);
+            usuarioService.save(usuario);
+            return ResponseEntity.ok("Admin creado");
         }
 
-        nuevo.setUsuario(request.getUsername());
-        nuevo.setContrasenia(passwordEncoder.encode(request.getPassword()));
-        nuevo.setRol(RolUsuario.valueOf(request.getRol().toUpperCase()));
-
-        usuarioService.save(nuevo);
-
-        String token = JwtUtil.generarToken(
-                nuevo.getUsername(),
-                List.of("ROLE_" + nuevo.getRol().name())
-        );
-
-        return ResponseEntity.ok().body(token);
     }
 }

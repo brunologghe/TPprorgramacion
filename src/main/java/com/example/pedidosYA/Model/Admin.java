@@ -13,18 +13,4 @@ public class Admin extends Usuario{
     public Admin() {
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.getAuthorities();
-    }
-
-    @Override
-    public String getPassword() {
-        return this.getContrasenia();
-    }
-
-    @Override
-    public String getUsername() {
-        return this.getUsuario();
-    }
 }

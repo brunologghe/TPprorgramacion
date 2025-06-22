@@ -4,6 +4,7 @@ import com.example.pedidosYA.DTO.ClienteDTO.ClienteDetailDto;
 import com.example.pedidosYA.DTO.DireccionDTO.DireccionCrearDTO;
 import com.example.pedidosYA.DTO.DireccionDTO.DireccionDTO;
 import com.example.pedidosYA.DTO.DireccionDTO.DireccionEliminarDTO;
+import com.example.pedidosYA.Security.AuthUtil;
 import com.example.pedidosYA.Service.DireccionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,31 +20,32 @@ public class DireccionController {
 
     @Autowired
     private DireccionService direccionService;
-
     @PostMapping
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<DireccionDTO> crearDireccion(@RequestBody DireccionCrearDTO dire)
-    {
-        DireccionDTO diredto = direccionService.crearDireccion(dire);
-        return ResponseEntity.status(HttpStatus.CREATED).body(diredto);
+    public ResponseEntity<DireccionDTO> crearDireccion(@RequestBody DireccionCrearDTO dire) {
+        String username = AuthUtil.getUsuarioLogueado();
+        return ResponseEntity.status(HttpStatus.CREATED).body(direccionService.crearDireccion(username, dire));
     }
 
     @DeleteMapping
     @PreAuthorize("hasRole('CLIENTE')")
-    public void eliminarDireccion(@RequestBody DireccionEliminarDTO dire)
-    {
-        direccionService.eliminarDireccion(dire);
+    public void eliminarDireccion(@RequestBody DireccionEliminarDTO dire) {
+        String username = AuthUtil.getUsuarioLogueado();
+        direccionService.eliminarDireccion(username, dire);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<DireccionDTO> modificar(@PathVariable Long id, @RequestBody DireccionCrearDTO dto) {
-        return ResponseEntity.ok(direccionService.modificarDireccion(id, dto));
+        String username = AuthUtil.getUsuarioLogueado();
+        return ResponseEntity.ok(direccionService.modificarDireccion(username, id, dto));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping
     @PreAuthorize("hasRole('CLIENTE')")
-    public List<DireccionDTO>listarDirecciones(@PathVariable Long id){
-        return direccionService.listarDirecciones(id);
+    public List<DireccionDTO> listarDirecciones() {
+        String username = AuthUtil.getUsuarioLogueado();
+        return direccionService.listarDirecciones(username);
     }
+
 }

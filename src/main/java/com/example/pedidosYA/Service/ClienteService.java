@@ -36,7 +36,7 @@ public class ClienteService {
         c.setUsuario(r.getUsuario());
         c.setContrasenia(passwordEncoder.encode(r.getContrasenia()));
         c.setRol(RolUsuario.CLIENTE);
-        Cliente cliente = clienteRepository.save(c);
+        clienteRepository.save(c);
 
         return new ResponseDTO(c.getId(), c.getUsuario(), c.getNombreYapellido());
     }
@@ -75,13 +75,19 @@ public class ClienteService {
 
     }
 
-    public ClienteDetailDto verUsuario(Long id)
+    public ClienteDetailDto verUsuario(String usuario)
     {
-        Cliente cliente = clienteValidations.validarExistencia(id);
+        Cliente cliente = findByUsuario(usuario);
+        return new ClienteDetailDto(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido(), cliente.getDirecciones(), cliente.getMetodosPago());
+    }
+
+    public ClienteDetailDto verUsuarioPorNombre(String nombreUsuario) {
+        Cliente cliente = clienteRepository.findByUsuario(nombreUsuario);
 
         return new ClienteDetailDto(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido(), cliente.getDirecciones(), cliente.getMetodosPago());
     }
 
-
-
+    public Cliente findByUsuario(String usuario) {
+        return clienteRepository.findByUsuario(usuario);
+    }
 }

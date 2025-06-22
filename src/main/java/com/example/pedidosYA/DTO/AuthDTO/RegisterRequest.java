@@ -1,16 +1,34 @@
 package com.example.pedidosYA.DTO.AuthDTO;
 
 public class RegisterRequest {
-    private String username;
-    private String password;
+    private String usuario;
+    private String contrasenia;
     private String rol; // CLIENTE, ADMIN, RESTAURANTE
+    private String nombreYapellido; //SOLO CLIENTE
+    private String nombreRestaurante; // SOLO RESTAURANTE
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public String getUsuario() { return usuario; }
+    public void setUsuario(String usuario) { this.usuario = usuario; }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public String getContrasenia() { return contrasenia; }
+    public void setContrasenia(String contrasenia) { this.contrasenia = contrasenia; }
 
     public String getRol() { return rol; }
     public void setRol(String rol) { this.rol = rol; }
+
+    public String getNombreYapellido() {
+        return nombreYapellido;
+    }
+
+    public void setNombreYapellido(String nombreYapellido) {
+        this.nombreYapellido = nombreYapellido;
+    }
+
+    public String getNombreRestaurante() {
+        return nombreRestaurante;
+    }
+
+    public void setNombreRestaurante(String nombreRestaurante) {
+        this.nombreRestaurante = nombreRestaurante;
+    }
 }

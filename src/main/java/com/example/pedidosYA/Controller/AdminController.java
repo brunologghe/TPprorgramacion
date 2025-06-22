@@ -74,11 +74,11 @@ public class AdminController {
         return ResponseEntity.ok(restauranteService.eliminarRestaurante(id));
     }
 
-    @PutMapping ("/restaurante/{id}")
+    @PutMapping ("/restaurante/{nombre}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<RestauranteResponseDTO> modificarRestaurante (@PathVariable Long id, @Valid @RequestBody RestauranteModificarDTO restauranteModificarDTO){
+    public ResponseEntity<RestauranteResponseDTO> modificarRestaurante (@PathVariable String nombre, @Valid @RequestBody RestauranteModificarDTO restauranteModificarDTO){
 
-        RestauranteResponseDTO bodyRestaurante = restauranteService.modificarRestaurante(id, restauranteModificarDTO);
+        RestauranteResponseDTO bodyRestaurante = restauranteService.modificarRestaurante(nombre, restauranteModificarDTO);
 
         return ResponseEntity.ok(bodyRestaurante);
     }

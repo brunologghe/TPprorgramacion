@@ -35,11 +35,10 @@ public class PedidoService {
     @Autowired
     private ProductoRepository productoRepository;
 
-    public PedidoDetailDTO hacerPedido(Long idCliente, PedidoCreateDTO pedidoCreateDTO)
-    {
-        Cliente cliente = clienteValidations.validarExistencia(idCliente);
+    public PedidoDetailDTO hacerPedido(String usuario, PedidoCreateDTO pedidoCreateDTO) {
+        Cliente cliente = clienteRepository.findByUsuario(usuario);
         Restaurante restaurante =  restauranteValidations.validarExisteId(pedidoCreateDTO.getRestauranteId());
-        clienteValidations.validarDireccion(pedidoCreateDTO.getDireccionId(), idCliente);
+        clienteValidations.validarDireccion(pedidoCreateDTO.getDireccionId(), cliente.getId());
         Pedido pedido = new Pedido();
         pedido.setFechaPedido(LocalDateTime.now());
         pedido.setEstado(EstadoPedido.PREPARACION);
@@ -68,12 +67,11 @@ public class PedidoService {
         Pedido pedidohecho = pedidoRepository.save(pedido);
 
         return new PedidoDetailDTO(pedidohecho.getId(), pedidohecho.getFechaPedido(), pedidohecho.getEstado(),
-                pedidohecho.getTotal(), pedidohecho.getRestaurante().getNombre(), idCliente, pedidoCreateDTO.getDetalles());
+                pedidohecho.getTotal(), pedidohecho.getRestaurante().getNombre(), cliente.getId(), pedidoCreateDTO.getDetalles());
     }
 
-    public List<PedidoDetailDTO> verPedidosEnCurso(Long idCliente)
-    {
-        Cliente cliente = clienteValidations.validarExistencia(idCliente);
+    public List<PedidoDetailDTO> verPedidosEnCurso(String usuario) {
+        Cliente cliente = clienteRepository.findByUsuario(usuario);
 
         List<Pedido>listaPedidos = cliente.getPedidos();
         List<PedidoDetailDTO>listaDetallePedidos = new ArrayList<>();
@@ -102,9 +100,8 @@ public class PedidoService {
         return listaDetallePedidos;
     }
 
-    public List<PedidoDetailDTO> verHistorialPedidos(Long idCliente)
-    {
-        Cliente cliente = clienteValidations.validarExistencia(idCliente);
+    public List<PedidoDetailDTO> verHistorialPedidos(String usuario) {
+        Cliente cliente = clienteRepository.findByUsuario(usuario);
 
         List<Pedido>listaPedidos = cliente.getPedidos();
         List<PedidoDetailDTO>listaDetallePedidos = new ArrayList<>();
@@ -143,8 +140,13 @@ public class PedidoService {
         return new PedidoDetailDTO(pedido.getId(), pedido.getFechaPedido(), pedido.getEstado(), pedido.getTotal(), pedido.getRestaurante().getNombre(), pedido.getCliente().getId(), detallePedido);
     }
 
-    public void cancelarPedido(Long idPedido){
+    public void cancelarPedido(String usuario, Long idPedido){
+        Cliente cliente = clienteRepository.findByUsuario(usuario);
         Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(()-> new BusinessException("Ese pedido no existe"));
+
+        if(!cliente.getId().equals(pedido.getCliente().getId())){
+            throw new BusinessException("El pedido no es del cliente");
+        }
 
         pedidoRepository.delete(pedido);
     }
@@ -168,21 +170,21 @@ public class PedidoService {
         return new PedidoDetailDTO(pedido.getId(), pedido.getFechaPedido(), pedido.getEstado(), pedido.getTotal(), pedido.getRestaurante().getNombre(), pedido.getCliente().getId(), detallePedido);
     }
 
-    public List<PedidoResumenDTO> verPedidosDeRestauranteEnCurso (Long idRestaurante){
-        Restaurante restaurante = restauranteRepository.findById(idRestaurante)
-                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese id"));
+    public List<PedidoResumenDTO> verPedidosDeRestauranteEnCurso (String usuario){
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese nombre"));
 
-        return pedidoRepository.findByRestauranteId(idRestaurante).stream()
+        return pedidoRepository.findByRestauranteId(restaurante.getId()).stream()
                 .filter(pedido -> pedido.getEstado() == EstadoPedido.PREPARACION || pedido.getEstado() == EstadoPedido.ENVIADO)
                 .map(pedido -> new PedidoResumenDTO(pedido.getId(), pedido.getFechaPedido(),
                         pedido.getEstado().toString(), pedido.getTotal())).toList();
     }
 
-    public List<PedidoResumenDTO> verHistorialPedidosDeRestaurante (Long idRestaurante){
-        Restaurante restaurante = restauranteRepository.findById(idRestaurante)
-                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese id"));
+    public List<PedidoResumenDTO> verHistorialPedidosDeRestaurante (String usuario){
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese nombre"));
 
-        return pedidoRepository.findByRestauranteId(idRestaurante).stream()
+        return pedidoRepository.findByRestauranteId(restaurante.getId()).stream()
                 .filter(pedido -> pedido.getEstado() == EstadoPedido.ENTREGADO || pedido.getEstado() == EstadoPedido.PREPARACION || pedido.getEstado() == EstadoPedido.ENVIADO)
                 .map(pedido -> new PedidoResumenDTO(pedido.getId(), pedido.getFechaPedido(),
                         pedido.getEstado().toString(), pedido.getTotal())).toList();

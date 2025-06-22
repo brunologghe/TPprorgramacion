@@ -3,9 +3,11 @@ package com.example.pedidosYA.Service;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaCreateDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaDetailDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaResumenDTO;
+import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.Cliente;
 import com.example.pedidosYA.Model.Resenia;
 import com.example.pedidosYA.Model.Restaurante;
+import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Repository.ReseniaRepository;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
@@ -22,14 +24,20 @@ public class ReseniaService {
 
     @Autowired
     private ReseniaRepository reseniaRepository;
+
+    @Autowired
+    private ClienteRepository clienteRepository;
     @Autowired
     private ClienteValidations clienteValidations;
     @Autowired
     private RestauranteValidations restauranteValidations;
+    @Autowired
+    private RestauranteRepository restauranteRepository;
 
-    public ReseniaDetailDTO crearResenia(Long idCliente, ReseniaCreateDTO reseniaCreateDTO)
-    {
-        Cliente cliente = clienteValidations.validarExistencia(idCliente);
+
+    public ReseniaDetailDTO crearResenia(String usuario, ReseniaCreateDTO reseniaCreateDTO) {
+        Cliente cliente = clienteRepository.findByUsuario(usuario);
+
         Restaurante restaurante = restauranteValidations.validarExisteId(reseniaCreateDTO.getRestauranteId());
 
         Resenia resenia = new Resenia();
@@ -42,9 +50,13 @@ public class ReseniaService {
         return new ReseniaDetailDTO(retorno.getId(), retorno.getCliente().getId(), retorno.getRestaurante().getId(), retorno.getDescripcion(), retorno.getPuntuacion());
     }
 
-    public List<ReseniaResumenDTO> verReseniasRestaurante(Long idRestaurante){
 
-        return reseniaRepository.findByRestauranteId(idRestaurante).stream()
+    public List<ReseniaResumenDTO> verReseniasRestaurante(String usuario){
+
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese nombre"));
+
+        return reseniaRepository.findByRestauranteId(restaurante.getId()).stream()
                 .sorted(Comparator.comparingDouble(Resenia::getPuntuacion).reversed()
                         .thenComparing(resenia -> resenia.getCliente().getId()))
                 .map(resenia -> new ReseniaResumenDTO
