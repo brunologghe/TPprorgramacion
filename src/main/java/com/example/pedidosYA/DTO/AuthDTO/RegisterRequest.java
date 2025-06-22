@@ -31,4 +31,5 @@ public class RegisterRequest {
     public void setNombreRestaurante(String nombreRestaurante) {
         this.nombreRestaurante = nombreRestaurante;
     }
+
 }

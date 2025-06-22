@@ -76,7 +76,7 @@ public class AuthController {
             restaurante.setNombre(request.getNombreRestaurante());
             restaurante.setRol(RolUsuario.RESTAURANTE);
             usuarioService.save(restaurante);
-            return ResponseEntity.ok("Restaurante creado");
+            return ResponseEntity.ok("Restaurante creado" +restaurante.getNombre());
         } else {
             // admin o usuario normal
             Usuario usuario = new Admin();

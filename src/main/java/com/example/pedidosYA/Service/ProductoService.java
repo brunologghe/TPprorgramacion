@@ -31,11 +31,6 @@ public class ProductoService {
     @Autowired
     private RestauranteRepository restauranteRepository;
 
-    @Autowired
-    private RestauranteValidations restauranteValidations;
-    @Autowired
-    private RestauranteService restauranteService;
-
     public Set<ProductoResumenDTO> findAllProductosByRestaurante(String usuario){
 
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("No existe restaurante con ese nombre"));

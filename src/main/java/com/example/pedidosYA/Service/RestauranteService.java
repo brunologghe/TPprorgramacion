@@ -31,22 +31,6 @@ public class RestauranteService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    public RestauranteResponseDTO crearRestaurante(RestauranteCrearDTO dto) {
-
-
-        Restaurante restaurante = new Restaurante();
-
-        restauranteValidations.validarNombreNoDuplicado(dto.getNombre());
-
-        restaurante.setNombre(dto.getNombre());
-        restaurante.setUsuario(dto.getUsuario());
-        restaurante.setContrasenia(passwordEncoder.encode(dto.getContrasenia()));
-        restaurante.setRol(RolUsuario.RESTAURANTE);
-
-        Restaurante r = restauranteRepository.save(restaurante);
-
-        return new RestauranteResponseDTO(r.getId(), r.getUsuario(), r.getNombre());
-    }
 
     public RestauranteDetailDTO findRestauranteByNombre(String nombre){
 
@@ -96,12 +80,4 @@ public class RestauranteService {
         return restauranteResponseDTO;
     }
 
-    public Restaurante getRestauranteDesdeToken() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-
-        Usuario usuario = usuarioRepository.findByUsuario(username);
-
-        return (Restaurante) usuario;
-    }
 }

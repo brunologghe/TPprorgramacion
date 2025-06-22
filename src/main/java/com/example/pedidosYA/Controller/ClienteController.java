@@ -36,47 +36,37 @@ public class ClienteController {
     @Autowired
     private ReseniaService reseniaService;
 
-    @PostMapping
-    public ResponseEntity<ResponseDTO> crear (@Valid @RequestBody ClienteCrearDTO cliente) {
-        ResponseDTO bodyCliente = clienteService.crearUsuario(cliente);
-        return ResponseEntity.status(HttpStatus.CREATED).body(bodyCliente);
-    }
 
     @GetMapping("/perfil")
     @PreAuthorize("hasRole('CLIENTE')")
     public ClienteDetailDto verCliente() {
-        String usuario = AuthUtil.getUsuarioLogueado();
-        return clienteService.verUsuarioPorNombre(usuario);
+        return clienteService.verUsuarioPorNombre(AuthUtil.getUsuarioLogueado());
     }
 
     @PostMapping("/pedir")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<PedidoDetailDTO> hacerPedido(@Valid @RequestBody PedidoCreateDTO pedido) {
-        String usuario = AuthUtil.getUsuarioLogueado();
-        PedidoDetailDTO pedidoDetailDTO = pedidoService.hacerPedido(usuario, pedido);
+        PedidoDetailDTO pedidoDetailDTO = pedidoService.hacerPedido(AuthUtil.getUsuarioLogueado(), pedido);
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDetailDTO);
     }
 
     @PostMapping("/resenia")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<ReseniaDetailDTO> hacerResenia(@Valid @RequestBody ReseniaCreateDTO reseniaCreateDTO) {
-        String usuario = AuthUtil.getUsuarioLogueado();
-        ReseniaDetailDTO reseniaDetailDTO = reseniaService.crearResenia(usuario, reseniaCreateDTO);
+        ReseniaDetailDTO reseniaDetailDTO = reseniaService.crearResenia(AuthUtil.getUsuarioLogueado(), reseniaCreateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(reseniaDetailDTO);
     }
 
     @GetMapping("/pedidosEnCurso")
     @PreAuthorize("hasRole('CLIENTE')")
     public List<PedidoDetailDTO> verPedidosEnCurso() {
-        String usuario = AuthUtil.getUsuarioLogueado();
-        return pedidoService.verPedidosEnCurso(usuario);
+        return pedidoService.verPedidosEnCurso(AuthUtil.getUsuarioLogueado());
     }
 
     @GetMapping("/historialPedidos")
     @PreAuthorize("hasRole('CLIENTE')")
     public List<PedidoDetailDTO> verHistorialPedidos() {
-        String usuario = AuthUtil.getUsuarioLogueado();
-        return pedidoService.verHistorialPedidos(usuario);
+        return pedidoService.verHistorialPedidos(AuthUtil.getUsuarioLogueado());
     }
 
     @GetMapping("/verDetallesPedido/{idPedido}")

@@ -30,17 +30,6 @@ public class ClienteService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public ResponseDTO crearUsuario(ClienteCrearDTO r) {
-        Cliente c = new Cliente();
-        c.setNombreYapellido(r.getNombreYapellido());
-        c.setUsuario(r.getUsuario());
-        c.setContrasenia(passwordEncoder.encode(r.getContrasenia()));
-        c.setRol(RolUsuario.CLIENTE);
-        clienteRepository.save(c);
-
-        return new ResponseDTO(c.getId(), c.getUsuario(), c.getNombreYapellido());
-    }
-
     public List<ResponseDTO> listAll(){
 
         return clienteRepository.findAll().stream()
@@ -73,12 +62,6 @@ public class ClienteService {
 
         return new ResponseDTO(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido());
 
-    }
-
-    public ClienteDetailDto verUsuario(String usuario)
-    {
-        Cliente cliente = findByUsuario(usuario);
-        return new ClienteDetailDto(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido(), cliente.getDirecciones(), cliente.getMetodosPago());
     }
 
     public ClienteDetailDto verUsuarioPorNombre(String nombreUsuario) {

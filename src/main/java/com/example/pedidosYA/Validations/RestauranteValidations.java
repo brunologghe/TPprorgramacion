@@ -11,12 +11,6 @@ public class RestauranteValidations {
     @Autowired
     RestauranteRepository restauranteRepository;
 
-public void validarNombreNoDuplicado(String nombre)throws BusinessException{
-    Restaurante r = restauranteRepository.findByNombre(nombre);
-    if (r != null && restauranteRepository.existsByNombre(nombre)) {
-        throw new BusinessException("El nombre ya pertenece a otro restaurante.");
-    }
-}
 
     public void validarNombreNoDuplicadoConID(Long id, String nombre)throws BusinessException{
         Restaurante r = restauranteRepository.findByNombre(nombre);
