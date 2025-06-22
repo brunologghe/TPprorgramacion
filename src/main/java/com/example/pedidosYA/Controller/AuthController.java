@@ -64,7 +64,7 @@ public class AuthController {
         if (request.getRol().equalsIgnoreCase("CLIENTE")) {
             Cliente cliente = new Cliente();
             cliente.setUsuario(request.getUsuario());
-            cliente.setContrasenia(request.getContrasenia());
+            cliente.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
             cliente.setNombreYapellido(request.getNombreYapellido());
             cliente.setRol(RolUsuario.CLIENTE);
             usuarioService.save(cliente);
@@ -72,7 +72,7 @@ public class AuthController {
         } else if (request.getRol().equalsIgnoreCase("RESTAURANTE")) {
             Restaurante restaurante = new Restaurante();
             restaurante.setUsuario(request.getUsuario());
-            restaurante.setContrasenia(request.getContrasenia());
+            restaurante.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
             restaurante.setNombre(request.getNombreRestaurante());
             restaurante.setRol(RolUsuario.RESTAURANTE);
             usuarioService.save(restaurante);
@@ -81,10 +81,10 @@ public class AuthController {
             // admin o usuario normal
             Usuario usuario = new Admin();
             usuario.setUsuario(request.getUsuario());
-            usuario.setContrasenia(request.getContrasenia());
+            usuario.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
             usuario.setRol(RolUsuario.ADMIN);
             usuarioService.save(usuario);
-            return ResponseEntity.ok("Usuario creado");
+            return ResponseEntity.ok("Admin creado");
         }
 
     }

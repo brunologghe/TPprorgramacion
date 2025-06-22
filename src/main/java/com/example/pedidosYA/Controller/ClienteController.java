@@ -88,7 +88,7 @@ public class ClienteController {
     @DeleteMapping("/{idPedido}")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<?> cancelarPedido(@PathVariable Long idPedido) {
-        pedidoService.cancelarPedido(idPedido);
+        pedidoService.cancelarPedido(AuthUtil.getUsuarioLogueado(),idPedido);
         return ResponseEntity.status(HttpStatus.OK).body("Pedido con id: "+idPedido+" eliminado");
     }
 }

@@ -79,8 +79,8 @@ public class RestauranteController {
     }
 
     @GetMapping ("/productos/{idRestaurante}/{nombre}")
-    public ResponseEntity<ProductoDetailDTO> findProductoBynombreAndIdRestaurante(@PathVariable Long idRestaurante, @PathVariable String nombre){
-        return ResponseEntity.ok(productoService.findProductoBynombreAndIdRestaurante(idRestaurante, nombre));
+    public ResponseEntity<ProductoDetailDTO> findProductoBynombre(@PathVariable String nombre){
+        return ResponseEntity.ok(productoService.findProductoBynombre(AuthUtil.getUsuarioLogueado(), nombre));
     }
 
     @PutMapping  ("/productos/{idProducto}")

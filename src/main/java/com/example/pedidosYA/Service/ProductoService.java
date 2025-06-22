@@ -46,13 +46,13 @@ public class ProductoService {
         return lista.stream().map(p -> new ProductoResumenDTO(p.getId(), p.getNombre(), p.getPrecio())).collect(Collectors.toSet());
     }
 
-    public ProductoDetailDTO findProductoBynombreAndIdRestaurante (Long idRestaurante, String nombre){
+    public ProductoDetailDTO findProductoBynombre (String usuario, String nombre){
+        Restaurante rest = restauranteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("No existe restaurante con ese nombre"));
 
         productoValidations.validarNombreProductoExistente(nombre);
-        Producto p =productoRepository.findByNombreAndRestauranteId(nombre, idRestaurante);
+        Producto p =productoRepository.findByNombreAndRestauranteId(nombre, rest.getId());
 
-        Restaurante restaurante = restauranteRepository.findById(idRestaurante).orElseThrow(() -> new BusinessException("No existe restaurante con ese id"));
-        RestauranteResumenDTO restResumen = new RestauranteResumenDTO(idRestaurante, restaurante.getNombre());
+        RestauranteResumenDTO restResumen = new RestauranteResumenDTO(rest.getId(), rest.getNombre());
         return new ProductoDetailDTO(p.getId(), p.getNombre(), p.getCaracteristicas(), p.getPrecio(), p.getStock(), restResumen);
     }
 
