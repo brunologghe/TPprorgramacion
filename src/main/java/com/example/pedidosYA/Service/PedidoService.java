@@ -50,7 +50,7 @@ public class PedidoService {
 
         Pedido pedido = new Pedido();
         pedido.setFechaPedido(LocalDateTime.now());
-        pedido.setEstado(EstadoPedido.PREPARACION);
+        pedido.setEstado(EstadoPedido.PENDIENTE);
 
         double total = 0;
         List<ProductoPedido> productosPedido = new ArrayList<>();
@@ -168,8 +168,8 @@ public class PedidoService {
         if(!cliente.getId().equals(pedido.getCliente().getId())){
             throw new BusinessException("Ese pedido no existe");
         }
-        if (pedido.getEstado() != EstadoPedido.PREPARACION) {
-            throw new BusinessException("No se puede cancelar un pedido que ya fue enviado o entregado");
+        if (pedido.getEstado() != EstadoPedido.PENDIENTE) {
+            throw new BusinessException("No se puede cancelar un pedido que ya fue tomado por el restaurante");
         }
 
         pedidoRepository.delete(pedido);

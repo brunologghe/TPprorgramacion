@@ -44,10 +44,7 @@ public class AdminController {
     @PutMapping ("/cliente/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseDTO> modificarCliente (@PathVariable Long id, @Valid @RequestBody ModificarDTO modificarDTO){
-
-        ResponseDTO cliente = clienteService.modificar(id, modificarDTO);
-
-        return ResponseEntity.ok(cliente);
+        return ResponseEntity.ok(clienteService.modificar(id, modificarDTO));
     }
 
     @GetMapping("/restaurante")
@@ -65,10 +62,7 @@ public class AdminController {
     @PutMapping ("/restaurante/{nombre}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RestauranteResponseDTO> modificarRestaurante (@PathVariable String nombre, @Valid @RequestBody RestauranteModificarDTO restauranteModificarDTO){
-
-        RestauranteResponseDTO bodyRestaurante = restauranteService.modificarRestaurante(nombre, restauranteModificarDTO);
-
-        return ResponseEntity.ok(bodyRestaurante);
+        return ResponseEntity.ok(restauranteService.modificarRestaurante(nombre, restauranteModificarDTO));
     }
 
 

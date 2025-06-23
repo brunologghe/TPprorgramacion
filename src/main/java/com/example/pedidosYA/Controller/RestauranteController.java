@@ -5,6 +5,7 @@ import com.example.pedidosYA.DTO.PedidoDTO.PedidoResumenDTO;
 import com.example.pedidosYA.DTO.ProductoDTO.ProductoCrearDTO;
 import com.example.pedidosYA.DTO.ProductoDTO.ProductoDetailDTO;
 import com.example.pedidosYA.DTO.ProductoDTO.ProductoModificarDTO;
+import com.example.pedidosYA.DTO.ProductoDTO.ProductoResumenDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaResumenDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteCrearDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteDetailDTO;
@@ -78,7 +79,7 @@ public class RestauranteController {
     @PreAuthorize("hasRole('RESTAURANTE')")
     public ResponseEntity<?> eliminarProducto(@PathVariable Long idProducto){
         productoService.eliminarProducto(AuthUtil.getUsuarioLogueado(), idProducto);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.OK).body("Producto con id: "+idProducto+" eliminado");
     }
 
     @PutMapping ("/pedidos/{idPedido}/{estado}")
