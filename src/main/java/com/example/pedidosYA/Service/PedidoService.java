@@ -7,6 +7,7 @@ import com.example.pedidosYA.DTO.PedidoDTO.PedidoResumenDTO;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.*;
 import com.example.pedidosYA.Repository.*;
+import com.example.pedidosYA.Security.AuthUtil;
 import com.example.pedidosYA.Validations.ClienteValidations;
 import com.example.pedidosYA.Validations.PedidoValidations;
 import com.example.pedidosYA.Validations.RestauranteValidations;
@@ -65,6 +66,7 @@ public class PedidoService {
             productoPedido.setProducto(producto);
             productoPedido.setCantidad(dpdto.getCantidad());
             productosPedido.add(productoPedido);
+            productoPedido.setPedido(pedido);
 
             double subtotal = producto.getPrecio() * dpdto.getCantidad();
             total += subtotal;
@@ -83,7 +85,6 @@ public class PedidoService {
 
     public List<PedidoDetailDTO> verPedidosEnCurso(String usuario) {
         Cliente cliente = clienteRepository.findByUsuario(usuario);
-        clienteValidations.validarExistencia(cliente.getId());
 
         List<PedidoDetailDTO>listaDetallePedidos = new ArrayList<>();
 
@@ -134,19 +135,30 @@ public class PedidoService {
         return listaDetallePedidos;
     }
 
-    public PedidoDetailDTO verDetallesPedido(Long idPedido){
+    public PedidoDetailDTO verDetallesPedido(Long idPedido) {
+        String username = AuthUtil.getUsuarioLogueado();
+        Cliente cliente = clienteRepository.findByUsuario(username);
 
-        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(()-> new BusinessException("Ese pedido no existe"));
+        Pedido pedido = pedidoRepository.findById(idPedido)
+                .filter(p -> p.getCliente().getId().equals(cliente.getId()))
+                .orElseThrow(() -> new BusinessException("Ese pedido no existe"));
 
-        List<DetallePedidoDTO>detallePedido = new ArrayList<>();
-        for(ProductoPedido p : pedido.getProductosPedidos())
-        {
+        List<DetallePedidoDTO> detallePedido = new ArrayList<>();
+        for (ProductoPedido p : pedido.getProductosPedidos()) {
             detallePedido.add(new DetallePedidoDTO(p.getProducto().getId(), p.getCantidad()));
         }
 
         pedidoValidations.verificarDetallesPedido(detallePedido);
 
-        return new PedidoDetailDTO(pedido.getId(), pedido.getFechaPedido(), pedido.getEstado(), pedido.getTotal(), pedido.getRestaurante().getNombre(), pedido.getCliente().getId(), detallePedido);
+        return new PedidoDetailDTO(
+                pedido.getId(),
+                pedido.getFechaPedido(),
+                pedido.getEstado(),
+                pedido.getTotal(),
+                pedido.getRestaurante().getNombre(),
+                pedido.getCliente().getId(),
+                detallePedido
+        );
     }
 
     public void cancelarPedido(String usuario, Long idPedido){
@@ -154,30 +166,51 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(()-> new BusinessException("Ese pedido no existe"));
 
         if(!cliente.getId().equals(pedido.getCliente().getId())){
-            throw new BusinessException("El pedido no es del cliente");
+            throw new BusinessException("Ese pedido no existe");
+        }
+        if (pedido.getEstado() != EstadoPedido.PREPARACION) {
+            throw new BusinessException("No se puede cancelar un pedido que ya fue enviado o entregado");
         }
 
         pedidoRepository.delete(pedido);
     }
 
 
-    public PedidoDetailDTO modificarEstadoPedido (Long idPedido, String estado){
+    public PedidoDetailDTO modificarEstadoPedido(Long idPedido, String estado) {
 
-        EstadoPedido estadoPedido = EstadoPedido.valueOf(estado);
-        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(()-> new BusinessException("Ese pedido no existe"));
+        EstadoPedido estadoPedido;
+        try {
+            estadoPedido = EstadoPedido.valueOf(estado.toUpperCase()); // por si lo mandan en minúsculas
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException("Ese estado no es válido");
+        }
+
+        String username = AuthUtil.getUsuarioLogueado();
+        Restaurante restaurante = restauranteRepository.findByUsuario(username).orElseThrow();
+
+        Pedido pedido = pedidoRepository.findById(idPedido)
+                .filter(p -> p.getRestaurante().getId().equals(restaurante.getId()))
+                .orElseThrow(() -> new BusinessException("Ese pedido no existe"));
 
         pedido.setEstado(estadoPedido);
-
         pedidoRepository.save(pedido);
 
-        List<DetallePedidoDTO>detallePedido = new ArrayList<>();
-        for(ProductoPedido p : pedido.getProductosPedidos())
-        {
+        List<DetallePedidoDTO> detallePedido = new ArrayList<>();
+        for (ProductoPedido p : pedido.getProductosPedidos()) {
             detallePedido.add(new DetallePedidoDTO(p.getProducto().getId(), p.getCantidad()));
         }
 
-        return new PedidoDetailDTO(pedido.getId(), pedido.getFechaPedido(), pedido.getEstado(), pedido.getTotal(), pedido.getRestaurante().getNombre(), pedido.getCliente().getId(), detallePedido);
+        return new PedidoDetailDTO(
+                pedido.getId(),
+                pedido.getFechaPedido(),
+                pedido.getEstado(),
+                pedido.getTotal(),
+                pedido.getRestaurante().getNombre(),
+                pedido.getCliente().getId(),
+                detallePedido
+        );
     }
+
 
     public List<PedidoResumenDTO> verPedidosDeRestauranteEnCurso (String usuario){
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario)

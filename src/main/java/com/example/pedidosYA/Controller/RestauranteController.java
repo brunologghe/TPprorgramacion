@@ -49,9 +49,7 @@ public class RestauranteController {
     @PutMapping
     @PreAuthorize("hasRole('RESTAURANTE')")
     public ResponseEntity<RestauranteResponseDTO> modificarRestaurante (@Valid @RequestBody RestauranteModificarDTO restauranteModificarDTO){
-        RestauranteResponseDTO bodyRestaurante = restauranteService.modificarRestaurante(AuthUtil.getUsuarioLogueado(), restauranteModificarDTO);
-
-        return ResponseEntity.ok(bodyRestaurante);
+        return ResponseEntity.ok(restauranteService.modificarRestaurante(AuthUtil.getUsuarioLogueado(), restauranteModificarDTO));
     }
 
     @PostMapping("/producto")

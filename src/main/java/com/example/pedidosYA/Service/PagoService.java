@@ -32,7 +32,7 @@ public class PagoService {
         Pago pagoRetorno = pagoRepository.save(pago);
         cliente.getMetodosPago().add(pagoRetorno);
 
-        return new PagoMuestraDTO(pago.getId(), pago.getMetodoDePago(), cliente.getId());
+        return new PagoMuestraDTO(pago.getId(), pago.getMetodoDePago());
     }
 
     public void eliminarPago(String username, Long idPago) {
