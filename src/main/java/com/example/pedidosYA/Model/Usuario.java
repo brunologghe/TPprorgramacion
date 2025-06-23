@@ -23,9 +23,6 @@ public abstract class Usuario implements UserDetails {
 
     private String contrasenia;
 
-    /*@ElementCollection(fetch = FetchType.EAGER)
-    private List<String> roles = new ArrayList<>();*/
-
     @Enumerated(EnumType.STRING)
     private RolUsuario rol;
 
