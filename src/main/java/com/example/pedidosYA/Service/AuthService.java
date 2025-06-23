@@ -76,7 +76,6 @@ public class AuthService {
 
                 restaurante.setUsuario(request.getUsuario());
                 restaurante.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
-                System.out.println("HOLA" + request.getNombreRestaurante());
                 restaurante.setNombre(request.getNombreRestaurante());
                 restaurante.setRol(RolUsuario.RESTAURANTE);
                 nuevoUsuario = restaurante;

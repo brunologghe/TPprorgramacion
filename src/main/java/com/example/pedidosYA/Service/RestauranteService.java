@@ -1,6 +1,9 @@
 package com.example.pedidosYA.Service;
 
 import com.example.pedidosYA.DTO.ClienteDTO.ResponseDTO;
+import com.example.pedidosYA.DTO.ProductoDTO.ProductoDetailDTO;
+import com.example.pedidosYA.DTO.ProductoDTO.ProductoResumenDTO;
+import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaResumenDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.*;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.Restaurante;
@@ -19,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+
 @Service
 public class RestauranteService {
 
@@ -35,8 +39,14 @@ public class RestauranteService {
     public RestauranteDetailDTO findRestauranteByNombre(String usuario){
 
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese usuario"));
+        Set<ProductoResumenDTO> menuDTO = restaurante.getMenu().stream()
+                .map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio()))
+                .collect(Collectors.toSet());
+        List<ReseniaResumenDTO> reseniaDTO = restaurante.getReseniasRestaurante().stream()
+                .map(resenia -> new ReseniaResumenDTO(resenia.getCliente().getId(), resenia.getDescripcion(), resenia.getPuntuacion()))
+                .collect(Collectors.toList());
         return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(),
-                restaurante.getMenu(), restaurante.getReseniasRestaurante());
+                menuDTO, reseniaDTO);
     }
 
     public Set<RestauranteResumenDTO> findAllRestaurantes(){

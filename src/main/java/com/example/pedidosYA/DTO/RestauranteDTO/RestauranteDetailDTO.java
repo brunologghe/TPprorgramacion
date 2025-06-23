@@ -1,5 +1,7 @@
 package com.example.pedidosYA.DTO.RestauranteDTO;
 
+import com.example.pedidosYA.DTO.ProductoDTO.ProductoResumenDTO;
+import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaResumenDTO;
 import com.example.pedidosYA.Model.Producto;
 import com.example.pedidosYA.Model.Resenia;
 
@@ -10,8 +12,8 @@ public record RestauranteDetailDTO(
 
         Long id,
         String nombre,
-        Set<Producto> menu,
-        List<Resenia> reseniasRestaurante
+        Set<ProductoResumenDTO> menu,
+        List<ReseniaResumenDTO> reseniasRestaurante
 )
 {}
 
