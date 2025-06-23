@@ -1,8 +1,7 @@
 package com.example.pedidosYA.Validations;
 
 import com.example.pedidosYA.Model.Cliente;
-import com.example.pedidosYA.Model.MetodoDePago;
-import com.example.pedidosYA.Model.Restaurante;
+import com.example.pedidosYA.Model.Pago;
 import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Repository.DireccionRepository;
 import com.example.pedidosYA.Repository.UsuarioRepository;
@@ -44,13 +43,13 @@ public class ClienteValidations {
     }
 
     public void validarNombreExistente(String nombre)throws BusinessException{
-        if(!clienteRepository.existsByNombre(nombre)){
+        if(!clienteRepository.existsByNombreYapellido(nombre)){
             throw new BusinessException("El nombre de este cliente no existe");
         }
     }
 
     public void validarNombreNoDuplicadoConID(Long id, String nombre)throws BusinessException {
-        Cliente c = clienteRepository.findByNombre(nombre);
+        Cliente c = clienteRepository.findByNombreYapellido(nombre);
 
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new BusinessException("El nombre es obligatorio.");
@@ -58,13 +57,13 @@ public class ClienteValidations {
         if (nombre.length() > 25) {
             throw new BusinessException("El nombre no puede tener más de 25 caracteres.");
         }
-        if (c != null && clienteRepository.existsByNombre(nombre) && c.getId() != id) {
+        if (c != null && clienteRepository.existsByNombreYapellido(nombre) && c.getId() != id) {
             throw new BusinessException("El nombre ya pertenece a otro restaurante.");
         }
     }
 
     public void validarNombreCrear(String nombre)throws BusinessException{
-        Cliente c = clienteRepository.findByNombre(nombre);
+        Cliente c = clienteRepository.findByNombreYapellido(nombre);
 
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new BusinessException("El nombre es obligatorio.");
@@ -73,7 +72,7 @@ public class ClienteValidations {
             throw new BusinessException("El nombre no puede tener más de 25 caracteres.");
         }
 
-        if (c != null && clienteRepository.existsByNombre(nombre)) {
+        if (c != null && clienteRepository.existsByNombreYapellido(nombre)) {
             throw new BusinessException("El nombre ya pertenece a otro cliente.");
         }
     }
@@ -99,6 +98,12 @@ public class ClienteValidations {
         }
         if (!contrasenia.matches("^[a-zA-Z0-9._]{3,15}$")) {
             throw new BusinessException("La contraseña debe tener entre 3 y 15 caracteres y solo puede contener letras, números, _ o .");
+        }
+    }
+
+    public void validarPagoEnCliente (Pago pago, Cliente cliente){
+        if (!pago.getCliente().getId().equals(cliente.getId())) {
+            throw new BusinessException("El pago no pertenece a este cliente");
         }
     }
 }

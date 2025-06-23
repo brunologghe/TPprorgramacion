@@ -5,6 +5,7 @@ import com.example.pedidosYA.Model.Restaurante;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,6 +15,8 @@ public class RestauranteValidations {
 
     @Autowired
     UsuarioRepository usuarioRepository;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     public void validarNombreCrear(String nombre)throws BusinessException{
         Restaurante r = restauranteRepository.findByNombre(nombre);
@@ -44,18 +47,13 @@ public class RestauranteValidations {
         }
     }
 
-    public void validarNombreExistente(String nombre)throws BusinessException{
-        if(!restauranteRepository.existsByNombre(nombre)){
-            throw new BusinessException("El nombre de este restaurante no existe");
-        }
-    }
 
     public void validarContraseniaActual(Long id, String contrasenia){
 
         Restaurante restaurante = restauranteRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Restaurante no encontrado con id: " + id));
 
-        if (!restaurante.getContrasenia().equals(contrasenia)) {
+        if (!passwordEncoder.matches(contrasenia, restaurante.getContrasenia())) {
             throw new BusinessException("La contraseña actual es incorrecta.");
         }
     }

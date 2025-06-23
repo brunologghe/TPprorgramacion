@@ -101,7 +101,7 @@ public class ProductoService {
             throw new BusinessException("El nombre del producto no puede estar vacío.");
         }
 
-        productoValidations.validarProductoContieneRestaurante(restaurante.getMenu(), productoNuevo.nombre());
+        productoValidations.validarProductoContieneRestaurantePorNombre(restaurante.getMenu(), producto);
 
         restaurante.getMenu().remove(producto);
 

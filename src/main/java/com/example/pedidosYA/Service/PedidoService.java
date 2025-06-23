@@ -6,10 +6,7 @@ import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoResumenDTO;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.*;
-import com.example.pedidosYA.Repository.ClienteRepository;
-import com.example.pedidosYA.Repository.PedidoRepository;
-import com.example.pedidosYA.Repository.ProductoRepository;
-import com.example.pedidosYA.Repository.RestauranteRepository;
+import com.example.pedidosYA.Repository.*;
 import com.example.pedidosYA.Validations.ClienteValidations;
 import com.example.pedidosYA.Validations.PedidoValidations;
 import com.example.pedidosYA.Validations.RestauranteValidations;
@@ -37,11 +34,19 @@ public class PedidoService {
     private ProductoRepository productoRepository;
     @Autowired
     private PedidoValidations pedidoValidations;
+    @Autowired
+    private PagoRepository pagoRepository;
 
     public PedidoDetailDTO hacerPedido(String usuario, PedidoCreateDTO pedidoCreateDTO) {
         Cliente cliente = clienteRepository.findByUsuario(usuario);
         Restaurante restaurante =  restauranteValidations.validarExisteId(pedidoCreateDTO.getRestauranteId());
         clienteValidations.validarDireccion(pedidoCreateDTO.getDireccionId(), cliente.getId());
+        Pago metodoPago = pagoRepository.findById(pedidoCreateDTO.getPagoId())
+                .orElseThrow(() -> new BusinessException("Método de pago no encontrado"));
+        if (!metodoPago.getCliente().getId().equals(cliente.getId())) {
+            throw new BusinessException("El método de pago no pertenece al cliente autenticado");
+        }
+
         Pedido pedido = new Pedido();
         pedido.setFechaPedido(LocalDateTime.now());
         pedido.setEstado(EstadoPedido.PREPARACION);
@@ -52,7 +57,9 @@ public class PedidoService {
         for(DetallePedidoDTO dpdto : pedidoCreateDTO.getDetalles())
         {
             Producto producto = productoRepository.findById(dpdto.getProductoId())
-                    .orElseThrow(() -> new RuntimeException("Producto con ID: " +dpdto.getProductoId()+ "no encontrado"));
+                    .orElseThrow(() -> new BusinessException("Producto con ID: " + dpdto.getProductoId() + " no encontrado"));
+
+            pedidoValidations.verificarCantidadPedido(dpdto.getCantidad());
 
             ProductoPedido productoPedido = new ProductoPedido();
             productoPedido.setProducto(producto);
@@ -70,7 +77,8 @@ public class PedidoService {
         Pedido pedidohecho = pedidoRepository.save(pedido);
 
         return new PedidoDetailDTO(pedidohecho.getId(), pedidohecho.getFechaPedido(), pedidohecho.getEstado(),
-                pedidohecho.getTotal(), pedidohecho.getRestaurante().getNombre(), cliente.getId(), pedidoCreateDTO.getDetalles());
+             pedidohecho.getTotal(), pedidohecho.getRestaurante().getNombre(), cliente.getId(), pedidoCreateDTO.getDetalles());
+
     }
 
     public List<PedidoDetailDTO> verPedidosEnCurso(String usuario) {

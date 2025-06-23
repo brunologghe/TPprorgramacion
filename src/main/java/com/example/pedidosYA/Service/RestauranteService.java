@@ -32,11 +32,9 @@ public class RestauranteService {
     private UsuarioRepository usuarioRepository;
 
 
-    public RestauranteDetailDTO findRestauranteByNombre(String nombre){
+    public RestauranteDetailDTO findRestauranteByNombre(String usuario){
 
-        restauranteValidations.validarNombreExistente(nombre);
-
-        Restaurante restaurante = restauranteRepository.findByNombre(nombre);
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese usuario"));
         return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(),
                 restaurante.getMenu(), restaurante.getReseniasRestaurante());
     }

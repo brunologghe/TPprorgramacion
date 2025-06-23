@@ -65,7 +65,7 @@ public class RestauranteController {
         return ResponseEntity.ok(productoService.findAllProductosByRestaurante(AuthUtil.getUsuarioLogueado()));
     }
 
-    @GetMapping ("/producto/{idRestaurante}/{nombre}")
+    @GetMapping ("/producto/{nombre}")
     public ResponseEntity<ProductoDetailDTO> findProductoBynombre(@PathVariable String nombre){
         return ResponseEntity.ok(productoService.findProductoBynombre(AuthUtil.getUsuarioLogueado(), nombre));
     }

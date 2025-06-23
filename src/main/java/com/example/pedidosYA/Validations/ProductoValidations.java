@@ -53,4 +53,11 @@ public class ProductoValidations {
         }
     }
 
+    public void validarProductoContieneRestaurantePorNombre (Set<Producto> menu, Producto producto){
+        if (menu.stream()
+                .anyMatch(p -> p.getNombre().equalsIgnoreCase(producto.getNombre()) && p.getId() != producto.getId())) {
+            throw new BusinessException("Ya existe un producto con ese nombre en el menú.");
+        }
+    }
+
 }

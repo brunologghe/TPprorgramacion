@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface PagoRepository extends JpaRepository<Pago, Long> {
     List<Pago> findByClienteId(Long clienteId);
-    boolean existsByMetodoAndClienteId(MetodoDePago metodo, Long clienteId);
+    boolean existsByMetodoDePagoAndClienteId(MetodoDePago metodoDePago, Long clienteId);
 }

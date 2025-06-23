@@ -27,20 +27,12 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("No existe ese usuario");
         }
 
-        System.out.println("Usuario encontrado: " + user.getUsername());
-        System.out.println("Rol: " + user.getRol());
-        System.out.println("Authorities: " + user.getAuthorities());
-
         return user;
     }
 
-    public boolean existsByUsername(String username) {
 
-        if(usuarioRepo.findByUsuario(username) == null)
-        {
-            return false;
-        }
-        return true;
+    public boolean existsByUsername(String username) {
+        return usuarioRepo.findByUsuario(username) != null;
     }
 
     public void save(Usuario usuario) {

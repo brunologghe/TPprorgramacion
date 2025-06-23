@@ -13,8 +13,6 @@ import java.util.List;
 
 public class PedidoValidations {
 
-    @Autowired
-    PedidoService pedidoService;
 
     public void verificarDetallesPedido (List<DetallePedidoDTO> detallePedido){
 
@@ -27,6 +25,12 @@ public class PedidoValidations {
 
         if(detallePedido.isEmpty()){
             throw new BusinessException("No hay detalles de pedido en la lista");
+        }
+    }
+
+    public void verificarCantidadPedido (int cantidad){
+        if(cantidad<1 || cantidad>15){
+            throw new BusinessException("La cantidad debe ser de entre 1 y 15 elementos del mismo producto");
         }
     }
 }

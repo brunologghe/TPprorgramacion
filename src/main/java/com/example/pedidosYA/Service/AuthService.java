@@ -11,10 +11,12 @@ import com.example.pedidosYA.Validations.RestauranteValidations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class AuthService {
 
 
@@ -74,6 +76,7 @@ public class AuthService {
 
                 restaurante.setUsuario(request.getUsuario());
                 restaurante.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
+                System.out.println("HOLA" + request.getNombreRestaurante());
                 restaurante.setNombre(request.getNombreRestaurante());
                 restaurante.setRol(RolUsuario.RESTAURANTE);
                 nuevoUsuario = restaurante;

@@ -68,8 +68,6 @@ public class ClienteService {
 
     public ClienteDetailDto verUsuarioPorNombre(String nombreUsuario) {
 
-        clienteValidations.validarNombreExistente(nombreUsuario);
-
         Cliente cliente = clienteRepository.findByUsuario(nombreUsuario);
 
         return new ClienteDetailDto(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido(), cliente.getDirecciones(), cliente.getMetodosPago());

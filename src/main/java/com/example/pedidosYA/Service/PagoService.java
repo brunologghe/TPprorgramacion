@@ -26,6 +26,8 @@ public class PagoService {
     public PagoMuestraDTO agregarPago(String username, PagoRequestDTO metodoDePago) {
         Cliente cliente = clienteRepository.findByUsuario(username);
 
+        clienteValidations.validarExistencia(cliente.getId());
+
         Pago pago = new Pago(metodoDePago.getMetodoDePago(), cliente);
         Pago pagoRetorno = pagoRepository.save(pago);
         cliente.getMetodosPago().add(pagoRetorno);
@@ -38,9 +40,7 @@ public class PagoService {
         Pago pago = pagoRepository.findById(idPago)
                 .orElseThrow(() -> new BusinessException("No existe ese método de pago"));
 
-        if (!pago.getCliente().getId().equals(cliente.getId())) {
-            throw new BusinessException("El pago no pertenece a este cliente");
-        }
+        clienteValidations.validarPagoEnCliente(pago, cliente);
 
         cliente.getMetodosPago().remove(pago);
         pagoRepository.delete(pago);

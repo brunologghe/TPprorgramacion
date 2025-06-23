@@ -8,6 +8,7 @@ import com.example.pedidosYA.Model.Direccion;
 import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Repository.DireccionRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
+import com.example.pedidosYA.Validations.DireccionValidations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,8 @@ public class DireccionService {
     private ClienteRepository clienteRepository;
     @Autowired
     private ClienteValidations clienteValidations;
+    @Autowired
+    private DireccionValidations direccionValidations;
 
     public DireccionDTO crearDireccion(String username, DireccionCrearDTO direccion) {
         Cliente cliente = clienteRepository.findByUsuario(username);
@@ -63,10 +66,13 @@ public class DireccionService {
             throw new RuntimeException("Esa dirección no pertenece al cliente logueado");
         }
 
+
         direccion.setDireccion(dto.getDireccion());
         direccion.setCiudad(dto.getCiudad());
         direccion.setPais(dto.getPais());
         direccion.setCodigoPostal(dto.getCodigoPostal());
+
+        direccionValidations.validarDireccionDuplicadaPorCliente(cliente, direccion);
 
         Direccion guardada = direccionRepository.save(direccion);
         return new DireccionDTO(guardada.getId(), guardada.getDireccion(), guardada.getCiudad(), guardada.getPais(), guardada.getCodigoPostal());
@@ -76,9 +82,7 @@ public class DireccionService {
         Cliente cliente = clienteRepository.findByUsuario(username);
         List<Direccion> direcciones = direccionRepository.findByClienteId(cliente.getId());
 
-        if (direcciones == null || direcciones.isEmpty()) {
-            throw new RuntimeException("No hay direcciones aún para este cliente");
-        }
+        direccionValidations.validarDirecciones(direcciones);
 
         return direcciones.stream()
                 .map(d -> new DireccionDTO(d.getId(), d.getDireccion(), d.getCiudad(), d.getPais(), d.getCodigoPostal()))
