@@ -3,6 +3,7 @@ package com.example.pedidosYA.Controller;
 
 import com.example.pedidosYA.DTO.ClienteDTO.ClienteCrearDTO;
 import com.example.pedidosYA.DTO.ClienteDTO.ClienteDetailDto;
+import com.example.pedidosYA.DTO.ClienteDTO.ModificarDTO;
 import com.example.pedidosYA.DTO.ClienteDTO.ResponseDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoCreateDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
@@ -43,18 +44,30 @@ public class ClienteController {
         return clienteService.verUsuarioPorNombre(AuthUtil.getUsuarioLogueado());
     }
 
+    @PutMapping("/perfil")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<?> modificarUsuarioNombreCliente (@Valid @RequestBody ModificarDTO modificarDTO){
+        clienteService.modificarUsuarioNombre(AuthUtil.getUsuarioLogueado(), modificarDTO);
+        return ResponseEntity.status(HttpStatus.OK).body("Usuario y/o Nombre cambiados con exito!");
+    }
+
+    @PutMapping("/contrasenia")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<?> modificarContraseniaCliente (@Valid @RequestBody ModificarDTO modificarDTO){
+        clienteService.modificarContrasenia(AuthUtil.getUsuarioLogueado(), modificarDTO);
+        return ResponseEntity.status(HttpStatus.OK).body("Contrasenia cambiada con exito!");
+    }
+
     @PostMapping("/pedir")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<PedidoDetailDTO> hacerPedido(@Valid @RequestBody PedidoCreateDTO pedido) {
-        PedidoDetailDTO pedidoDetailDTO = pedidoService.hacerPedido(AuthUtil.getUsuarioLogueado(), pedido);
-        return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDetailDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(pedidoService.hacerPedido(AuthUtil.getUsuarioLogueado(), pedido));
     }
 
     @PostMapping("/resenia")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<ReseniaDetailDTO> hacerResenia(@Valid @RequestBody ReseniaCreateDTO reseniaCreateDTO) {
-        ReseniaDetailDTO reseniaDetailDTO = reseniaService.crearResenia(AuthUtil.getUsuarioLogueado(), reseniaCreateDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(reseniaDetailDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(reseniaService.crearResenia(AuthUtil.getUsuarioLogueado(), reseniaCreateDTO));
     }
 
     @GetMapping("/pedidosEnCurso")

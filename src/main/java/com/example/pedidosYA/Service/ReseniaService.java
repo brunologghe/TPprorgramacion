@@ -36,7 +36,7 @@ public class ReseniaService {
 
 
     public ReseniaDetailDTO crearResenia(String usuario, ReseniaCreateDTO reseniaCreateDTO) {
-        Cliente cliente = clienteRepository.findByUsuario(usuario);
+        Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
         Restaurante restaurante = restauranteValidations.validarExisteId(reseniaCreateDTO.getRestauranteId());
 

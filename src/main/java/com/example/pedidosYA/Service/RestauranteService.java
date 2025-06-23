@@ -57,23 +57,36 @@ public class RestauranteService {
         return restauranteRepository.findAll().stream().map(r -> new RestauranteResumenDTO(r.getId(), r.getNombre())).collect(Collectors.toSet());
     }
 
-    public RestauranteResponseDTO modificarRestaurante (String usuario, RestauranteModificarDTO restauranteNuevo){
+    public void modificarContraseniaRestaurante (String usuario, RestauranteModificarDTO restauranteNuevo){
 
         Long id = restauranteRepository.findByUsuario(usuario).get().getId();
-
-        restauranteValidations.validarContraseniaActual(id, restauranteNuevo.getContraseniaActual());
-        restauranteValidations.validarNombreNoDuplicadoConID(id, restauranteNuevo.getNombre());
 
         Restaurante restaurante = restauranteRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Restaurante no encontrado"));
 
-        restaurante.setNombre(restauranteNuevo.getNombre());
-        restaurante.setUsuario(restauranteNuevo.getUsuario());
+        restauranteValidations.validarContraseniaActual(id, restauranteNuevo.getContraseniaActual());
+
         restaurante.setContrasenia(passwordEncoder.encode(restauranteNuevo.getContraseniaNueva()));
 
         Restaurante r = restauranteRepository.save(restaurante);
 
-        return new RestauranteResponseDTO(r.getId(), r.getUsuario(), r.getNombre());
+    }
+
+    public void modificarUsuarioNombreRestaurante (String usuario, RestauranteModificarDTO restauranteNuevo){
+
+        Long id = restauranteRepository.findByUsuario(usuario).get().getId();
+
+        Restaurante restaurante = restauranteRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Restaurante no encontrado"));
+
+        restauranteValidations.validarContraseniaActual(id, restauranteNuevo.getContraseniaActual());
+        restauranteValidations.validarNombreNoDuplicadoConID(id, restauranteNuevo.getNombreRestaurante());
+
+        restaurante.setUsuario(restauranteNuevo.getUsuario());
+        restaurante.setNombre(restauranteNuevo.getNombreRestaurante());
+
+        Restaurante r = restauranteRepository.save(restaurante);
+
     }
 
     public RestauranteResponseDTO eliminarRestaurante (Long id){

@@ -3,6 +3,7 @@ package com.example.pedidosYA.Service;
 import com.example.pedidosYA.DTO.DireccionDTO.DireccionCrearDTO;
 import com.example.pedidosYA.DTO.DireccionDTO.DireccionDTO;
 import com.example.pedidosYA.DTO.DireccionDTO.DireccionEliminarDTO;
+import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.Cliente;
 import com.example.pedidosYA.Model.Direccion;
 import com.example.pedidosYA.Repository.ClienteRepository;
@@ -30,7 +31,7 @@ public class DireccionService {
     private DireccionValidations direccionValidations;
 
     public DireccionDTO crearDireccion(String username, DireccionCrearDTO direccion) {
-        Cliente cliente = clienteRepository.findByUsuario(username);
+        Cliente cliente = clienteRepository.findByUsuario(username).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
         Direccion nueva = new Direccion();
         nueva.setDireccion(direccion.getDireccion());
@@ -46,7 +47,7 @@ public class DireccionService {
 
 
     public void eliminarDireccion(String username, DireccionEliminarDTO dto) {
-        Cliente cliente = clienteRepository.findByUsuario(username);
+        Cliente cliente = clienteRepository.findByUsuario(username).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         Direccion direccion = direccionRepository.findByClienteIdAndCodigoPostalAndDireccion(
                 cliente.getId(), dto.getCodigoPostal(), dto.getDireccion());
 
@@ -58,7 +59,7 @@ public class DireccionService {
     }
 
     public DireccionDTO modificarDireccion(String username, Long id, DireccionCrearDTO dto) {
-        Cliente cliente = clienteRepository.findByUsuario(username);
+        Cliente cliente = clienteRepository.findByUsuario(username).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         Direccion direccion = direccionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("No se encontró esa dirección"));
 
@@ -79,7 +80,7 @@ public class DireccionService {
     }
 
     public List<DireccionDTO> listarDirecciones(String username) {
-        Cliente cliente = clienteRepository.findByUsuario(username);
+        Cliente cliente = clienteRepository.findByUsuario(username).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         List<Direccion> direcciones = direccionRepository.findByClienteId(cliente.getId());
 
         direccionValidations.validarDirecciones(direcciones);

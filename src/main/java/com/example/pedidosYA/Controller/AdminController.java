@@ -10,6 +10,7 @@ import com.example.pedidosYA.Service.RestauranteService;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -41,10 +42,11 @@ public class AdminController {
         return ResponseEntity.ok(clienteService.eliminar(id));
     }
 
-    @PutMapping ("/cliente/{id}")
+    @PutMapping ("/cliente/{usuario}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseDTO> modificarCliente (@PathVariable Long id, @Valid @RequestBody ModificarDTO modificarDTO){
-        return ResponseEntity.ok(clienteService.modificar(id, modificarDTO));
+    public ResponseEntity<?> modificarCliente (@PathVariable String usuario, @Valid @RequestBody ModificarDTO modificarDTO){
+        clienteService.modificarUsuarioNombre(usuario, modificarDTO);
+        return ResponseEntity.status(HttpStatus.OK).body("Usuario y/o Nombre cambiados con exito!");
     }
 
     @GetMapping("/restaurante")
@@ -59,10 +61,11 @@ public class AdminController {
         return ResponseEntity.ok(restauranteService.eliminarRestaurante(id));
     }
 
-    @PutMapping ("/restaurante/{nombre}")
+    @PutMapping ("/restaurante/{usuario}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<RestauranteResponseDTO> modificarRestaurante (@PathVariable String nombre, @Valid @RequestBody RestauranteModificarDTO restauranteModificarDTO){
-        return ResponseEntity.ok(restauranteService.modificarRestaurante(nombre, restauranteModificarDTO));
+    public ResponseEntity<?> modificarRestaurante (@PathVariable String usuario, @Valid @RequestBody RestauranteModificarDTO restauranteModificarDTO){
+        restauranteService.modificarUsuarioNombreRestaurante(usuario, restauranteModificarDTO);
+        return ResponseEntity.status(HttpStatus.OK).body("Usuario y/o Nombre cambiados con exito!");
     }
 
 

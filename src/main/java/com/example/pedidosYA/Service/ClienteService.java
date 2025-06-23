@@ -49,31 +49,35 @@ public class ClienteService {
         return clienteDTO;
     }
 
-    public ResponseDTO modificar (Long id, ModificarDTO clienteNuevo){
+    public void modificarContrasenia (String usuario, ModificarDTO clienteNuevo){
+        Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
-        clienteValidations.validarContraseniaActual(id, clienteNuevo.getContraseniaActual());
-        clienteValidations.validarNombreNoDuplicadoConID(id, clienteNuevo.getNombreYapellido());
+        clienteValidations.validarContraseniaActual(cliente.getId(), clienteNuevo.getContraseniaActual());
 
-        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
-
-        cliente.setNombreYapellido(clienteNuevo.getNombreYapellido());
-        cliente.setUsuario(clienteNuevo.getUsuario());
         cliente.setContrasenia(passwordEncoder.encode(clienteNuevo.getContraseniaNueva()));
 
         Cliente c = clienteRepository.save(cliente);
-
-        return new ResponseDTO(c.getId(), c.getUsuario(), c.getNombreYapellido());
-
     }
+
+    public void modificarUsuarioNombre (String usuario, ModificarDTO clienteNuevo){
+        Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
+
+        clienteValidations.validarContraseniaActual(cliente.getId(), clienteNuevo.getContraseniaActual());
+        clienteValidations.validarNombreNoDuplicadoConID(cliente.getId(), clienteNuevo.getNombreYapellido());
+
+        cliente.setNombreYapellido(clienteNuevo.getNombreYapellido());
+        cliente.setUsuario(clienteNuevo.getUsuario());
+
+        Cliente c = clienteRepository.save(cliente);
+    }
+
+
 
     public ClienteDetailDto verUsuarioPorNombre(String nombreUsuario) {
 
-        Cliente cliente = clienteRepository.findByUsuario(nombreUsuario);
+        Cliente cliente = clienteRepository.findByUsuario(nombreUsuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
         return new ClienteDetailDto(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido(), cliente.getDirecciones(), cliente.getMetodosPago());
     }
 
-    public Cliente findByUsuario(String usuario) {
-        return clienteRepository.findByUsuario(usuario);
-    }
 }

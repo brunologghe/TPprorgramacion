@@ -6,6 +6,7 @@ import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Repository.DireccionRepository;
 import com.example.pedidosYA.Repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import com.example.pedidosYA.Exceptions.BusinessException;
 
@@ -16,7 +17,8 @@ public class ClienteValidations {
     private ClienteRepository clienteRepository;
     @Autowired
     private DireccionRepository direccionRepository;
-
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Autowired
     private UsuarioRepository usuarioRepository;
 
@@ -37,7 +39,7 @@ public class ClienteValidations {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Cliente no encontrado con id: " + id));
 
-        if (!cliente.getContrasenia().equals(contrasenia)) {
+        if (!passwordEncoder.matches(contrasenia, cliente.getContrasenia())) {
             throw new BusinessException("La contraseña actual es incorrecta.");
         }
     }

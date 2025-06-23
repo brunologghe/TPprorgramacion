@@ -24,7 +24,7 @@ public class PagoService {
     private PagoRepository pagoRepository;
 
     public PagoMuestraDTO agregarPago(String username, PagoRequestDTO metodoDePago) {
-        Cliente cliente = clienteRepository.findByUsuario(username);
+        Cliente cliente = clienteRepository.findByUsuario(username).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
         clienteValidations.validarExistencia(cliente.getId());
 
@@ -36,7 +36,7 @@ public class PagoService {
     }
 
     public void eliminarPago(String username, Long idPago) {
-        Cliente cliente = clienteRepository.findByUsuario(username);
+        Cliente cliente = clienteRepository.findByUsuario(username).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         Pago pago = pagoRepository.findById(idPago)
                 .orElseThrow(() -> new BusinessException("No existe ese método de pago"));
 
@@ -47,7 +47,7 @@ public class PagoService {
     }
 
     public List<Pago> mostarPagos(String username) {
-        Cliente cliente = clienteRepository.findByUsuario(username);
+        Cliente cliente = clienteRepository.findByUsuario(username).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         return cliente.getMetodosPago();
     }
 }

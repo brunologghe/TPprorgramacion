@@ -39,7 +39,7 @@ public class PedidoService {
     private PagoRepository pagoRepository;
 
     public PedidoDetailDTO hacerPedido(String usuario, PedidoCreateDTO pedidoCreateDTO) {
-        Cliente cliente = clienteRepository.findByUsuario(usuario);
+        Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         Restaurante restaurante =  restauranteValidations.validarExisteId(pedidoCreateDTO.getRestauranteId());
         clienteValidations.validarDireccion(pedidoCreateDTO.getDireccionId(), cliente.getId());
         Pago metodoPago = pagoRepository.findById(pedidoCreateDTO.getPagoId())
@@ -84,7 +84,7 @@ public class PedidoService {
     }
 
     public List<PedidoDetailDTO> verPedidosEnCurso(String usuario) {
-        Cliente cliente = clienteRepository.findByUsuario(usuario);
+        Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
         List<PedidoDetailDTO>listaDetallePedidos = new ArrayList<>();
 
@@ -110,7 +110,7 @@ public class PedidoService {
     }
 
     public List<PedidoDetailDTO> verHistorialPedidos(String usuario) {
-        Cliente cliente = clienteRepository.findByUsuario(usuario);
+        Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         clienteValidations.validarExistencia(cliente.getId());
 
 
@@ -137,7 +137,7 @@ public class PedidoService {
 
     public PedidoDetailDTO verDetallesPedido(Long idPedido) {
         String username = AuthUtil.getUsuarioLogueado();
-        Cliente cliente = clienteRepository.findByUsuario(username);
+        Cliente cliente = clienteRepository.findByUsuario(username).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
         Pedido pedido = pedidoRepository.findById(idPedido)
                 .filter(p -> p.getCliente().getId().equals(cliente.getId()))
@@ -162,7 +162,7 @@ public class PedidoService {
     }
 
     public void cancelarPedido(String usuario, Long idPedido){
-        Cliente cliente = clienteRepository.findByUsuario(usuario);
+        Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(()-> new BusinessException("Ese pedido no existe"));
 
         if(!cliente.getId().equals(pedido.getCliente().getId())){
