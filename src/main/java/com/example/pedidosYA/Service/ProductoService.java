@@ -134,9 +134,9 @@ public class ProductoService {
 
         productoValidations.validarProductoPerteneceARestaurante(restaurante.getId(), producto);
         productoValidations.validarProductoEnRestaurante(restaurante, producto);
+        productoValidations.validarProductoNoAsociadoAPedidos(producto, restaurante);
 
         restaurante.getMenu().remove(producto);
-
         restauranteRepository.save(restaurante);
     }
 }
