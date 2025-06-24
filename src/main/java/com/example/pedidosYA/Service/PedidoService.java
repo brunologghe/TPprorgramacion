@@ -180,7 +180,7 @@ public class PedidoService {
 
         EstadoPedido estadoPedido;
         try {
-            estadoPedido = EstadoPedido.valueOf(estado.toUpperCase()); // por si lo mandan en minúsculas
+            estadoPedido = EstadoPedido.valueOf(estado.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new BusinessException("Ese estado no es válido");
         }
