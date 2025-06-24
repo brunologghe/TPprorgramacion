@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -32,7 +33,7 @@ public class Pedido {
     private Restaurante restaurante;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductoPedido> productosPedidos;
+    private List<ProductoPedido> productosPedidos = new ArrayList<>();
 
     public Pedido() {
     }

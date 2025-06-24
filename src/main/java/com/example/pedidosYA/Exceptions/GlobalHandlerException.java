@@ -23,7 +23,7 @@ public class GlobalHandlerException {
                         FieldError::getField, FieldError::getDefaultMessage,
                         (msg1, msg2) -> msg1
                 ));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errores);
     }
 
     @ExceptionHandler(BusinessException.class)

@@ -1,11 +1,16 @@
 package com.example.pedidosYA.Validations;
 
 import com.example.pedidosYA.Exceptions.BusinessException;
+import com.example.pedidosYA.Model.Pedido;
 import com.example.pedidosYA.Model.Producto;
+import com.example.pedidosYA.Model.ProductoPedido;
 import com.example.pedidosYA.Model.Restaurante;
 import com.example.pedidosYA.Repository.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Set;
 
 @Component
 public class ProductoValidations {
@@ -37,4 +42,37 @@ public class ProductoValidations {
             throw new BusinessException("El restaurante no contiene este producto");
         }
     }
+
+    public void validarProductoNoAsociadoAPedidos(Producto producto, Restaurante restaurante) {
+        List<Pedido> pedidos = restaurante.getPedidos();
+
+        for (Pedido pedido : pedidos) {
+            for (ProductoPedido productoPedido : pedido.getProductosPedidos()) {
+                if (productoPedido.getProducto().getId().equals(producto.getId())) {
+                    throw new BusinessException("No se puede eliminar el producto porque está asociado a pedidos del restaurante.");
+                }
+            }
+        }
+    }
+
+    public void validarListaVacia (Set<Producto> lista){
+        if (lista.isEmpty()) {
+            throw new BusinessException("No hay productos cargados actualmente");
+        }
+    }
+
+    public void validarProductoContieneRestaurante (Set<Producto> menu, String nombre){
+        if (menu.stream()
+                .anyMatch(p -> p.getNombre().equalsIgnoreCase(nombre))) {
+            throw new BusinessException("Ya existe un producto con ese nombre en el menú.");
+        }
+    }
+
+    public void validarProductoContieneRestaurantePorNombre (Set<Producto> menu, Producto producto){
+        if (menu.stream()
+                .anyMatch(p -> p.getNombre().equalsIgnoreCase(producto.getNombre()) && p.getId() != producto.getId())) {
+            throw new BusinessException("Ya existe un producto con ese nombre en el menú.");
+        }
+    }
+
 }
