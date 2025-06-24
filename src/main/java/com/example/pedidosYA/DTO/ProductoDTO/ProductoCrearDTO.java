@@ -21,9 +21,6 @@ public class ProductoCrearDTO {
     @Min(value = 0, message = "El minimo de stock es 0")
     private int stock;
 
-    @NotNull
-    private Long restaurante;
-
     public String getNombre() {
         return nombre;
     }
@@ -58,11 +55,4 @@ public class ProductoCrearDTO {
         this.stock = stock;
     }
 
-    public Long getRestaurante() {
-        return restaurante;
-    }
-
-    public void setRestaurante(Long restaurante) {
-        this.restaurante = restaurante;
-    }
 }

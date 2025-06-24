@@ -16,9 +16,6 @@ public class DireccionCrearDTO {
     @NotBlank(message = "El código postal es obligatorio")
     private String codigoPostal;
 
-    @NotNull(message = "El cliente es obligatorio")
-    private Long id;
-
     public @NotBlank(message = "La dirección es obligatoria") String getDireccion() {
         return direccion;
     }
@@ -49,13 +46,5 @@ public class DireccionCrearDTO {
 
     public void setCodigoPostal(@NotBlank(message = "El código postal es obligatorio") String codigoPostal) {
         this.codigoPostal = codigoPostal;
-    }
-
-    public @NotNull(message = "El cliente es obligatorio") Long getId() {
-        return id;
-    }
-
-    public void setId(@NotNull(message = "El cliente es obligatorio") Long id) {
-        this.id = id;
     }
 }

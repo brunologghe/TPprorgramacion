@@ -9,10 +9,12 @@ import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResponseDTO;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.Cliente;
 import com.example.pedidosYA.Model.Restaurante;
+import com.example.pedidosYA.Model.RolUsuario;
 import com.example.pedidosYA.Model.Usuario;
 import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,17 +27,8 @@ public class ClienteService {
     private ClienteRepository clienteRepository;
     @Autowired
     private ClienteValidations clienteValidations;
-
-    public ResponseDTO crearUsuario(ClienteCrearDTO r) {
-        Cliente c = new Cliente();
-        c.setNombreYapellido(r.getNombreYapellido());
-        c.setUsuario(r.getUsuario());
-        c.setContrasenia(r.getContrasenia());
-
-        Cliente cliente = clienteRepository.save(c);
-
-        return new ResponseDTO(c.getId(), c.getUsuario(), c.getNombreYapellido());
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<ResponseDTO> listAll(){
 
@@ -57,27 +50,30 @@ public class ClienteService {
     }
 
     public ResponseDTO modificar (Long id, ModificarDTO clienteNuevo){
+
         clienteValidations.validarContraseniaActual(id, clienteNuevo.getContraseniaActual());
+        clienteValidations.validarNombreNoDuplicadoConID(id, clienteNuevo.getNombreYapellido());
 
         Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
         cliente.setNombreYapellido(clienteNuevo.getNombreYapellido());
         cliente.setUsuario(clienteNuevo.getUsuario());
-        cliente.setContrasenia(clienteNuevo.getContraseniaNueva());
+        cliente.setContrasenia(passwordEncoder.encode(clienteNuevo.getContraseniaNueva()));
 
-        clienteRepository.save(cliente);
+        Cliente c = clienteRepository.save(cliente);
 
-        return new ResponseDTO(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido());
+        return new ResponseDTO(c.getId(), c.getUsuario(), c.getNombreYapellido());
 
     }
 
-    public ClienteDetailDto verUsuario(Long id)
-    {
-        Cliente cliente = clienteValidations.validarExistencia(id);
+    public ClienteDetailDto verUsuarioPorNombre(String nombreUsuario) {
+
+        Cliente cliente = clienteRepository.findByUsuario(nombreUsuario);
 
         return new ClienteDetailDto(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido(), cliente.getDirecciones(), cliente.getMetodosPago());
     }
 
-
-
+    public Cliente findByUsuario(String usuario) {
+        return clienteRepository.findByUsuario(usuario);
+    }
 }

@@ -1,7 +1,9 @@
 package com.example.pedidosYA.Model;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,4 +62,5 @@ public class Restaurante extends Usuario{
     public void setPedidos(List<Pedido> pedidos) {
         this.pedidos = pedidos;
     }
+
 }
