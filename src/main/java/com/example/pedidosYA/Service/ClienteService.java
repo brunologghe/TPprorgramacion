@@ -71,6 +71,17 @@ public class ClienteService {
         Cliente c = clienteRepository.save(cliente);
     }
 
+    public void modificarUsuarioNombreAdmin (String usuario, ModificarDTO clienteNuevo){
+        Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
+
+        clienteValidations.validarNombreNoDuplicadoConID(cliente.getId(), clienteNuevo.getNombreYapellido());
+
+        cliente.setNombreYapellido(clienteNuevo.getNombreYapellido());
+        cliente.setUsuario(clienteNuevo.getUsuario());
+
+        Cliente c = clienteRepository.save(cliente);
+    }
+
 
 
     public ClienteDetailDto verUsuarioPorNombre(String nombreUsuario) {

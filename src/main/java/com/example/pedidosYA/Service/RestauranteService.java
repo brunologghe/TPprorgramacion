@@ -89,6 +89,22 @@ public class RestauranteService {
 
     }
 
+    public void modificarUsuarioNombreRestauranteAdmin (String usuario, RestauranteModificarDTO restauranteNuevo){
+
+        Long id = restauranteRepository.findByUsuario(usuario).get().getId();
+
+        Restaurante restaurante = restauranteRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Restaurante no encontrado"));
+
+        restauranteValidations.validarNombreNoDuplicadoConID(id, restauranteNuevo.getNombreRestaurante());
+
+        restaurante.setUsuario(restauranteNuevo.getUsuario());
+        restaurante.setNombre(restauranteNuevo.getNombreRestaurante());
+
+        Restaurante r = restauranteRepository.save(restaurante);
+
+    }
+
     public RestauranteResponseDTO eliminarRestaurante (Long id){
         Restaurante restaurante = restauranteValidations.validarExisteId(id);
 

@@ -9,10 +9,9 @@ import com.example.pedidosYA.DTO.PedidoDTO.PedidoCreateDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaCreateDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaDetailDTO;
+import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResumenDTO;
 import com.example.pedidosYA.Security.AuthUtil;
-import com.example.pedidosYA.Service.ClienteService;
-import com.example.pedidosYA.Service.PedidoService;
-import com.example.pedidosYA.Service.ReseniaService;
+import com.example.pedidosYA.Service.*;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/cliente")
@@ -36,6 +36,12 @@ public class ClienteController {
 
     @Autowired
     private ReseniaService reseniaService;
+
+    @Autowired
+    private ProductoService productoService;
+
+    @Autowired
+    private RestauranteService restauranteService;
 
 
     @GetMapping("/perfil")
@@ -56,6 +62,18 @@ public class ClienteController {
     public ResponseEntity<?> modificarContraseniaCliente (@Valid @RequestBody ModificarDTO modificarDTO){
         clienteService.modificarContrasenia(AuthUtil.getUsuarioLogueado(), modificarDTO);
         return ResponseEntity.status(HttpStatus.OK).body("Contrasenia cambiada con exito!");
+    }
+
+    @GetMapping("/restaurante")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<Set<RestauranteResumenDTO>> listAllRestaurantes(){
+        return ResponseEntity.ok(restauranteService.findAllRestaurantes());
+    }
+
+    @GetMapping ("/verMenu/{nombre}")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<?> findALlProducto(@PathVariable String nombre){
+        return ResponseEntity.ok(productoService.findAllProductosByRestauranteNombre(nombre));
     }
 
     @PostMapping("/pedir")

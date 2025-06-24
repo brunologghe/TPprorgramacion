@@ -45,7 +45,7 @@ public class AdminController {
     @PutMapping ("/cliente/{usuario}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> modificarCliente (@PathVariable String usuario, @Valid @RequestBody ModificarDTO modificarDTO){
-        clienteService.modificarUsuarioNombre(usuario, modificarDTO);
+        clienteService.modificarUsuarioNombreAdmin(usuario, modificarDTO);
         return ResponseEntity.status(HttpStatus.OK).body("Usuario y/o Nombre cambiados con exito!");
     }
 
@@ -64,7 +64,7 @@ public class AdminController {
     @PutMapping ("/restaurante/{usuario}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> modificarRestaurante (@PathVariable String usuario, @Valid @RequestBody RestauranteModificarDTO restauranteModificarDTO){
-        restauranteService.modificarUsuarioNombreRestaurante(usuario, restauranteModificarDTO);
+        restauranteService.modificarUsuarioNombreRestauranteAdmin(usuario, restauranteModificarDTO);
         return ResponseEntity.status(HttpStatus.OK).body("Usuario y/o Nombre cambiados con exito!");
     }
 

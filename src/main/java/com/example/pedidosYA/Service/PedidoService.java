@@ -61,7 +61,7 @@ public class PedidoService {
                     .orElseThrow(() -> new BusinessException("Producto con ID: " + dpdto.getProductoId() + " no encontrado"));
 
             pedidoValidations.verificarCantidadPedido(dpdto.getCantidad());
-
+            pedidoValidations.verificarStockProducto(producto);
             ProductoPedido productoPedido = new ProductoPedido();
             productoPedido.setProducto(producto);
             productoPedido.setCantidad(dpdto.getCantidad());
@@ -70,6 +70,7 @@ public class PedidoService {
 
             double subtotal = producto.getPrecio() * dpdto.getCantidad();
             total += subtotal;
+            productoPedido.getProducto().setStock(productoPedido.getProducto().getStock() - dpdto.getCantidad());
         }
         pedido.setTotal(total);
         pedido.setRestaurante(restaurante);
