@@ -30,38 +30,38 @@ public class AdminController {
     private RestauranteService restauranteService;
 
 
-    @GetMapping("/cliente")
+    @GetMapping("/clientes")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ResponseDTO>> listAllClientes(){
         return ResponseEntity.ok(clienteService.listAll());
     }
 
-    @DeleteMapping("/cliente/{id}")
+    @DeleteMapping("/clientes/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseDTO> deleteCliente(@PathVariable Long id){
         return ResponseEntity.ok(clienteService.eliminar(id));
     }
 
-    @PutMapping ("/cliente/{usuario}")
+    @PutMapping ("/clientes/{usuario}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> modificarCliente (@PathVariable String usuario, @Valid @RequestBody ModificarDTO modificarDTO){
         clienteService.modificarUsuarioNombreAdmin(usuario, modificarDTO);
         return ResponseEntity.status(HttpStatus.OK).body("Usuario y/o Nombre cambiados con exito!");
     }
 
-    @GetMapping("/restaurante")
+    @GetMapping("/restaurantes")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Set<RestauranteResumenDTO>> listAllRestaurantes(){
         return ResponseEntity.ok(restauranteService.findAllRestaurantes());
     }
 
-    @DeleteMapping("/restaurante/{id}")
+    @DeleteMapping("/restaurantes/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RestauranteResponseDTO> deleteRestaurante(@PathVariable Long id){
         return ResponseEntity.ok(restauranteService.eliminarRestaurante(id));
     }
 
-    @PutMapping ("/restaurante/{usuario}")
+    @PutMapping ("/restaurantes/{usuario}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> modificarRestaurante (@PathVariable String usuario, @Valid @RequestBody RestauranteModificarDTO restauranteModificarDTO){
         restauranteService.modificarUsuarioNombreRestauranteAdmin(usuario, restauranteModificarDTO);

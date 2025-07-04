@@ -11,6 +11,8 @@ import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteCrearDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteDetailDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteModificarDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResponseDTO;
+import com.example.pedidosYA.DTO.ProductoDTO.BuscarProductoDTO;
+import com.example.pedidosYA.DTO.PedidoDTO.EstadoPedidoDTO;
 import com.example.pedidosYA.Security.AuthUtil;
 import com.example.pedidosYA.Service.PedidoService;
 import com.example.pedidosYA.Service.ProductoService;
@@ -26,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/restaurante")
+@RequestMapping("/restaurantes")
 public class RestauranteController {
 
     @Autowired
@@ -41,67 +43,70 @@ public class RestauranteController {
     @Autowired
     ReseniaService reseniaService;
 
-    @GetMapping("/perfil")
+    @GetMapping("/perfiles")
     @PreAuthorize("hasRole('RESTAURANTE')")
     public ResponseEntity<RestauranteDetailDTO> verRestaurante (){
         return ResponseEntity.ok(restauranteService.findRestauranteByNombre(AuthUtil.getUsuarioLogueado()));
     }
 
-    @PutMapping("/contrasenia")
+    @PutMapping("/contrasenias")
     @PreAuthorize("hasRole('RESTAURANTE')")
     public ResponseEntity<?> modificarContraseniaRestaurante (@Valid @RequestBody RestauranteModificarDTO restauranteModificarDTO){
         restauranteService.modificarContraseniaRestaurante(AuthUtil.getUsuarioLogueado(), restauranteModificarDTO);
         return ResponseEntity.status(HttpStatus.OK).body("Contrasenia cambiada con exito!");
     }
 
-    @PutMapping("/perfil")
+    @PutMapping("/perfiles")
     @PreAuthorize("hasRole('RESTAURANTE')")
     public ResponseEntity<?> modificarUsuarioNombreRestaurante (@Valid @RequestBody RestauranteModificarDTO restauranteModificarDTO){
         restauranteService.modificarUsuarioNombreRestaurante(AuthUtil.getUsuarioLogueado(), restauranteModificarDTO);
         return ResponseEntity.status(HttpStatus.OK).body("Usuario y/o Nombre cambiados con exito!");
     }
 
-    @PostMapping("/producto")
+    @PostMapping("/productos")
     @PreAuthorize("hasRole('RESTAURANTE')")
     public ResponseEntity<ProductoDetailDTO> crearProducto (@Valid @RequestBody ProductoCrearDTO productoCrearDTO){
         return ResponseEntity.status(HttpStatus.CREATED).body(productoService.crearProducto(AuthUtil.getUsuarioLogueado(),productoCrearDTO));
     }
 
-    @GetMapping ("/producto")
+    @GetMapping ("/productos")
     public ResponseEntity<?> findALlProducto(){
         return ResponseEntity.ok(productoService.findAllProductosByRestaurante(AuthUtil.getUsuarioLogueado()));
     }
 
-    @GetMapping ("/producto/{nombre}")
-    public ResponseEntity<ProductoDetailDTO> findProductoBynombre(@PathVariable String nombre){
-        return ResponseEntity.ok(productoService.findProductoBynombre(AuthUtil.getUsuarioLogueado(), nombre));
+    @PostMapping("/productos/buscar")
+    public ResponseEntity<ProductoDetailDTO> findProductoPorNombre(@Valid @RequestBody BuscarProductoDTO buscarDTO){
+        return ResponseEntity.ok(productoService.findProductoBynombre(AuthUtil.getUsuarioLogueado(), buscarDTO.getNombre())
+        );
     }
 
-    @PutMapping  ("/producto/{idProducto}")
+    @PutMapping("/productos/{id-producto}")
     @PreAuthorize("hasRole('RESTAURANTE')")
-    public ResponseEntity<ProductoDetailDTO> modificarProducto(@PathVariable Long idProducto, @Valid @RequestBody ProductoModificarDTO productoNuevo){
+    public ResponseEntity<ProductoDetailDTO> modificarProducto(@PathVariable("id-producto") Long idProducto, @Valid @RequestBody ProductoModificarDTO productoNuevo){
         return ResponseEntity.ok(productoService.modificarProducto(AuthUtil.getUsuarioLogueado(), idProducto, productoNuevo));
     }
 
-    @DeleteMapping ("/producto/{idProducto}")
+    @DeleteMapping("/productos/{id-producto}")
     @PreAuthorize("hasRole('RESTAURANTE')")
-    public ResponseEntity<?> eliminarProducto(@PathVariable Long idProducto){
+    public ResponseEntity<?> eliminarProducto(@PathVariable("id-producto") Long idProducto){
         productoService.eliminarProducto(AuthUtil.getUsuarioLogueado(), idProducto);
         return ResponseEntity.status(HttpStatus.OK).body("Producto con id: "+idProducto+" eliminado");
     }
 
-    @PutMapping ("/pedidos/{idPedido}/{estado}")
+    @PutMapping("/pedidos/{id-pedido}/estado")
     @PreAuthorize("hasRole('RESTAURANTE')")
-    public ResponseEntity<PedidoDetailDTO>modificarEstadoPedido(@PathVariable Long idPedido, @PathVariable String estado){
-        return ResponseEntity.ok(pedidoService.modificarEstadoPedido(idPedido, estado));
+    public ResponseEntity<PedidoDetailDTO> modificarEstadoPedido(@PathVariable("id-pedido") Long idPedido, @Valid @RequestBody EstadoPedidoDTO estadoDTO) {
+        return ResponseEntity.ok(
+                pedidoService.modificarEstadoPedido(idPedido, estadoDTO.getEstado())
+        );
     }
 
-    @GetMapping("/pedidosEnCurso")
+    @GetMapping("/pedidos-en-curso")
     public ResponseEntity<List<PedidoResumenDTO>> verPedidosDeRestauranteEnCurso(){
         return ResponseEntity.ok(pedidoService.verPedidosDeRestauranteEnCurso(AuthUtil.getUsuarioLogueado()));
     }
 
-    @GetMapping("/historialPedidos")
+    @GetMapping("/historial-pedidos")
     public ResponseEntity<List<PedidoResumenDTO>> verHistorialPedidosDeRestaurante(){
         return ResponseEntity.ok(pedidoService.verHistorialPedidosDeRestaurante(AuthUtil.getUsuarioLogueado()));
     }

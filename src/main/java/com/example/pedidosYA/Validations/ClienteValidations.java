@@ -1,9 +1,10 @@
 package com.example.pedidosYA.Validations;
 
 import com.example.pedidosYA.Model.Cliente;
-import com.example.pedidosYA.Model.Pago;
+import com.example.pedidosYA.Model.Tarjeta;
 import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Repository.DireccionRepository;
+import com.example.pedidosYA.Repository.TarjetaRepository;
 import com.example.pedidosYA.Repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +18,8 @@ public class ClienteValidations {
     private ClienteRepository clienteRepository;
     @Autowired
     private DireccionRepository direccionRepository;
+    @Autowired
+    private TarjetaRepository tarjetaRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -73,10 +76,6 @@ public class ClienteValidations {
         if (nombre.length() > 25) {
             throw new BusinessException("El nombre no puede tener más de 25 caracteres.");
         }
-
-        if (c != null && clienteRepository.existsByNombreYapellido(nombre)) {
-            throw new BusinessException("El nombre ya pertenece a otro cliente.");
-        }
     }
 
     public void validarUsuario(String usuario) {
@@ -103,9 +102,18 @@ public class ClienteValidations {
         }
     }
 
-    public void validarPagoEnCliente (Pago pago, Cliente cliente){
+    public void validarPagoEnCliente (Tarjeta pago, Cliente cliente){
         if (!pago.getCliente().getId().equals(cliente.getId())) {
             throw new BusinessException("El pago no pertenece a este cliente");
         }
     }
+
+    public void validarExistenciaTarjeta(Tarjeta tarjeta, Cliente cliente) {
+        boolean yaExiste = cliente.getTarjetas().stream().anyMatch(t -> t.getNumero().equals(tarjeta.getNumero()));
+
+        if (yaExiste) {
+            throw new BusinessException("Ya tenés una tarjeta registrada con ese número");
+        }
+    }
+
 }

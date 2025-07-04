@@ -1,9 +1,8 @@
 package com.example.pedidosYA.Controller;
 
-import com.example.pedidosYA.DTO.PagoDTO.PagoMuestraDTO;
-import com.example.pedidosYA.DTO.PagoDTO.PagoRequestDTO;
-import com.example.pedidosYA.Model.MetodoDePago;
-import com.example.pedidosYA.Model.Pago;
+import com.example.pedidosYA.DTO.PagoDTO.TarjetaMuestraDTO;
+import com.example.pedidosYA.DTO.PagoDTO.TarjetaRequestDTO;
+import com.example.pedidosYA.Model.Tarjeta;
 import com.example.pedidosYA.Security.AuthUtil;
 import com.example.pedidosYA.Service.PagoService;
 import jakarta.validation.Valid;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/pago")
+@RequestMapping("/pagos")
 public class PagoController {
 
     @Autowired
@@ -24,24 +23,24 @@ public class PagoController {
 
     @PostMapping
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<PagoMuestraDTO> crearPago(@Valid @RequestBody PagoRequestDTO metodo) {
+    public ResponseEntity<TarjetaMuestraDTO> crearTarjeta(@Valid @RequestBody TarjetaRequestDTO tarjetaRequestDTO) {
         String username = AuthUtil.getUsuarioLogueado();
-        PagoMuestraDTO pago = pagoService.agregarPago(username, metodo);
-        return ResponseEntity.status(HttpStatus.CREATED).body(pago);
+        TarjetaMuestraDTO tarjeta = pagoService.agregarTarjeta(username, tarjetaRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(tarjeta);
     }
 
-    @DeleteMapping("/{idPago}")
+    @DeleteMapping("/{id-pago}")
     @PreAuthorize("hasRole('CLIENTE')")
-    public void eliminarPago(@PathVariable Long idPago) {
+    public void eliminarTarjeta(@PathVariable("id-pago") Long idPago) {
         String username = AuthUtil.getUsuarioLogueado();
-        pagoService.eliminarPago(username, idPago);
+        pagoService.eliminarTarjeta(username, idPago);
     }
 
     @GetMapping
     @PreAuthorize("hasRole('CLIENTE')")
-    public List<Pago> mostrarPagos() {
+    public List<Tarjeta> mostrarTarjetas() {
         String username = AuthUtil.getUsuarioLogueado();
-        return pagoService.mostarPagos(username);
+        return pagoService.mostarTarjetas(username);
     }
 
 }
