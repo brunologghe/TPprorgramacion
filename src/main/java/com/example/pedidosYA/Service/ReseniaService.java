@@ -13,6 +13,7 @@ import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
 import com.example.pedidosYA.Validations.ReseniaValidations;
 import com.example.pedidosYA.Validations.RestauranteValidations;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,7 @@ public class ReseniaService {
     @Autowired
     private ReseniaValidations reseniaValidations;
 
-
+    @Transactional
     public ReseniaDetailDTO crearResenia(String usuario, ReseniaCreateDTO reseniaCreateDTO) {
         Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 

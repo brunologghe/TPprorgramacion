@@ -9,6 +9,7 @@ import com.example.pedidosYA.Model.Pago;
 import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Repository.PagoRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ public class PagoService {
     @Autowired
     private PagoRepository pagoRepository;
 
+    @Transactional
     public PagoMuestraDTO agregarPago(String username, PagoRequestDTO metodoDePago) {
         Cliente cliente = clienteRepository.findByUsuario(username).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
@@ -35,6 +37,7 @@ public class PagoService {
         return new PagoMuestraDTO(pago.getId(), pago.getMetodoDePago());
     }
 
+    @Transactional
     public void eliminarPago(String username, Long idPago) {
         Cliente cliente = clienteRepository.findByUsuario(username).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         Pago pago = pagoRepository.findById(idPago)

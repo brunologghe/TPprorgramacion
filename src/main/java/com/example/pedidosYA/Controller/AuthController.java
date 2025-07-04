@@ -3,19 +3,10 @@ package com.example.pedidosYA.Controller;
 
 import com.example.pedidosYA.DTO.AuthDTO.LoginRequest;
 import com.example.pedidosYA.DTO.AuthDTO.RegisterRequest;
-import com.example.pedidosYA.Model.*;
-import com.example.pedidosYA.Security.JwtUtil;
 import com.example.pedidosYA.Service.AuthService;
-import com.example.pedidosYA.Service.CustomUserDetailsService;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

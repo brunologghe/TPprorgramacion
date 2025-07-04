@@ -10,6 +10,7 @@ import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Repository.DireccionRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
 import com.example.pedidosYA.Validations.DireccionValidations;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,7 @@ public class DireccionService {
     @Autowired
     private DireccionValidations direccionValidations;
 
+    @Transactional
     public DireccionDTO crearDireccion(String username, DireccionCrearDTO direccion) {
         Cliente cliente = clienteRepository.findByUsuario(username).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
@@ -45,7 +47,7 @@ public class DireccionService {
         return new DireccionDTO(guardada.getId(), guardada.getDireccion(), guardada.getCiudad(), guardada.getPais(), guardada.getCodigoPostal());
     }
 
-
+    @Transactional
     public void eliminarDireccion(String username, DireccionEliminarDTO dto) {
         Cliente cliente = clienteRepository.findByUsuario(username).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         Direccion direccion = direccionRepository.findByClienteIdAndCodigoPostalAndDireccion(
@@ -58,6 +60,7 @@ public class DireccionService {
         direccionRepository.delete(direccion);
     }
 
+    @Transactional
     public DireccionDTO modificarDireccion(String username, Long id, DireccionCrearDTO dto) {
         Cliente cliente = clienteRepository.findByUsuario(username).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         Direccion direccion = direccionRepository.findById(id)

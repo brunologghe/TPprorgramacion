@@ -13,6 +13,7 @@ import com.example.pedidosYA.Model.RolUsuario;
 import com.example.pedidosYA.Model.Usuario;
 import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ public class ClienteService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public ResponseDTO eliminar(Long id){
         Cliente cliente = clienteValidations.validarExistencia(id);
         ResponseDTO clienteDTO = new ResponseDTO(
@@ -49,6 +51,7 @@ public class ClienteService {
         return clienteDTO;
     }
 
+    @Transactional
     public void modificarContrasenia (String usuario, ModificarDTO clienteNuevo){
         Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
@@ -59,6 +62,7 @@ public class ClienteService {
         Cliente c = clienteRepository.save(cliente);
     }
 
+    @Transactional
     public void modificarUsuarioNombre (String usuario, ModificarDTO clienteNuevo){
         Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
@@ -71,6 +75,7 @@ public class ClienteService {
         Cliente c = clienteRepository.save(cliente);
     }
 
+    @Transactional
     public void modificarUsuarioNombreAdmin (String usuario, ModificarDTO clienteNuevo){
         Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 

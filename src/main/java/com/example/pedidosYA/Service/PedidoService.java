@@ -11,6 +11,7 @@ import com.example.pedidosYA.Security.AuthUtil;
 import com.example.pedidosYA.Validations.ClienteValidations;
 import com.example.pedidosYA.Validations.PedidoValidations;
 import com.example.pedidosYA.Validations.RestauranteValidations;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,7 @@ public class PedidoService {
     @Autowired
     private PagoRepository pagoRepository;
 
+    @Transactional
     public PedidoDetailDTO hacerPedido(String usuario, PedidoCreateDTO pedidoCreateDTO) {
         Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         Restaurante restaurante =  restauranteValidations.validarExisteId(pedidoCreateDTO.getRestauranteId());
@@ -162,6 +164,7 @@ public class PedidoService {
         );
     }
 
+    @Transactional
     public void cancelarPedido(String usuario, Long idPedido){
         Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(()-> new BusinessException("Ese pedido no existe"));
@@ -176,7 +179,7 @@ public class PedidoService {
         pedidoRepository.delete(pedido);
     }
 
-
+    @Transactional
     public PedidoDetailDTO modificarEstadoPedido(Long idPedido, String estado) {
 
         EstadoPedido estadoPedido;

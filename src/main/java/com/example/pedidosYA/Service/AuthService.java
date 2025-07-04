@@ -8,6 +8,7 @@ import com.example.pedidosYA.Security.JwtUtil;
 import com.example.pedidosYA.Validations.AdminValidations;
 import com.example.pedidosYA.Validations.ClienteValidations;
 import com.example.pedidosYA.Validations.RestauranteValidations;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,6 +46,7 @@ public class AuthService {
         return JwtUtil.generarToken(userDetails.getUsername(), roles);
     }
 
+    @Transactional
     public String registro(RegisterRequest request) {
         if (usuarioService.existsByUsername(request.getUsuario())) {
             throw new RuntimeException("El usuario ya existe");

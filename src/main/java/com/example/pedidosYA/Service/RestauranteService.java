@@ -12,6 +12,7 @@ import com.example.pedidosYA.Model.Usuario;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Repository.UsuarioRepository;
 import com.example.pedidosYA.Validations.RestauranteValidations;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -57,6 +58,7 @@ public class RestauranteService {
         return restauranteRepository.findAll().stream().map(r -> new RestauranteResumenDTO(r.getId(), r.getNombre())).collect(Collectors.toSet());
     }
 
+    @Transactional
     public void modificarContraseniaRestaurante (String usuario, RestauranteModificarDTO restauranteNuevo){
 
         Long id = restauranteRepository.findByUsuario(usuario).get().getId();
@@ -72,6 +74,7 @@ public class RestauranteService {
 
     }
 
+    @Transactional
     public void modificarUsuarioNombreRestaurante (String usuario, RestauranteModificarDTO restauranteNuevo){
 
         Long id = restauranteRepository.findByUsuario(usuario).get().getId();
@@ -89,6 +92,7 @@ public class RestauranteService {
 
     }
 
+    @Transactional
     public void modificarUsuarioNombreRestauranteAdmin (String usuario, RestauranteModificarDTO restauranteNuevo){
 
         Long id = restauranteRepository.findByUsuario(usuario).get().getId();
@@ -105,6 +109,7 @@ public class RestauranteService {
 
     }
 
+    @Transactional
     public RestauranteResponseDTO eliminarRestaurante (Long id){
         Restaurante restaurante = restauranteValidations.validarExisteId(id);
 
