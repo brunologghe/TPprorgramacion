@@ -7,10 +7,7 @@ import com.example.pedidosYA.DTO.ProductoDTO.ProductoDetailDTO;
 import com.example.pedidosYA.DTO.ProductoDTO.ProductoModificarDTO;
 import com.example.pedidosYA.DTO.ProductoDTO.ProductoResumenDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaResumenDTO;
-import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteCrearDTO;
-import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteDetailDTO;
-import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteModificarDTO;
-import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResponseDTO;
+import com.example.pedidosYA.DTO.RestauranteDTO.*;
 import com.example.pedidosYA.DTO.ProductoDTO.BuscarProductoDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.EstadoPedidoDTO;
 import com.example.pedidosYA.Security.AuthUtil;
@@ -115,4 +112,11 @@ public class RestauranteController {
     public ResponseEntity<List<ReseniaResumenDTO>> verReseniasRestaurante(){
         return ResponseEntity.ok(reseniaService.verReseniasRestaurante(AuthUtil.getUsuarioLogueado()));
     }
+
+    @GetMapping("/estadisticas")
+    public ResponseEntity<EstadisticasDTO>estadisticasRestaurante(){
+        return ResponseEntity.ok(restauranteService.obtenerEstadisticas(AuthUtil.getUsuarioLogueado()));
+    }
+
+
 }

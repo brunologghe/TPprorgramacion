@@ -22,28 +22,28 @@ public class DireccionController {
     @Autowired
     private DireccionService direccionService;
     @PostMapping
-    @PreAuthorize("hasRole('CLIENTE')")
+    @PreAuthorize("hasRole('CLIENTE') or hasRole('RESTAURANTE')" )
     public ResponseEntity<DireccionDTO> crearDireccion(@Valid @RequestBody DireccionCrearDTO dire) {
         String username = AuthUtil.getUsuarioLogueado();
         return ResponseEntity.status(HttpStatus.CREATED).body(direccionService.crearDireccion(username, dire));
     }
 
     @DeleteMapping
-    @PreAuthorize("hasRole('CLIENTE')")
+    @PreAuthorize("hasRole('CLIENTE')or hasRole('RESTAURANTE')")
     public void eliminarDireccion(@RequestBody DireccionEliminarDTO dire) {
         String username = AuthUtil.getUsuarioLogueado();
         direccionService.eliminarDireccion(username, dire);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('CLIENTE')")
+    @PreAuthorize("hasRole('CLIENTE')or hasRole('RESTAURANTE')")
     public ResponseEntity<DireccionDTO> modificar(@PathVariable Long id, @RequestBody DireccionCrearDTO dto) {
         String username = AuthUtil.getUsuarioLogueado();
         return ResponseEntity.ok(direccionService.modificarDireccion(username, id, dto));
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('CLIENTE')")
+    @PreAuthorize("hasRole('CLIENTE')or hasRole('RESTAURANTE')")
     public List<DireccionDTO> listarDirecciones() {
         String username = AuthUtil.getUsuarioLogueado();
         return direccionService.listarDirecciones(username);

@@ -1,14 +1,13 @@
 package com.example.pedidosYA.Service;
 
 import com.example.pedidosYA.DTO.ClienteDTO.ResponseDTO;
+import com.example.pedidosYA.DTO.DireccionDTO.DireccionDTO;
 import com.example.pedidosYA.DTO.ProductoDTO.ProductoDetailDTO;
 import com.example.pedidosYA.DTO.ProductoDTO.ProductoResumenDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaResumenDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.*;
 import com.example.pedidosYA.Exceptions.BusinessException;
-import com.example.pedidosYA.Model.Restaurante;
-import com.example.pedidosYA.Model.RolUsuario;
-import com.example.pedidosYA.Model.Usuario;
+import com.example.pedidosYA.Model.*;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Repository.UsuarioRepository;
 import com.example.pedidosYA.Validations.RestauranteValidations;
@@ -18,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,8 +45,12 @@ public class RestauranteService {
         List<ReseniaResumenDTO> reseniaDTO = restaurante.getReseniasRestaurante().stream()
                 .map(resenia -> new ReseniaResumenDTO(resenia.getCliente().getId(), resenia.getDescripcion(), resenia.getPuntuacion()))
                 .collect(Collectors.toList());
+
+        List<DireccionDTO>direccionDTOS = restaurante.getDirecciones().stream().map(direccion ->
+                new DireccionDTO(direccion.getId(), direccion.getDireccion(), direccion.getCiudad(), direccion.getPais(), direccion.getCodigoPostal())).collect(Collectors.toList());
+
         return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(),
-                menuDTO, reseniaDTO);
+                menuDTO, reseniaDTO, direccionDTOS);
     }
 
     public Set<RestauranteResumenDTO> findAllRestaurantes(){
@@ -116,6 +120,22 @@ public class RestauranteService {
 
         restauranteRepository.delete(restaurante);
         return restauranteDTO;
+    }
+
+    public EstadisticasDTO obtenerEstadisticas(String usuario)
+    {
+        Long id = restauranteRepository.findByUsuario(usuario).get().getId();
+
+        Restaurante restaurante = restauranteRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Restaurante no encontrado"));
+
+        List<Pedido>pedidos = restaurante.getPedidos();
+
+        int cantidadPedidos = pedidos.size();
+        double ingresos = pedidos.stream().mapToDouble(Pedido::getTotal).sum();
+        double calificacionPromedio = restaurante.getReseniasRestaurante().stream().mapToDouble(Resenia::getPuntuacion).average().orElse(0);
+
+        return new EstadisticasDTO(cantidadPedidos, ingresos, calificacionPromedio);
     }
 
 }
