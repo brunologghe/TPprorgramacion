@@ -94,11 +94,5 @@ public class Pedido {
         this.productosPedidos = productosPedidos;
     }
 
-    public Integer getTiempoPreparacionEntrega() {
-        return tiempoPreparacionEntrega;
-    }
 
-    public void setTiempoPreparacionEntrega(Integer tiempoPreparacionEntrega) {
-        this.tiempoPreparacionEntrega = tiempoPreparacionEntrega;
-    }
 }
