@@ -10,6 +10,7 @@ import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaResumenDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.*;
 import com.example.pedidosYA.DTO.ProductoDTO.BuscarProductoDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.EstadoPedidoDTO;
+import com.example.pedidosYA.Model.Combo;
 import com.example.pedidosYA.Security.AuthUtil;
 import com.example.pedidosYA.Service.PedidoService;
 import com.example.pedidosYA.Service.ProductoService;
@@ -118,5 +119,13 @@ public class RestauranteController {
         return ResponseEntity.ok(restauranteService.obtenerEstadisticas(AuthUtil.getUsuarioLogueado()));
     }
 
+    @PostMapping("/agregar-combo")
+    public ResponseEntity<ComboResponseDTO>agregarCombo(@Valid @RequestBody ComboRequestDTO comboRequestDTO){
+        return ResponseEntity.status(HttpStatus.OK).body(restauranteService.agregarCombo(AuthUtil.getUsuarioLogueado(), comboRequestDTO));
+    }
 
+    @GetMapping("/combos")
+    public ResponseEntity<List<ComboResponseDTO>>verCombos(){
+        return ResponseEntity.status(HttpStatus.OK).body(restauranteService.verCombos(AuthUtil.getUsuarioLogueado()));
+    }
 }

@@ -1,9 +1,6 @@
 package com.example.pedidosYA.Model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 import java.util.List;
 
@@ -21,6 +18,10 @@ public class Cliente extends Usuario {
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pedido>pedidos;
+
+    @ManyToMany
+    @JoinTable(name = "cliente_restaurante_favoritos", joinColumns = @JoinColumn(name = "cliente_id"), inverseJoinColumns = @JoinColumn(name = "restaurante_id"))
+    private List<Restaurante>listaRestaurantesFavoritos;
 
     public Cliente() {
     }
@@ -57,4 +58,11 @@ public class Cliente extends Usuario {
         this.pedidos = pedidos;
     }
 
+    public List<Restaurante> getListaRestaurantesFavoritos() {
+        return listaRestaurantesFavoritos;
+    }
+
+    public void setListaRestaurantesFavoritos(List<Restaurante> listaRestaurantesFavoritos) {
+        this.listaRestaurantesFavoritos = listaRestaurantesFavoritos;
+    }
 }

@@ -8,6 +8,7 @@ import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaResumenDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.*;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.*;
+import com.example.pedidosYA.Repository.ProductoRepository;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Repository.UsuarioRepository;
 import com.example.pedidosYA.Validations.RestauranteValidations;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,11 +36,12 @@ public class RestauranteService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UsuarioRepository usuarioRepository;
-
+    @Autowired
+    private ProductoRepository productoRepository;
 
     public RestauranteDetailDTO findRestauranteByNombre(String usuario){
 
-        Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese usuario"));
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
         Set<ProductoResumenDTO> menuDTO = restaurante.getMenu().stream()
                 .map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio()))
                 .collect(Collectors.toSet());
@@ -62,13 +65,9 @@ public class RestauranteService {
     }
 
     public void modificarContraseniaRestaurante (String usuario, RestauranteModificarDTO restauranteNuevo){
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
 
-        Long id = restauranteRepository.findByUsuario(usuario).get().getId();
-
-        Restaurante restaurante = restauranteRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Restaurante no encontrado"));
-
-        restauranteValidations.validarContraseniaActual(id, restauranteNuevo.getContraseniaActual());
+        restauranteValidations.validarContraseniaActual(restaurante.getId(), restauranteNuevo.getContraseniaActual());
 
         restaurante.setContrasenia(passwordEncoder.encode(restauranteNuevo.getContraseniaNueva()));
 
@@ -77,14 +76,10 @@ public class RestauranteService {
     }
 
     public void modificarUsuarioNombreRestaurante (String usuario, RestauranteModificarDTO restauranteNuevo){
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
 
-        Long id = restauranteRepository.findByUsuario(usuario).get().getId();
-
-        Restaurante restaurante = restauranteRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Restaurante no encontrado"));
-
-        restauranteValidations.validarContraseniaActual(id, restauranteNuevo.getContraseniaActual());
-        restauranteValidations.validarNombreNoDuplicadoConID(id, restauranteNuevo.getNombreRestaurante());
+        restauranteValidations.validarContraseniaActual(restaurante.getId(), restauranteNuevo.getContraseniaActual());
+        restauranteValidations.validarNombreNoDuplicadoConID(restaurante.getId(), restauranteNuevo.getNombreRestaurante());
 
         restaurante.setUsuario(restauranteNuevo.getUsuario());
         restaurante.setNombre(restauranteNuevo.getNombreRestaurante());
@@ -94,13 +89,9 @@ public class RestauranteService {
     }
 
     public void modificarUsuarioNombreRestauranteAdmin (String usuario, RestauranteModificarDTO restauranteNuevo){
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
 
-        Long id = restauranteRepository.findByUsuario(usuario).get().getId();
-
-        Restaurante restaurante = restauranteRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Restaurante no encontrado"));
-
-        restauranteValidations.validarNombreNoDuplicadoConID(id, restauranteNuevo.getNombreRestaurante());
+        restauranteValidations.validarNombreNoDuplicadoConID(restaurante.getId(), restauranteNuevo.getNombreRestaurante());
 
         restaurante.setUsuario(restauranteNuevo.getUsuario());
         restaurante.setNombre(restauranteNuevo.getNombreRestaurante());
@@ -124,10 +115,7 @@ public class RestauranteService {
 
     public EstadisticasDTO obtenerEstadisticas(String usuario)
     {
-        Long id = restauranteRepository.findByUsuario(usuario).get().getId();
-
-        Restaurante restaurante = restauranteRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Restaurante no encontrado"));
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
 
         List<Pedido>pedidos = restaurante.getPedidos();
 
@@ -138,4 +126,42 @@ public class RestauranteService {
         return new EstadisticasDTO(cantidadPedidos, ingresos, calificacionPromedio);
     }
 
+    public ComboResponseDTO agregarCombo(String usuario, ComboRequestDTO comboRequestDTO)
+    {
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
+
+        Combo combo = new Combo();
+
+        combo.setNombre(comboRequestDTO.getNombre());
+        combo.setDescuento(comboRequestDTO.getDescuento());
+        combo.setRestaurante(restaurante);
+
+        Set<Producto>productoSet = new HashSet<>();
+
+        for(Long id : comboRequestDTO.getProductoIds())
+        {
+            Producto producto = productoRepository.findById(id).orElseThrow(()-> new RuntimeException("Producto con id: "+id+" no encontrado"));
+            productoSet.add(producto);
+        }
+        combo.setProductos(productoSet);
+        double precioProductos = productoSet.stream().mapToDouble(Producto::getPrecio).sum();
+        combo.setPrecio(precioProductos * (1 - (comboRequestDTO.getDescuento() / 100)));
+
+        restaurante.getCombos().add(combo);
+        restauranteRepository.save(restaurante);
+
+        Set<ProductoResumenDTO> productosResumen = productoSet.stream().map(producto -> new ProductoResumenDTO(producto.getId(),producto.getNombre(),producto.getPrecio())).collect(Collectors.toSet());
+
+        return new ComboResponseDTO(combo.getNombre(), productosResumen, comboRequestDTO.getDescuento(), combo.getPrecio());
+    }
+
+    public List<ComboResponseDTO> verCombos(String usuario) {
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
+
+        List<ComboResponseDTO> listaCombos = restaurante.getCombos().stream().map(combo -> {Set<ProductoResumenDTO> productosResumen = combo.getProductos().stream().map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio())).collect(Collectors.toSet());
+            return new ComboResponseDTO(combo.getNombre(), productosResumen, combo.getDescuento(), combo.getPrecio());}).collect(Collectors.toList());
+
+        return listaCombos;
+    }
 }

@@ -6,17 +6,20 @@ import com.example.pedidosYA.DTO.ClienteDTO.ModificarDTO;
 import com.example.pedidosYA.DTO.ClienteDTO.ResponseDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteModificarDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResponseDTO;
+import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResumenDTO;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.Cliente;
 import com.example.pedidosYA.Model.Restaurante;
 import com.example.pedidosYA.Model.RolUsuario;
 import com.example.pedidosYA.Model.Usuario;
 import com.example.pedidosYA.Repository.ClienteRepository;
+import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +32,8 @@ public class ClienteService {
     private ClienteValidations clienteValidations;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RestauranteRepository restauranteRepository;
 
     public List<ResponseDTO> listAll(){
 
@@ -91,4 +96,35 @@ public class ClienteService {
         return new ClienteDetailDto(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido(), cliente.getDirecciones(), cliente.getTarjetas());
     }
 
+    public RestauranteResumenDTO agregarRestauranteALista(String usuario, Long id)
+    {
+        Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
+
+        Restaurante restaurante = restauranteRepository.findById(id).orElseThrow(() -> new BusinessException("Restaurante no encontrado"));
+
+        cliente.getListaRestaurantesFavoritos().add(restaurante);
+
+        clienteRepository.save(cliente);
+
+        return new RestauranteResumenDTO(restaurante.getId(), restaurante.getNombre());
+    }
+
+    public List<RestauranteResumenDTO> verListaFavoritos(String usuario)
+    {
+        Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
+
+        List<RestauranteResumenDTO>listaFav = new ArrayList<>();
+
+        for(Restaurante r : cliente.getListaRestaurantesFavoritos()){
+            RestauranteResumenDTO restauranteResumenDTO = new RestauranteResumenDTO(r.getId(), r.getNombre());
+            listaFav.add(restauranteResumenDTO);
+        }
+
+        if(listaFav.isEmpty())
+        {
+            throw new RuntimeException("Aun no hay restaurantes en la lista de favoritos");
+        }
+
+        return listaFav;
+    }
 }
