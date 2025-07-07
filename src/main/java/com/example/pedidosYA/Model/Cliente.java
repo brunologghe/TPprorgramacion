@@ -1,12 +1,7 @@
 package com.example.pedidosYA.Model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import org.springframework.security.core.GrantedAuthority;
+import jakarta.persistence.*;
 
-import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -19,10 +14,14 @@ public class Cliente extends Usuario {
     private List<Direccion> direcciones;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Pago> metodosPago;
+    private List<Tarjeta> tarjetas;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pedido>pedidos;
+
+    @ManyToMany
+    @JoinTable(name = "cliente_restaurante_favoritos", joinColumns = @JoinColumn(name = "cliente_id"), inverseJoinColumns = @JoinColumn(name = "restaurante_id"))
+    private List<Restaurante>listaRestaurantesFavoritos;
 
     public Cliente() {
     }
@@ -43,12 +42,12 @@ public class Cliente extends Usuario {
         this.direcciones = direcciones;
     }
 
-    public List<Pago> getMetodosPago() {
-        return metodosPago;
+    public List<Tarjeta> getTarjetas() {
+        return tarjetas;
     }
 
-    public void setMetodosPago(List<Pago> metodosPago) {
-        this.metodosPago = metodosPago;
+    public void setTarjetas(List<Tarjeta> tarjetas) {
+        this.tarjetas = tarjetas;
     }
 
     public List<Pedido> getPedidos() {
@@ -59,4 +58,11 @@ public class Cliente extends Usuario {
         this.pedidos = pedidos;
     }
 
+    public List<Restaurante> getListaRestaurantesFavoritos() {
+        return listaRestaurantesFavoritos;
+    }
+
+    public void setListaRestaurantesFavoritos(List<Restaurante> listaRestaurantesFavoritos) {
+        this.listaRestaurantesFavoritos = listaRestaurantesFavoritos;
+    }
 }

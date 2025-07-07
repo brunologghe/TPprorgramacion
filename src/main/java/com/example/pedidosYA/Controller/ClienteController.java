@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/cliente")
+@RequestMapping("/clientes")
 @DiscriminatorValue("CLIENTE")
 public class ClienteController {
 
@@ -44,33 +44,33 @@ public class ClienteController {
     private RestauranteService restauranteService;
 
 
-    @GetMapping("/perfil")
+    @GetMapping("/perfiles")
     @PreAuthorize("hasRole('CLIENTE')")
     public ClienteDetailDto verCliente() {
         return clienteService.verUsuarioPorNombre(AuthUtil.getUsuarioLogueado());
     }
 
-    @PutMapping("/perfil")
+    @PutMapping("/perfiles")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<?> modificarUsuarioNombreCliente (@Valid @RequestBody ModificarDTO modificarDTO){
         clienteService.modificarUsuarioNombre(AuthUtil.getUsuarioLogueado(), modificarDTO);
         return ResponseEntity.status(HttpStatus.OK).body("Usuario y/o Nombre cambiados con exito!");
     }
 
-    @PutMapping("/contrasenia")
+    @PutMapping("/contrasenias")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<?> modificarContraseniaCliente (@Valid @RequestBody ModificarDTO modificarDTO){
         clienteService.modificarContrasenia(AuthUtil.getUsuarioLogueado(), modificarDTO);
         return ResponseEntity.status(HttpStatus.OK).body("Contrasenia cambiada con exito!");
     }
 
-    @GetMapping("/restaurante")
+    @GetMapping("/restaurantes")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<Set<RestauranteResumenDTO>> listAllRestaurantes(){
         return ResponseEntity.ok(restauranteService.findAllRestaurantes());
     }
 
-    @GetMapping ("/verMenu/{nombre}")
+    @GetMapping ("/ver-menu/{nombre}")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<?> findALlProducto(@PathVariable String nombre){
         return ResponseEntity.ok(productoService.findAllProductosByRestauranteNombre(nombre));
@@ -82,34 +82,48 @@ public class ClienteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoService.hacerPedido(AuthUtil.getUsuarioLogueado(), pedido));
     }
 
-    @PostMapping("/resenia")
+    @PostMapping("/resenias")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<ReseniaDetailDTO> hacerResenia(@Valid @RequestBody ReseniaCreateDTO reseniaCreateDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reseniaService.crearResenia(AuthUtil.getUsuarioLogueado(), reseniaCreateDTO));
     }
 
-    @GetMapping("/pedidosEnCurso")
+    @GetMapping("/pedidos-en-curso")
     @PreAuthorize("hasRole('CLIENTE')")
     public List<PedidoDetailDTO> verPedidosEnCurso() {
         return pedidoService.verPedidosEnCurso(AuthUtil.getUsuarioLogueado());
     }
 
-    @GetMapping("/historialPedidos")
+    @GetMapping("/historial-pedidos")
     @PreAuthorize("hasRole('CLIENTE')")
     public List<PedidoDetailDTO> verHistorialPedidos() {
         return pedidoService.verHistorialPedidos(AuthUtil.getUsuarioLogueado());
     }
 
-    @GetMapping("/verDetallesPedido/{idPedido}")
+    @GetMapping("/ver-detalles-pedidos/{id-pedido}")
     @PreAuthorize("hasRole('CLIENTE')")
-    public PedidoDetailDTO verDetallesPedido(@PathVariable Long idPedido) {
+    public PedidoDetailDTO verDetallesPedido(@PathVariable("id-pedido") Long idPedido) {
         return pedidoService.verDetallesPedido(idPedido);
     }
 
-    @DeleteMapping("/{idPedido}")
+    @DeleteMapping("/{id-pedido}")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<?> cancelarPedido(@PathVariable Long idPedido) {
+    public ResponseEntity<?> cancelarPedido(@PathVariable("id-producto") Long idPedido) {
         pedidoService.cancelarPedido(AuthUtil.getUsuarioLogueado(),idPedido);
         return ResponseEntity.status(HttpStatus.OK).body("Pedido con id: "+idPedido+" eliminado");
     }
+
+    @PostMapping("agregar-resto-lista/{id-restaurante}")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<?> agregarRestauranteALista(@PathVariable("id-restaurante") Long idRestaurante) {
+        return ResponseEntity.status(HttpStatus.OK).body(clienteService.agregarRestauranteALista(AuthUtil.getUsuarioLogueado(), idRestaurante));
+    }
+
+    @GetMapping("/mostrar-listafav")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<?> verListaFavoritos() {
+        return ResponseEntity.status(HttpStatus.OK).body(clienteService.verListaFavoritos(AuthUtil.getUsuarioLogueado()));
+    }
+
+
 }

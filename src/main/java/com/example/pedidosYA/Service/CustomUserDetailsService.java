@@ -1,5 +1,6 @@
 package com.example.pedidosYA.Service;
 
+import com.example.pedidosYA.Model.RolUsuario;
 import com.example.pedidosYA.Model.Usuario;
 import com.example.pedidosYA.Repository.UsuarioRepository;
 import org.springframework.security.core.GrantedAuthority;
@@ -37,6 +38,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     public void save(Usuario usuario) {
         usuarioRepo.save(usuario);
+    }
+
+    public boolean existsByRol(RolUsuario rol) {
+        return usuarioRepo.existsByRol(rol);
     }
 }
 

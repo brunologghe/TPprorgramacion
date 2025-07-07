@@ -1,11 +1,15 @@
 package com.example.pedidosYA.DTO.PedidoDTO;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 public class DetallePedidoDTO {
     @NotNull(message = "El producto no puede ser nulo")
+    @Min(value = 1, message = "El productoId debe ser mayor o igual a 1")
     private Long productoId;
-    @NotNull(message = "El pago no puede ser nula")
+
+    @NotNull(message = "La cantidad no puede ser nula")
+    @Min(value = 1, message = "La cantidad debe ser al menos 1")
     private Integer cantidad;
     public @NotNull(message = "El producto no puede ser nulo") Long getProductoId() {
         return productoId;

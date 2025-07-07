@@ -24,6 +24,12 @@ public class Restaurante extends Usuario{
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pedido> pedidos;
 
+    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL)
+    private List<Direccion> direcciones;
+
+    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Combo> combos;
+
     public Restaurante() {
     }
 
@@ -63,4 +69,19 @@ public class Restaurante extends Usuario{
         this.pedidos = pedidos;
     }
 
+    public List<Direccion> getDirecciones() {
+        return direcciones;
+    }
+
+    public void setDirecciones(List<Direccion> direcciones) {
+        this.direcciones = direcciones;
+    }
+
+    public List<Combo> getCombos() {
+        return combos;
+    }
+
+    public void setCombos(List<Combo> combos) {
+        this.combos = combos;
+    }
 }

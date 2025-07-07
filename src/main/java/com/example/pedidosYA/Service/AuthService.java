@@ -83,19 +83,30 @@ public class AuthService {
                 nuevoUsuario = restaurante;
                 break;
 
-            default: // ADMIN
-                Admin admin = new Admin();
-
-                adminValidations.validarUsuario(request.getUsuario());
-                adminValidations.validarContrasenia(request.getContrasenia());
-
-                admin.setUsuario(request.getUsuario());
-                admin.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
-                admin.setRol(RolUsuario.ADMIN);
-                nuevoUsuario = admin;
+            default:
+                throw new RuntimeException("Solo se pueden registrar usuarios con rol CLIENTE o RESTAURANTE.");
         }
 
         usuarioService.save(nuevoUsuario);
         return nuevoUsuario.getRol().name() + " creado";
+    }
+
+
+    public String registrarAdmin(RegisterRequest request) {
+        if (usuarioService.existsByRol(RolUsuario.ADMIN)) {
+            return "Ya existe un administrador registrado.";
+        }
+
+        Admin admin = new Admin();
+
+        adminValidations.validarUsuario(request.getUsuario());
+        adminValidations.validarContrasenia(request.getContrasenia());
+
+        admin.setUsuario(request.getUsuario());
+        admin.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
+        admin.setRol(RolUsuario.ADMIN);
+
+        usuarioService.save(admin);
+        return "ADMIN creado";
     }
 }

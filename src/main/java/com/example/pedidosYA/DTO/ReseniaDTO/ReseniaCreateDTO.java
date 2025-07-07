@@ -1,17 +1,18 @@
 package com.example.pedidosYA.DTO.ReseniaDTO;
 
 import com.example.pedidosYA.DTO.PedidoDTO.DetallePedidoDTO;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 
 import java.util.List;
 
 public class ReseniaCreateDTO {
+
     @NotNull(message = "El restaurante no puede ser nulo")
+    @Min(value = 1, message = "El restauranteId debe ser mayor o igual a 1")
     private Long restauranteId;
-    @NotBlank(message = "La resenia no puede ser nula")
+
+    @NotBlank(message = "La reseña no puede ser nula ni vacía")
+    @Size(min = 10, max = 500, message = "La reseña debe tener entre 10 y 500 caracteres")
     private String resenia;
     @NotNull(message = "La puntuacion no puede ser nula")
     @DecimalMin(value = "0.1", inclusive = true, message = "La puntuación debe ser al menos 0.1")

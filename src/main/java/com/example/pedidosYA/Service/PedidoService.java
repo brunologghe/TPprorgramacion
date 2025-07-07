@@ -37,14 +37,14 @@ public class PedidoService {
     @Autowired
     private PedidoValidations pedidoValidations;
     @Autowired
-    private PagoRepository pagoRepository;
+    private TarjetaRepository pagoRepository;
 
     @Transactional
     public PedidoDetailDTO hacerPedido(String usuario, PedidoCreateDTO pedidoCreateDTO) {
         Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         Restaurante restaurante =  restauranteValidations.validarExisteId(pedidoCreateDTO.getRestauranteId());
         clienteValidations.validarDireccion(pedidoCreateDTO.getDireccionId(), cliente.getId());
-        Pago metodoPago = pagoRepository.findById(pedidoCreateDTO.getPagoId())
+        Tarjeta metodoPago = pagoRepository.findById(pedidoCreateDTO.getPagoId())
                 .orElseThrow(() -> new BusinessException("Método de pago no encontrado"));
         if (!metodoPago.getCliente().getId().equals(cliente.getId())) {
             throw new BusinessException("El método de pago no pertenece al cliente autenticado");

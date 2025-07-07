@@ -19,6 +19,11 @@ public class Direccion {
     @JsonIgnore
     private Cliente cliente;
 
+    @ManyToOne
+    @JoinColumn(name = "restaurante_id")
+    @JsonIgnore
+    private Restaurante restaurante;
+
     public Long getId() {
         return id;
     }
@@ -68,5 +73,13 @@ public class Direccion {
     }
 
     public Direccion() {
+    }
+
+    public Restaurante getRestaurante() {
+        return restaurante;
+    }
+
+    public void setRestaurante(Restaurante restaurante) {
+        this.restaurante = restaurante;
     }
 }

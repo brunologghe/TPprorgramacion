@@ -17,6 +17,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -63,6 +64,32 @@ public class ReseniaService {
                         (resenia.getCliente().getId(), resenia.getDescripcion(), resenia.getPuntuacion())).toList();
 
         reseniaValidations.validarResenia(resenias);
+
+        return resenias;
+    }
+
+    public void eliminarResenia(Long idResenia)
+    {
+        Resenia resenia = reseniaRepository.findById(idResenia).orElseThrow(()-> new RuntimeException("No existe esa reseña"));
+
+        reseniaRepository.delete(resenia);
+    }
+
+    public List<ReseniaResumenDTO>verResenias(Long idRestaurante)
+    {
+        Restaurante restaurante = restauranteRepository.findById(idRestaurante).orElseThrow(()-> new RuntimeException("No existe ese restaurante"));
+
+        List<ReseniaResumenDTO> resenias = new ArrayList<>();
+
+        for(Resenia r : restaurante.getReseniasRestaurante()){
+            ReseniaResumenDTO resenia = new ReseniaResumenDTO(r.getCliente().getId(), r.getDescripcion(), r.getPuntuacion());
+            resenias.add(resenia);
+        }
+
+        if(resenias.isEmpty())
+        {
+            throw new RuntimeException("No hay resenias en este restaurante");
+        }
 
         return resenias;
     }
