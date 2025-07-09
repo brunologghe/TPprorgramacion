@@ -42,9 +42,11 @@ public class RestauranteService {
     public RestauranteDetailDTO findRestauranteByNombre(String usuario){
 
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
+
         Set<ProductoResumenDTO> menuDTO = restaurante.getMenu().stream()
                 .map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio()))
                 .collect(Collectors.toSet());
+
         List<ReseniaResumenDTO> reseniaDTO = restaurante.getReseniasRestaurante().stream()
                 .map(resenia -> new ReseniaResumenDTO(resenia.getCliente().getId(), resenia.getDescripcion(), resenia.getPuntuacion()))
                 .collect(Collectors.toList());
@@ -52,8 +54,11 @@ public class RestauranteService {
         List<DireccionDTO>direccionDTOS = restaurante.getDirecciones().stream().map(direccion ->
                 new DireccionDTO(direccion.getId(), direccion.getDireccion(), direccion.getCiudad(), direccion.getPais(), direccion.getCodigoPostal())).collect(Collectors.toList());
 
+        List<ComboResponseDTO> comboResponseDTOS = restaurante.getCombos().stream().map(combo -> new ComboResponseDTO(combo.getNombre(), combo.getProductos().stream().map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio())).collect(Collectors.toSet())
+                , combo.getDescuento(), combo.getPrecio())).collect(Collectors.toList());
+
         return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(),
-                menuDTO, reseniaDTO, direccionDTOS);
+                menuDTO,comboResponseDTOS, reseniaDTO, direccionDTOS);
     }
 
     public Set<RestauranteResumenDTO> findAllRestaurantes(){

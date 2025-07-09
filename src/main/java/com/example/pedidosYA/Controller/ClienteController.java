@@ -9,11 +9,13 @@ import com.example.pedidosYA.DTO.PedidoDTO.PedidoCreateDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaCreateDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaDetailDTO;
+import com.example.pedidosYA.DTO.RestauranteDTO.MenuComboDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResumenDTO;
 import com.example.pedidosYA.Security.AuthUtil;
 import com.example.pedidosYA.Service.*;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,12 +72,6 @@ public class ClienteController {
         return ResponseEntity.ok(restauranteService.findAllRestaurantes());
     }
 
-    @GetMapping ("/ver-menu/{nombre}")
-    @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<?> findALlProducto(@PathVariable String nombre){
-        return ResponseEntity.ok(productoService.findAllProductosByRestauranteNombre(nombre));
-    }
-
     @PostMapping("/pedir")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<PedidoDetailDTO> hacerPedido(@Valid @RequestBody PedidoCreateDTO pedido) {
@@ -125,5 +121,9 @@ public class ClienteController {
         return ResponseEntity.status(HttpStatus.OK).body(clienteService.verListaFavoritos(AuthUtil.getUsuarioLogueado()));
     }
 
-
+    @GetMapping("/ver-menu/{id-restaurante}")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<MenuComboDTO>verMenuRestaurante(@PathVariable("id-restaurante") Long idRestaurante){
+        return ResponseEntity.status(HttpStatus.OK).body(clienteService.verMenuRestaurante(idRestaurante));
+    }
 }
