@@ -100,12 +100,12 @@ public class RestauranteController {
     }
 
     @GetMapping("/pedidos-en-curso")
-    public ResponseEntity<List<PedidoResumenDTO>> verPedidosDeRestauranteEnCurso(){
+    public ResponseEntity<List<PedidoDetailDTO>> verPedidosDeRestauranteEnCurso(){
         return ResponseEntity.ok(pedidoService.verPedidosDeRestauranteEnCurso(AuthUtil.getUsuarioLogueado()));
     }
 
     @GetMapping("/historial-pedidos")
-    public ResponseEntity<List<PedidoResumenDTO>> verHistorialPedidosDeRestaurante(){
+    public ResponseEntity<List<PedidoDetailDTO>> verHistorialPedidosDeRestaurante(){
         return ResponseEntity.ok(pedidoService.verHistorialPedidosDeRestaurante(AuthUtil.getUsuarioLogueado()));
     }
 
