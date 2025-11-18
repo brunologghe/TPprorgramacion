@@ -1,5 +1,6 @@
 package com.example.pedidosYA.DTO.AuthDTO;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -12,6 +13,10 @@ public class RegisterRequest {
     @NotBlank(message = "La contraseña es obligatoria")
     @Size(min = 6, max = 100, message = "La contraseña debe tener entre 6 y 100 caracteres")
     private String contrasenia;
+
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "El formato del email no es válido")
+    private String email;
 
     @NotBlank(message = "El rol es obligatorio")
     @Pattern(regexp = "CLIENTE|ADMIN|RESTAURANTE", flags = Pattern.Flag.CASE_INSENSITIVE, message = "El rol debe ser CLIENTE o RESTAURANTE")
@@ -28,6 +33,9 @@ public class RegisterRequest {
 
     public String getContrasenia() { return contrasenia; }
     public void setContrasenia(String contrasenia) { this.contrasenia = contrasenia; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
     public String getRol() { return rol; }
     public void setRol(String rol) { this.rol = rol; }

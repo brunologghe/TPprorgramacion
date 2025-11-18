@@ -1,6 +1,7 @@
 package com.example.pedidosYA.Model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +23,10 @@ public abstract class Usuario implements UserDetails {
     private String usuario;
 
     private String contrasenia;
+
+    @Email(message = "El formato del email no es válido")
+    @Column(unique = true, nullable = false)
+    private String email;
 
     @Enumerated(EnumType.STRING)
     private RolUsuario rol;
@@ -59,6 +64,14 @@ public abstract class Usuario implements UserDetails {
 
     public void setRol(RolUsuario rol) {
         this.rol = rol;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @Override

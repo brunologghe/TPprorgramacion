@@ -4,6 +4,7 @@ public record RestauranteResponseDTO (
 
         Long id,
         String usuario,
-        String nombre
+        String nombre,
+        String email
 )
 {}

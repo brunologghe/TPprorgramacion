@@ -5,6 +5,7 @@ public class RestauranteModificarDTO {
     private String contraseniaActual;
     private String contraseniaNueva;
     private String nombreRestaurante;
+    private String email;
 
     public String getUsuario() {
         return usuario;
@@ -36,5 +37,13 @@ public class RestauranteModificarDTO {
 
     public void setNombreRestaurante(String nombreRestaurante) {
         this.nombreRestaurante = nombreRestaurante;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

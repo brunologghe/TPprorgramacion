@@ -53,7 +53,7 @@ public class RestauranteService {
         List<DireccionDTO>direccionDTOS = restaurante.getDirecciones().stream().map(direccion ->
                 new DireccionDTO(direccion.getId(), direccion.getDireccion(), direccion.getCiudad(), direccion.getPais(), direccion.getCodigoPostal())).collect(Collectors.toList());
 
-        return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(),
+        return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(), restaurante.getEmail(),
                 menuDTO, reseniaDTO, direccionDTOS);
     }
 
@@ -86,6 +86,9 @@ public class RestauranteService {
 
         restaurante.setUsuario(restauranteNuevo.getUsuario());
         restaurante.setNombre(restauranteNuevo.getNombreRestaurante());
+        if (restauranteNuevo.getEmail() != null) {
+            restaurante.setEmail(restauranteNuevo.getEmail());
+        }
 
         Restaurante r = restauranteRepository.save(restaurante);
 
@@ -99,6 +102,10 @@ public class RestauranteService {
 
         restaurante.setUsuario(restauranteNuevo.getUsuario());
         restaurante.setNombre(restauranteNuevo.getNombreRestaurante());
+        if (restauranteNuevo.getEmail() != null) {
+            restauranteValidations.validarEmailModificacion(restaurante.getId(), restauranteNuevo.getEmail());
+            restaurante.setEmail(restauranteNuevo.getEmail());
+        }
 
         Restaurante r = restauranteRepository.save(restaurante);
 
@@ -111,7 +118,8 @@ public class RestauranteService {
         RestauranteResponseDTO restauranteDTO = new RestauranteResponseDTO(
                 restaurante.getId(),
                 restaurante.getUsuario(),
-                restaurante.getNombre()
+                restaurante.getNombre(),
+                restaurante.getEmail()
         );
 
         restauranteRepository.delete(restaurante);
@@ -168,5 +176,68 @@ public class RestauranteService {
             return new ComboResponseDTO(combo.getNombre(), productosResumen, combo.getDescuento(), combo.getPrecio());}).collect(Collectors.toList());
 
         return listaCombos;
+    }
+
+    public RestauranteDetailDTO findRestauranteByNombreParaCliente(String nombreRestaurante) {
+        Restaurante restaurante = restauranteRepository.findByNombre(nombreRestaurante);
+        if (restaurante == null) {
+            throw new RuntimeException("Restaurante no encontrado");
+        }
+        
+        Set<ProductoResumenDTO> menuDTO = restaurante.getMenu().stream()
+                .map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio()))
+                .collect(Collectors.toSet());
+        List<ReseniaResumenDTO> reseniaDTO = restaurante.getReseniasRestaurante().stream()
+                .map(resenia -> new ReseniaResumenDTO(resenia.getCliente().getId(), resenia.getDescripcion(), resenia.getPuntuacion()))
+                .collect(Collectors.toList());
+
+        List<DireccionDTO>direccionDTOS = restaurante.getDirecciones().stream().map(direccion ->
+                new DireccionDTO(direccion.getId(), direccion.getDireccion(), direccion.getCiudad(), direccion.getPais(), direccion.getCodigoPostal())).collect(Collectors.toList());
+
+        return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(), restaurante.getEmail(),
+                menuDTO, reseniaDTO, direccionDTOS);
+    }
+
+    @Transactional
+    public void actualizarPerfilRestaurante(String usuario, ActualizarPerfilRestauranteDTO perfilDTO) {
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
+
+        // Verificar contraseña actual
+        restauranteValidations.validarContraseniaActual(restaurante.getId(), perfilDTO.getContraseniaActual());
+
+        // Actualizar campos si se proporcionan
+        if (perfilDTO.getNombreRestaurante() != null && !perfilDTO.getNombreRestaurante().trim().isEmpty()) {
+            restauranteValidations.validarNombreNoDuplicadoConID(restaurante.getId(), perfilDTO.getNombreRestaurante());
+            restaurante.setNombre(perfilDTO.getNombreRestaurante());
+        }
+
+        if (perfilDTO.getEmail() != null && !perfilDTO.getEmail().trim().isEmpty()) {
+            restauranteValidations.validarEmailModificacion(restaurante.getId(), perfilDTO.getEmail());
+            restaurante.setEmail(perfilDTO.getEmail());
+        }
+
+        restauranteRepository.save(restaurante);
+    }
+
+    @Transactional
+    public void cambiarContraseniaRestaurante(String usuario, CambiarContraseniaRestauranteDTO contraseniaDTO) {
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
+
+        // Validar contraseña actual
+        restauranteValidations.validarContraseniaActual(restaurante.getId(), contraseniaDTO.getContraseniaActual());
+
+        // Validar que las nuevas contraseñas coincidan
+        if (!contraseniaDTO.getContraseniaNueva().equals(contraseniaDTO.getConfirmarContrasenia())) {
+            throw new RuntimeException("Las contraseñas nuevas no coinciden");
+        }
+
+        // Validar nueva contraseña
+        restauranteValidations.validarContrasenia(contraseniaDTO.getContraseniaNueva());
+
+        // Actualizar contraseña
+        restaurante.setContrasenia(passwordEncoder.encode(contraseniaDTO.getContraseniaNueva()));
+        restauranteRepository.save(restaurante);
     }
 }

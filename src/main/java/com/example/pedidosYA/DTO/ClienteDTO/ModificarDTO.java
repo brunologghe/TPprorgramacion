@@ -3,6 +3,7 @@ package com.example.pedidosYA.DTO.ClienteDTO;
 public class ModificarDTO {
     private String usuario;
     private String nombreYapellido;
+    private String email;
     private String contraseniaActual;
     private String contraseniaNueva;
 
@@ -36,5 +37,13 @@ public class ModificarDTO {
 
     public void setNombreYapellido(String nombreYapellido) {
         this.nombreYapellido = nombreYapellido;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

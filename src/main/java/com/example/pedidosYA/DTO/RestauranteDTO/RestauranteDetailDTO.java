@@ -14,6 +14,7 @@ public record RestauranteDetailDTO(
 
         Long id,
         String nombre,
+        String email,
         Set<ProductoResumenDTO> menu,
         List<ReseniaResumenDTO> reseniasRestaurante,
         List<DireccionDTO>direcciones

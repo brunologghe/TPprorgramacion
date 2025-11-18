@@ -1,5 +1,7 @@
 package com.example.pedidosYA.Service;
 
+import com.example.pedidosYA.DTO.ClienteDTO.ActualizarPerfilDTO;
+import com.example.pedidosYA.DTO.ClienteDTO.CambiarContraseniaDTO;
 import com.example.pedidosYA.DTO.ClienteDTO.ClienteCrearDTO;
 import com.example.pedidosYA.DTO.ClienteDTO.ClienteDetailDto;
 import com.example.pedidosYA.DTO.ClienteDTO.ModificarDTO;
@@ -39,7 +41,7 @@ public class ClienteService {
     public List<ResponseDTO> listAll(){
 
         return clienteRepository.findAll().stream()
-                .map(cliente -> new ResponseDTO(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido()))
+                .map(cliente -> new ResponseDTO(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido(), cliente.getEmail()))
                 .collect(Collectors.toList());
     }
 
@@ -49,7 +51,8 @@ public class ClienteService {
         ResponseDTO clienteDTO = new ResponseDTO(
                 cliente.getId(),
                 cliente.getUsuario(),
-                cliente.getNombreYapellido()
+                cliente.getNombreYapellido(),
+                cliente.getEmail()
         );
 
         clienteRepository.deleteById(id);
@@ -76,6 +79,10 @@ public class ClienteService {
 
         cliente.setNombreYapellido(clienteNuevo.getNombreYapellido());
         cliente.setUsuario(clienteNuevo.getUsuario());
+        if (clienteNuevo.getEmail() != null) {
+            clienteValidations.validarEmail(clienteNuevo.getEmail());
+            cliente.setEmail(clienteNuevo.getEmail());
+        }
 
         Cliente c = clienteRepository.save(cliente);
     }
@@ -88,6 +95,10 @@ public class ClienteService {
 
         cliente.setNombreYapellido(clienteNuevo.getNombreYapellido());
         cliente.setUsuario(clienteNuevo.getUsuario());
+        if (clienteNuevo.getEmail() != null) {
+            clienteValidations.validarEmail(clienteNuevo.getEmail());
+            cliente.setEmail(clienteNuevo.getEmail());
+        }
 
         Cliente c = clienteRepository.save(cliente);
     }
@@ -98,7 +109,7 @@ public class ClienteService {
 
         Cliente cliente = clienteRepository.findByUsuario(nombreUsuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
-        return new ClienteDetailDto(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido(), cliente.getDirecciones(), cliente.getTarjetas());
+        return new ClienteDetailDto(cliente.getId(), cliente.getUsuario(), cliente.getNombreYapellido(), cliente.getEmail(), cliente.getDirecciones(), cliente.getTarjetas());
     }
 
     public RestauranteResumenDTO agregarRestauranteALista(String usuario, Long id)
@@ -131,5 +142,48 @@ public class ClienteService {
         }
 
         return listaFav;
+    }
+
+    @Transactional
+    public void actualizarPerfil(String usuario, ActualizarPerfilDTO perfilDTO) {
+        Cliente cliente = clienteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Cliente no encontrado"));
+
+        // Verificar contraseña actual
+        clienteValidations.validarContraseniaActual(cliente.getId(), perfilDTO.getContraseniaActual());
+
+        // Actualizar campos si se proporcionan
+        if (perfilDTO.getNombreYapellido() != null && !perfilDTO.getNombreYapellido().trim().isEmpty()) {
+            clienteValidations.validarNombreNoDuplicadoConID(cliente.getId(), perfilDTO.getNombreYapellido());
+            cliente.setNombreYapellido(perfilDTO.getNombreYapellido());
+        }
+
+        if (perfilDTO.getEmail() != null && !perfilDTO.getEmail().trim().isEmpty()) {
+            clienteValidations.validarEmailModificacion(cliente.getId(), perfilDTO.getEmail());
+            cliente.setEmail(perfilDTO.getEmail());
+        }
+
+        clienteRepository.save(cliente);
+    }
+
+    @Transactional
+    public void cambiarContrasenia(String usuario, CambiarContraseniaDTO contraseniaDTO) {
+        Cliente cliente = clienteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Cliente no encontrado"));
+
+        // Validar contraseña actual
+        clienteValidations.validarContraseniaActual(cliente.getId(), contraseniaDTO.getContraseniaActual());
+
+        // Validar que las nuevas contraseñas coincidan
+        if (!contraseniaDTO.getContraseniaNueva().equals(contraseniaDTO.getConfirmarContrasenia())) {
+            throw new BusinessException("Las contraseñas nuevas no coinciden");
+        }
+
+        // Validar nueva contraseña
+        clienteValidations.validarContrasenia(contraseniaDTO.getContraseniaNueva());
+
+        // Actualizar contraseña
+        cliente.setContrasenia(passwordEncoder.encode(contraseniaDTO.getContraseniaNueva()));
+        clienteRepository.save(cliente);
     }
 }

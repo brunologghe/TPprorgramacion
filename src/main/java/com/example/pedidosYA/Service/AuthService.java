@@ -61,10 +61,12 @@ public class AuthService {
                 clienteValidations.validarNombreCrear(request.getNombreYapellido());
                 clienteValidations.validarUsuario(request.getUsuario());
                 clienteValidations.validarContrasenia(request.getContrasenia());
+                clienteValidations.validarEmail(request.getEmail());
 
                 cliente.setUsuario(request.getUsuario());
                 cliente.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
                 cliente.setNombreYapellido(request.getNombreYapellido());
+                cliente.setEmail(request.getEmail());
                 cliente.setRol(RolUsuario.CLIENTE);
                 nuevoUsuario = cliente;
                 break;
@@ -75,10 +77,12 @@ public class AuthService {
                 restauranteValidations.validarNombreCrear(request.getNombreRestaurante());
                 restauranteValidations.validarUsuario(request.getUsuario());
                 restauranteValidations.validarContrasenia(request.getContrasenia());
+                restauranteValidations.validarEmail(request.getEmail());
 
                 restaurante.setUsuario(request.getUsuario());
                 restaurante.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
                 restaurante.setNombre(request.getNombreRestaurante());
+                restaurante.setEmail(request.getEmail());
                 restaurante.setRol(RolUsuario.RESTAURANTE);
                 nuevoUsuario = restaurante;
                 break;
@@ -101,9 +105,11 @@ public class AuthService {
 
         adminValidations.validarUsuario(request.getUsuario());
         adminValidations.validarContrasenia(request.getContrasenia());
+        adminValidations.validarEmail(request.getEmail());
 
         admin.setUsuario(request.getUsuario());
         admin.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
+        admin.setEmail(request.getEmail());
         admin.setRol(RolUsuario.ADMIN);
 
         usuarioService.save(admin);

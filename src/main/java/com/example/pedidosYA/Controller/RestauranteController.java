@@ -54,11 +54,18 @@ public class RestauranteController {
         return ResponseEntity.status(HttpStatus.OK).body("Contrasenia cambiada con exito!");
     }
 
-    @PutMapping("/perfiles")
+    @PutMapping("/perfil")
     @PreAuthorize("hasRole('RESTAURANTE')")
-    public ResponseEntity<?> modificarUsuarioNombreRestaurante (@Valid @RequestBody RestauranteModificarDTO restauranteModificarDTO){
-        restauranteService.modificarUsuarioNombreRestaurante(AuthUtil.getUsuarioLogueado(), restauranteModificarDTO);
-        return ResponseEntity.status(HttpStatus.OK).body("Usuario y/o Nombre cambiados con exito!");
+    public ResponseEntity<?> actualizarPerfil(@Valid @RequestBody ActualizarPerfilRestauranteDTO perfilDTO) {
+        restauranteService.actualizarPerfilRestaurante(AuthUtil.getUsuarioLogueado(), perfilDTO);
+        return ResponseEntity.status(HttpStatus.OK).body("Perfil actualizado con éxito!");
+    }
+
+    @PutMapping("/nueva-contrasenia")
+    @PreAuthorize("hasRole('RESTAURANTE')")
+    public ResponseEntity<?> cambiarContrasenia(@Valid @RequestBody CambiarContraseniaRestauranteDTO contraseniaDTO) {
+        restauranteService.cambiarContraseniaRestaurante(AuthUtil.getUsuarioLogueado(), contraseniaDTO);
+        return ResponseEntity.status(HttpStatus.OK).body("Contraseña cambiada con éxito!");
     }
 
     @PostMapping("/productos")
