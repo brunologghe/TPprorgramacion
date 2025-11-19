@@ -185,13 +185,13 @@ public class ClienteService {
         // Actualizar contraseña
         cliente.setContrasenia(passwordEncoder.encode(contraseniaDTO.getContraseniaNueva()));
         clienteRepository.save(cliente);
-=======
+
     public MenuComboDTO verMenuRestaurante(Long id)
     {
         Restaurante restaurante = restauranteRepository.findById(id).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
 
         return new MenuComboDTO(restaurante.getMenu().stream().map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio())).collect(Collectors.toList()),
         restaurante.getCombos().stream().map(combo -> new ComboResponseDTO(combo.getNombre(), combo.getProductos().stream().map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio())).collect(Collectors.toSet()), combo.getDescuento(), combo.getPrecio())).collect(Collectors.toList()));
->>>>>>> feli-branch
+
     }
 }
