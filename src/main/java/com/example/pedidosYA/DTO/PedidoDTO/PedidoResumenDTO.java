@@ -7,4 +7,5 @@ public record PedidoResumenDTO(
         LocalDateTime fecha,
         String estado,
         Double total
+
 ) {}
