@@ -82,16 +82,16 @@ public class ClienteController {
         return ResponseEntity.ok(restauranteService.findAllRestaurantes());
     }
 
-    @GetMapping ("/ver-menu/{nombre}")
+    @GetMapping ("/ver-menu/{usuario}")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<?> findALlProducto(@PathVariable String nombre){
-        return ResponseEntity.ok(productoService.findAllProductosByRestauranteNombre(nombre));
+    public ResponseEntity<?> findALlProducto(@PathVariable String usuario){
+        return ResponseEntity.ok(productoService.findAllProductosByRestaurante(usuario));
     }
 
-    @GetMapping("/restaurante/{nombre}")
+    @GetMapping("/restaurante/{usuario}")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<RestauranteDetailDTO> verRestauranteCompleto(@PathVariable String nombre) {
-        return ResponseEntity.ok(restauranteService.findRestauranteByNombreParaCliente(nombre));
+    public ResponseEntity<RestauranteDetailDTO> verRestauranteCompleto(@PathVariable String usuario) {
+        return ResponseEntity.ok(restauranteService.findRestauranteByNombre(usuario));
     }
 
     @PostMapping("/pedir")
