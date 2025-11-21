@@ -143,5 +143,9 @@ public class ClienteController {
         return ResponseEntity.status(HttpStatus.OK).body(clienteService.verListaFavoritos(AuthUtil.getUsuarioLogueado()));
     }
 
-
+    @GetMapping("/ver-menu/{id-restaurante}")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<MenuComboDTO>verMenuRestaurante(@PathVariable("id-restaurante") Long idRestaurante){
+        return ResponseEntity.status(HttpStatus.OK).body(clienteService.verMenuRestaurante(idRestaurante));
+    }
 }

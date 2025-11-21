@@ -46,11 +46,15 @@ public class PedidoService {
 
     @Transactional
     public PedidoDetailDTO hacerPedido(String usuario, PedidoCreateDTO pedidoCreateDTO) {
-        Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
-        Restaurante restaurante =  restauranteValidations.validarExisteId(pedidoCreateDTO.getRestauranteId());
+        Cliente cliente = clienteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Cliente no encontrado"));
+
+        Restaurante restaurante = restauranteValidations.validarExisteId(pedidoCreateDTO.getRestauranteId());
         clienteValidations.validarDireccion(pedidoCreateDTO.getDireccionId(), cliente.getId());
+
         Tarjeta metodoPago = pagoRepository.findById(pedidoCreateDTO.getPagoId())
                 .orElseThrow(() -> new BusinessException("Método de pago no encontrado"));
+
         if (!metodoPago.getCliente().getId().equals(cliente.getId())) {
             throw new BusinessException("El método de pago no pertenece al cliente autenticado");
         }
@@ -69,16 +73,23 @@ public class PedidoService {
 
             pedidoValidations.verificarCantidadPedido(dpdto.getCantidad());
             pedidoValidations.verificarStockProducto(producto);
+
             ProductoPedido productoPedido = new ProductoPedido();
             productoPedido.setProducto(producto);
             productoPedido.setCantidad(dpdto.getCantidad());
+            productoPedido.setPedido(pedido);
+
             productosPedido.add(productoPedido);
             productoPedido.setPedido(pedido);
 
             double subtotal = producto.getPrecio() * dpdto.getCantidad();
             total += subtotal;
-            productoPedido.getProducto().setStock(productoPedido.getProducto().getStock() - dpdto.getCantidad());
+
+            productoPedido.getProducto().setStock(
+                    productoPedido.getProducto().getStock() - dpdto.getCantidad()
+            );
         }
+
         pedido.setTotal(total);
         pedido.setRestaurante(restaurante);
         pedido.setCliente(cliente);
@@ -190,9 +201,13 @@ public class PedidoService {
     }
 
     @Transactional
-    public void cancelarPedido(String usuario, Long idPedido){
-        Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
-        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(()-> new BusinessException("Ese pedido no existe"));
+    public void cancelarPedido(String usuario, Long idPedido) {
+        Cliente cliente = clienteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Cliente no encontrado"));
+
+
+        Pedido pedido = pedidoRepository.findById(idPedido)
+                .orElseThrow(() -> new BusinessException("Ese pedido no existe"));
 
         if(!cliente.getId().equals(pedido.getCliente().getId())){
             throw new BusinessException("Ese pedido no existe");
