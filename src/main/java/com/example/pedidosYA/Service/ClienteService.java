@@ -170,20 +170,17 @@ public class ClienteService {
         Cliente cliente = clienteRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
-        // Validar contraseña actual
         clienteValidations.validarContraseniaActual(cliente.getId(), contraseniaDTO.getContraseniaActual());
 
-        // Validar que las nuevas contraseñas coincidan
         if (!contraseniaDTO.getContraseniaNueva().equals(contraseniaDTO.getConfirmarContrasenia())) {
             throw new BusinessException("Las contraseñas nuevas no coinciden");
         }
 
-        // Validar nueva contraseña
         clienteValidations.validarContrasenia(contraseniaDTO.getContraseniaNueva());
 
-        // Actualizar contraseña
         cliente.setContrasenia(passwordEncoder.encode(contraseniaDTO.getContraseniaNueva()));
         clienteRepository.save(cliente);
+    }
 
     public MenuComboDTO verMenuRestaurante(Long id)
     {

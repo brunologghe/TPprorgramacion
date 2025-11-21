@@ -196,8 +196,7 @@ public class RestauranteService {
         List<DireccionDTO>direccionDTOS = restaurante.getDirecciones().stream().map(direccion ->
                 new DireccionDTO(direccion.getId(), direccion.getDireccion(), direccion.getCiudad(), direccion.getPais(), direccion.getCodigoPostal())).collect(Collectors.toList());
 
-        return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(), restaurante.getEmail(),
-                menuDTO, reseniaDTO, direccionDTOS);
+        return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(), restaurante.getEmail(), menuDTO, reseniaDTO, direccionDTOS);
     }
 
     @Transactional

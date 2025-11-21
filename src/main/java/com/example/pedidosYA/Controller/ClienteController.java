@@ -11,6 +11,7 @@ import com.example.pedidosYA.DTO.PedidoDTO.PedidoCreateDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaCreateDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaDetailDTO;
+import com.example.pedidosYA.DTO.RestauranteDTO.MenuComboDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteDetailDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResumenDTO;
 import com.example.pedidosYA.Security.AuthUtil;
