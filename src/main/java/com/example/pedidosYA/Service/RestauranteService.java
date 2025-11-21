@@ -61,12 +61,12 @@ public class RestauranteService {
         return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(), restaurante.getEmail(), menuDTO, reseniaDTO, direccionDTOS);
     }
 
-    public Set<RestauranteResumenDTO> findAllRestaurantes(){
+    public Set<RestauranteResponseDTO> findAllRestaurantes(){
         List<Restaurante> lista = restauranteRepository.findAll();
         if (lista.isEmpty()) {
             throw new BusinessException("No hay restaurantes cargados actualmente");
         }
-        return restauranteRepository.findAll().stream().map(r -> new RestauranteResumenDTO(r.getId(), r.getNombre())).collect(Collectors.toSet());
+        return restauranteRepository.findAll().stream().map(r -> new RestauranteResponseDTO(r.getId(), r.getUsuario(), r.getNombre(), r.getEmail())).collect(Collectors.toSet());
     }
 
     @Transactional

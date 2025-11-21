@@ -54,7 +54,7 @@ public class AdminController {
 
     @GetMapping("/restaurantes")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Set<RestauranteResumenDTO>> listAllRestaurantes(){
+    public ResponseEntity<Set<RestauranteResponseDTO>> listAllRestaurantes(){
         return ResponseEntity.ok(restauranteService.findAllRestaurantes());
     }
 
