@@ -16,7 +16,6 @@ public record RestauranteDetailDTO(
         String nombre,
         String email,
         Set<ProductoResumenDTO> menu,
-        List<ComboResponseDTO>comboResponseDTOS,
         List<ReseniaResumenDTO> reseniasRestaurante,
         List<DireccionDTO>direcciones
 )

@@ -8,6 +8,7 @@ import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaResumenDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.*;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.*;
+import com.example.pedidosYA.Repository.PedidoRepository;
 import com.example.pedidosYA.Repository.ProductoRepository;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Repository.UsuarioRepository;
@@ -41,6 +42,8 @@ public class RestauranteService {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private ProductoRepository productoRepository;
+    @Autowired
+    private PedidoRepository pedidoRepository;
 
     public RestauranteDetailDTO findRestauranteByNombre(String usuario){
 
@@ -55,8 +58,7 @@ public class RestauranteService {
         List<DireccionDTO>direccionDTOS = restaurante.getDirecciones().stream().map(direccion ->
                 new DireccionDTO(direccion.getId(), direccion.getDireccion(), direccion.getCiudad(), direccion.getPais(), direccion.getCodigoPostal())).collect(Collectors.toList());
 
-        return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(), restaurante.getEmail(),
-                menuDTO, reseniaDTO, direccionDTOS);
+        return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(), restaurante.getEmail(), menuDTO, reseniaDTO, direccionDTOS);
     }
 
     public Set<RestauranteResumenDTO> findAllRestaurantes(){
@@ -226,19 +228,53 @@ public class RestauranteService {
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
 
-        // Validar contraseña actual
         restauranteValidations.validarContraseniaActual(restaurante.getId(), contraseniaDTO.getContraseniaActual());
 
-        // Validar que las nuevas contraseñas coincidan
         if (!contraseniaDTO.getContraseniaNueva().equals(contraseniaDTO.getConfirmarContrasenia())) {
             throw new RuntimeException("Las contraseñas nuevas no coinciden");
         }
 
-        // Validar nueva contraseña
         restauranteValidations.validarContrasenia(contraseniaDTO.getContraseniaNueva());
 
-        // Actualizar contraseña
         restaurante.setContrasenia(passwordEncoder.encode(contraseniaDTO.getContraseniaNueva()));
         restauranteRepository.save(restaurante);
+    }
+
+    public BalanceDTO obtenerBalance(String usuario, String tipoFiltro, String fecha, String mes) {
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
+        List<Pedido> pedidos = pedidoRepository.findByRestauranteId(restaurante.getId());
+
+        pedidos = pedidos.stream().filter(p -> "ENVIADO".equals(p.getEstado())).collect(Collectors.toList());
+
+        if ("dia".equals(tipoFiltro) && fecha != null) {
+            LocalDate fechaBuscada = LocalDate.parse(fecha);
+            pedidos = pedidos.stream()
+                    .filter(p -> {
+                        LocalDate fechaPedido = p.getFechaPedido().toLocalDate();
+                        return fechaPedido.equals(fechaBuscada);
+                    })
+                    .collect(Collectors.toList());
+        } else if ("mes".equals(tipoFiltro) && mes != null) {
+            String[] partes = mes.split("-");
+            int anio = Integer.parseInt(partes[0]);
+            int mesNum = Integer.parseInt(partes[1]);
+
+            pedidos = pedidos.stream()
+                    .filter(p -> {
+                        LocalDate fechaPedido = p.getFechaPedido().toLocalDate();
+                        return fechaPedido.getYear() == anio && fechaPedido.getMonthValue() == mesNum;
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        double totalRecaudado = pedidos.stream()
+                .mapToDouble(Pedido::getTotal)
+                .sum();
+
+        int cantidadPedidos = pedidos.size();
+
+        double promedioVenta = cantidadPedidos > 0 ? totalRecaudado / cantidadPedidos : 0.0;
+
+        return new BalanceDTO(totalRecaudado, cantidadPedidos, promedioVenta);
     }
 }
