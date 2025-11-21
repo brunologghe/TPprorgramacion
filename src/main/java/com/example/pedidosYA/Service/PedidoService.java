@@ -19,6 +19,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.pedidosYA.Service.EmailService;
+
 @Service
 public class PedidoService {
 
@@ -38,6 +40,9 @@ public class PedidoService {
     private PedidoValidations pedidoValidations;
     @Autowired
     private TarjetaRepository pagoRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     @Transactional
     public PedidoDetailDTO hacerPedido(String usuario, PedidoCreateDTO pedidoCreateDTO) {
@@ -90,7 +95,17 @@ public class PedidoService {
 
         Pedido pedidohecho = pedidoRepository.save(pedido);
 
-        // Armamos los detalles con nombre y precio unitario
+        try {
+            String emailRestaurante = restaurante.getUsuario();
+            String nombreCliente = cliente.getNombreYapellido() != null ? cliente.getNombreYapellido() : cliente.getUsuario();
+            emailService.enviarEmailNuevoPedidoRestaurante(emailRestaurante, pedidohecho.getId(), nombreCliente, pedidohecho.getTotal());
+
+            String emailCliente = cliente.getUsuario();
+            emailService.enviarEmailPedidoConfirmado(emailCliente, pedidohecho.getId(), pedidohecho.getTotal());
+        } catch (Exception e) {
+
+        }
+
         List<DetallePedidoDTO> detalles = new ArrayList<>();
         for (ProductoPedido pp : pedidohecho.getProductosPedidos()) {
             detalles.add(new DetallePedidoDTO(
@@ -258,6 +273,14 @@ public class PedidoService {
 
         pedido.setEstado(estadoPedido);
         pedidoRepository.save(pedido);
+
+        // Notificar al cliente del cambio de estado (asincrónico)
+        try {
+            String emailCliente = pedido.getCliente().getUsuario();
+            emailService.enviarEmailCambioEstado(emailCliente, pedido.getId(), pedido.getEstado().name());
+        } catch (Exception e) {
+            // No interrumpir flujo por errores de notificación
+        }
 
         List<DetallePedidoDTO> detallePedido = new ArrayList<>();
         for (ProductoPedido p : pedido.getProductosPedidos()) {
