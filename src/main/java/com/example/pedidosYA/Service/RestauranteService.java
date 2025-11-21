@@ -227,6 +227,7 @@ public class RestauranteService {
         double promedioVenta = cantidadPedidos > 0 ? totalRecaudado / cantidadPedidos : 0.0;
 
         return new BalanceDTO(totalRecaudado, cantidadPedidos, promedioVenta);
+    }
     @Transactional
     public void actualizarPerfilRestaurante(String usuario, ActualizarPerfilRestauranteDTO perfilDTO) {
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
