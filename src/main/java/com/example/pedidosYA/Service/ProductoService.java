@@ -13,6 +13,7 @@ import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Security.AuthUtil;
 import com.example.pedidosYA.Validations.ProductoValidations;
 import com.example.pedidosYA.Validations.RestauranteValidations;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +51,7 @@ public class ProductoService {
         return new ProductoDetailDTO(p.getId(), p.getNombre(), p.getCaracteristicas(), p.getPrecio(), p.getStock(), restResumen);
     }
 
+    @Transactional
     public ProductoDetailDTO crearProducto(String usuario, ProductoCrearDTO productoDTO){
 
         Restaurante rest = restauranteRepository.findByUsuario(usuario)
@@ -77,7 +79,7 @@ public class ProductoService {
         return new ProductoDetailDTO(uProd.getId(), p.getNombre(), p.getCaracteristicas(), p.getPrecio(), p.getStock(), restauranteResumenDTO);
     }
 
-
+    @Transactional
     public ProductoDetailDTO modificarProducto(String usuario, Long idProducto, ProductoModificarDTO productoNuevo) {
 
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
@@ -125,6 +127,7 @@ public class ProductoService {
         );
     }
 
+    @Transactional
     public void eliminarProducto (String usuario, Long idProducto){
 
         Producto producto = productoRepository.findById(idProducto)

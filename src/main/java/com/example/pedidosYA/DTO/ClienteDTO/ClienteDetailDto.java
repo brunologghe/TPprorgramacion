@@ -8,5 +8,6 @@ import java.util.List;
 public record ClienteDetailDto(Long id,
                                String usuario,
                                String nombreYapellido,
+                               String email,
 List<Direccion>direcciones, List<Tarjeta>metodosPago) {
 }

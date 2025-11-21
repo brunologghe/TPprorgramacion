@@ -54,11 +54,18 @@ public class RestauranteController {
         return ResponseEntity.status(HttpStatus.OK).body("Contrasenia cambiada con exito!");
     }
 
-    @PutMapping("/perfiles")
+    @PutMapping("/perfil")
     @PreAuthorize("hasRole('RESTAURANTE')")
-    public ResponseEntity<?> modificarUsuarioNombreRestaurante (@Valid @RequestBody RestauranteModificarDTO restauranteModificarDTO){
-        restauranteService.modificarUsuarioNombreRestaurante(AuthUtil.getUsuarioLogueado(), restauranteModificarDTO);
-        return ResponseEntity.status(HttpStatus.OK).body("Usuario y/o Nombre cambiados con exito!");
+    public ResponseEntity<?> actualizarPerfil(@Valid @RequestBody ActualizarPerfilRestauranteDTO perfilDTO) {
+        restauranteService.actualizarPerfilRestaurante(AuthUtil.getUsuarioLogueado(), perfilDTO);
+        return ResponseEntity.status(HttpStatus.OK).body("Perfil actualizado con éxito!");
+    }
+
+    @PutMapping("/nueva-contrasenia")
+    @PreAuthorize("hasRole('RESTAURANTE')")
+    public ResponseEntity<?> cambiarContrasenia(@Valid @RequestBody CambiarContraseniaRestauranteDTO contraseniaDTO) {
+        restauranteService.cambiarContraseniaRestaurante(AuthUtil.getUsuarioLogueado(), contraseniaDTO);
+        return ResponseEntity.status(HttpStatus.OK).body("Contraseña cambiada con éxito!");
     }
 
     @PostMapping("/productos")
@@ -100,12 +107,12 @@ public class RestauranteController {
     }
 
     @GetMapping("/pedidos-en-curso")
-    public ResponseEntity<List<PedidoDetailDTO>> verPedidosDeRestauranteEnCurso(){
+    public ResponseEntity<List<PedidoResumenDTO>> verPedidosDeRestauranteEnCurso(){
         return ResponseEntity.ok(pedidoService.verPedidosDeRestauranteEnCurso(AuthUtil.getUsuarioLogueado()));
     }
 
     @GetMapping("/historial-pedidos")
-    public ResponseEntity<List<PedidoDetailDTO>> verHistorialPedidosDeRestaurante(){
+    public ResponseEntity<List<PedidoResumenDTO>> verHistorialPedidosDeRestaurante(){
         return ResponseEntity.ok(pedidoService.verHistorialPedidosDeRestaurante(AuthUtil.getUsuarioLogueado()));
     }
 

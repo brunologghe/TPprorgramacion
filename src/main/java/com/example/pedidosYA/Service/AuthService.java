@@ -8,6 +8,7 @@ import com.example.pedidosYA.Security.JwtUtil;
 import com.example.pedidosYA.Validations.AdminValidations;
 import com.example.pedidosYA.Validations.ClienteValidations;
 import com.example.pedidosYA.Validations.RestauranteValidations;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,6 +46,7 @@ public class AuthService {
         return JwtUtil.generarToken(userDetails.getUsername(), roles);
     }
 
+    @Transactional
     public String registro(RegisterRequest request) {
         if (usuarioService.existsByUsername(request.getUsuario())) {
             throw new RuntimeException("El usuario ya existe");
@@ -59,10 +61,12 @@ public class AuthService {
                 clienteValidations.validarNombreCrear(request.getNombreYapellido());
                 clienteValidations.validarUsuario(request.getUsuario());
                 clienteValidations.validarContrasenia(request.getContrasenia());
+                clienteValidations.validarEmail(request.getEmail());
 
                 cliente.setUsuario(request.getUsuario());
                 cliente.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
                 cliente.setNombreYapellido(request.getNombreYapellido());
+                cliente.setEmail(request.getEmail());
                 cliente.setRol(RolUsuario.CLIENTE);
                 nuevoUsuario = cliente;
                 break;
@@ -73,10 +77,12 @@ public class AuthService {
                 restauranteValidations.validarNombreCrear(request.getNombreRestaurante());
                 restauranteValidations.validarUsuario(request.getUsuario());
                 restauranteValidations.validarContrasenia(request.getContrasenia());
+                restauranteValidations.validarEmail(request.getEmail());
 
                 restaurante.setUsuario(request.getUsuario());
                 restaurante.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
                 restaurante.setNombre(request.getNombreRestaurante());
+                restaurante.setEmail(request.getEmail());
                 restaurante.setRol(RolUsuario.RESTAURANTE);
                 nuevoUsuario = restaurante;
                 break;
@@ -99,9 +105,11 @@ public class AuthService {
 
         adminValidations.validarUsuario(request.getUsuario());
         adminValidations.validarContrasenia(request.getContrasenia());
+        adminValidations.validarEmail(request.getEmail());
 
         admin.setUsuario(request.getUsuario());
         admin.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
+        admin.setEmail(request.getEmail());
         admin.setRol(RolUsuario.ADMIN);
 
         usuarioService.save(admin);

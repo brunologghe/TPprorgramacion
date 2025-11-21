@@ -2,6 +2,7 @@ package com.example.pedidosYA.Validations;
 
 import com.example.pedidosYA.Model.Cliente;
 import com.example.pedidosYA.Model.Tarjeta;
+import com.example.pedidosYA.Model.Usuario;
 import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Repository.DireccionRepository;
 import com.example.pedidosYA.Repository.TarjetaRepository;
@@ -90,6 +91,25 @@ public class ClienteValidations {
 
         if (usuarioRepository.existsByUsuario(usuario)) {
             throw new BusinessException("El usuario ya existe en el sistema.");
+        }
+    }
+
+    public void validarEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new BusinessException("El email es obligatorio.");
+        }
+        if (usuarioRepository.existsByEmail(email)) {
+            throw new BusinessException("El email ya existe en el sistema.");
+        }
+    }
+
+    public void validarEmailModificacion(Long id, String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new BusinessException("El email es obligatorio.");
+        }
+        Usuario usuarioConEmail = usuarioRepository.findByEmail(email).orElse(null);
+        if (usuarioConEmail != null && !usuarioConEmail.getId().equals(id)) {
+            throw new BusinessException("El email ya existe en el sistema.");
         }
     }
 

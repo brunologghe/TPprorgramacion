@@ -1,6 +1,8 @@
 
 package com.example.pedidosYA.Controller;
 
+import com.example.pedidosYA.DTO.ClienteDTO.ActualizarPerfilDTO;
+import com.example.pedidosYA.DTO.ClienteDTO.CambiarContraseniaDTO;
 import com.example.pedidosYA.DTO.ClienteDTO.ClienteCrearDTO;
 import com.example.pedidosYA.DTO.ClienteDTO.ClienteDetailDto;
 import com.example.pedidosYA.DTO.ClienteDTO.ModificarDTO;
@@ -9,13 +11,12 @@ import com.example.pedidosYA.DTO.PedidoDTO.PedidoCreateDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaCreateDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaDetailDTO;
-import com.example.pedidosYA.DTO.RestauranteDTO.MenuComboDTO;
+import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteDetailDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResumenDTO;
 import com.example.pedidosYA.Security.AuthUtil;
 import com.example.pedidosYA.Service.*;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,30 +47,51 @@ public class ClienteController {
     private RestauranteService restauranteService;
 
 
-    @GetMapping("/perfiles")
+    @GetMapping("/perfil")
     @PreAuthorize("hasRole('CLIENTE')")
     public ClienteDetailDto verCliente() {
         return clienteService.verUsuarioPorNombre(AuthUtil.getUsuarioLogueado());
     }
 
-    @PutMapping("/perfiles")
-    @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<?> modificarUsuarioNombreCliente (@Valid @RequestBody ModificarDTO modificarDTO){
-        clienteService.modificarUsuarioNombre(AuthUtil.getUsuarioLogueado(), modificarDTO);
-        return ResponseEntity.status(HttpStatus.OK).body("Usuario y/o Nombre cambiados con exito!");
-    }
 
-    @PutMapping("/contrasenias")
+
+    @PutMapping("/contrasenia")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<?> modificarContraseniaCliente (@Valid @RequestBody ModificarDTO modificarDTO){
         clienteService.modificarContrasenia(AuthUtil.getUsuarioLogueado(), modificarDTO);
         return ResponseEntity.status(HttpStatus.OK).body("Contrasenia cambiada con exito!");
     }
 
+    @PutMapping("/perfil")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<?> actualizarPerfil(@Valid @RequestBody ActualizarPerfilDTO perfilDTO) {
+        clienteService.actualizarPerfil(AuthUtil.getUsuarioLogueado(), perfilDTO);
+        return ResponseEntity.status(HttpStatus.OK).body("Perfil actualizado con éxito!");
+    }
+
+    @PutMapping("/nueva-contrasenia")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<?> cambiarContrasenia(@Valid @RequestBody CambiarContraseniaDTO contraseniaDTO) {
+        clienteService.cambiarContrasenia(AuthUtil.getUsuarioLogueado(), contraseniaDTO);
+        return ResponseEntity.status(HttpStatus.OK).body("Contraseña cambiada con éxito!");
+    }
+
     @GetMapping("/restaurantes")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<Set<RestauranteResumenDTO>> listAllRestaurantes(){
         return ResponseEntity.ok(restauranteService.findAllRestaurantes());
+    }
+
+    @GetMapping ("/ver-menu/{usuario}")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<?> findALlProducto(@PathVariable String usuario){
+        return ResponseEntity.ok(productoService.findAllProductosByRestaurante(usuario));
+    }
+
+    @GetMapping("/restaurante/{usuario}")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<RestauranteDetailDTO> verRestauranteCompleto(@PathVariable String usuario) {
+        return ResponseEntity.ok(restauranteService.findRestauranteByNombre(usuario));
     }
 
     @PostMapping("/pedir")
@@ -121,9 +143,5 @@ public class ClienteController {
         return ResponseEntity.status(HttpStatus.OK).body(clienteService.verListaFavoritos(AuthUtil.getUsuarioLogueado()));
     }
 
-    @GetMapping("/ver-menu/{id-restaurante}")
-    @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<MenuComboDTO>verMenuRestaurante(@PathVariable("id-restaurante") Long idRestaurante){
-        return ResponseEntity.status(HttpStatus.OK).body(clienteService.verMenuRestaurante(idRestaurante));
-    }
+
 }

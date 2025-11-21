@@ -13,6 +13,10 @@ public class RestauranteCrearDTO {
     private String contrasenia;
 
     @NotBlank
+    @Email(message = "El formato del email no es válido")
+    private String email;
+
+    @NotBlank
     @Size(max = 25)
     private String nombre;
 
@@ -30,6 +34,14 @@ public class RestauranteCrearDTO {
 
     public void setContrasenia(String contrasenia) {
         this.contrasenia = contrasenia;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getNombre() {

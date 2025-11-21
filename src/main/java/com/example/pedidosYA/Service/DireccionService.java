@@ -12,6 +12,7 @@ import com.example.pedidosYA.Repository.DireccionRepository;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
 import com.example.pedidosYA.Validations.DireccionValidations;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,7 @@ public class DireccionService {
     @Autowired
     private DireccionValidations direccionValidations;
 
+    @Transactional
     public DireccionDTO crearDireccion(String username, DireccionCrearDTO direccion) {
         Optional<Cliente> clienteOpt = clienteRepository.findByUsuario(username);
         Optional<Restaurante> restauranteOpt = restauranteRepository.findByUsuario(username);
@@ -57,7 +59,7 @@ public class DireccionService {
         return new DireccionDTO(guardada.getId(), guardada.getDireccion(), guardada.getCiudad(), guardada.getPais(), guardada.getCodigoPostal());
     }
 
-
+    @Transactional
     public void eliminarDireccion(String username, DireccionEliminarDTO dto) {
         Optional<Cliente> clienteOpt = clienteRepository.findByUsuario(username);
         Optional<Restaurante> restauranteOpt = restauranteRepository.findByUsuario(username);
@@ -82,6 +84,8 @@ public class DireccionService {
 
         direccionRepository.delete(direccion);
     }
+
+    @Transactional
     public DireccionDTO modificarDireccion(String username, Long id, DireccionCrearDTO dto) {
         Optional<Cliente> clienteOpt = clienteRepository.findByUsuario(username);
         Optional<Restaurante> restauranteOpt = restauranteRepository.findByUsuario(username);

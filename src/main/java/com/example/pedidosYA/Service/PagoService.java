@@ -8,6 +8,7 @@ import com.example.pedidosYA.Model.Tarjeta;
 import com.example.pedidosYA.Repository.ClienteRepository;
 import com.example.pedidosYA.Repository.TarjetaRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,9 @@ public class PagoService {
     @Autowired
     private TarjetaRepository tarjetaRepository;
 
+    @Transactional
     public TarjetaMuestraDTO agregarTarjeta(String username, TarjetaRequestDTO tarjetaRequestDTO) {
+
         Cliente cliente = clienteRepository.findByUsuario(username).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
         clienteValidations.validarExistencia(cliente.getId());
@@ -37,6 +40,7 @@ public class PagoService {
         return new TarjetaMuestraDTO(tarjetaRetorno.getId(), tarjetaRetorno.getTipo(), tarjetaRetorno.getNumeroEnmascarado(), tarjetaRetorno.getVencimiento());
     }
 
+    @Transactional
     public void eliminarTarjeta(String username, Long idPago) {
         Cliente cliente = clienteRepository.findByUsuario(username).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         Tarjeta pago = tarjetaRepository.findById(idPago)

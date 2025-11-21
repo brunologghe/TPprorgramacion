@@ -48,6 +48,7 @@ public class AuthController {
         return ResponseEntity.ok().body(token);
     }
 
+
     @PostMapping("/registro")
     public ResponseEntity<?> registro(@Valid @RequestBody RegisterRequest request) {
         String mensaje = authService.registro(request);
