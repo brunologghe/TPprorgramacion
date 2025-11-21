@@ -110,6 +110,7 @@ public class RestauranteController {
     }
 
     @GetMapping("/resenias")
+    @PreAuthorize("hasRole('RESTAURANTE')")
     public ResponseEntity<List<ReseniaResumenDTO>> verReseniasRestaurante(){
         return ResponseEntity.ok(reseniaService.verReseniasRestaurante(AuthUtil.getUsuarioLogueado()));
     }
@@ -127,5 +128,15 @@ public class RestauranteController {
     @GetMapping("/combos")
     public ResponseEntity<List<ComboResponseDTO>>verCombos(){
         return ResponseEntity.status(HttpStatus.OK).body(restauranteService.verCombos(AuthUtil.getUsuarioLogueado()));
+    }
+
+    @PostMapping("/balance")
+    @PreAuthorize("hasRole('RESTAURANTE')")
+    public ResponseEntity<BalanceDTO> obtenerBalance(@Valid @RequestBody BalanceFiltroDTO filtroDTO) {
+        String tipoFiltro = filtroDTO.getTipoFiltro();
+        String fecha = filtroDTO.getFecha();
+        String mes = filtroDTO.getMes();
+
+        return ResponseEntity.ok(restauranteService.obtenerBalance(AuthUtil.getUsuarioLogueado(), tipoFiltro, fecha, mes));
     }
 }

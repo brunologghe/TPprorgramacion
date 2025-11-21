@@ -18,6 +18,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -168,5 +170,60 @@ public class RestauranteService {
             return new ComboResponseDTO(combo.getNombre(), productosResumen, combo.getDescuento(), combo.getPrecio());}).collect(Collectors.toList());
 
         return listaCombos;
+    }
+
+    public BalanceDTO obtenerBalance(String usuario, String tipoFiltro, String fecha, String mes) {
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
+
+        List<Pedido> pedidosValidos = restaurante.getPedidos().stream()
+                .filter(pedido -> {
+                    String estado = pedido.getEstado().toString();
+                    return estado.equals("ENVIADO");
+                })
+                .collect(Collectors.toList());
+
+        List<Pedido> pedidosFiltrados;
+
+        if ("dia".equals(tipoFiltro) && fecha != null && !fecha.isEmpty()) {
+            LocalDate fechaBuscada = LocalDate.parse(fecha);
+
+            pedidosFiltrados = pedidosValidos.stream()
+                    .filter(pedido -> {
+                        LocalDateTime fechaPedido = pedido.getFechaPedido();
+                        if (fechaPedido != null) {
+                            return fechaPedido.toLocalDate().equals(fechaBuscada);
+                        }
+                        return false;
+                    })
+                    .collect(Collectors.toList());
+        } else if ("mes".equals(tipoFiltro) && mes != null && !mes.isEmpty()) {
+            String[] partes = mes.split("-");
+            int anio = Integer.parseInt(partes[0]);
+            int mesNum = Integer.parseInt(partes[1]);
+
+            pedidosFiltrados = pedidosValidos.stream()
+                    .filter(pedido -> {
+                        LocalDateTime fechaPedido = pedido.getFechaPedido();
+                        if (fechaPedido != null) {
+                            return fechaPedido.getYear() == anio &&
+                                    fechaPedido.getMonthValue() == mesNum;
+                        }
+                        return false;
+                    })
+                    .collect(Collectors.toList());
+        } else {
+            pedidosFiltrados = pedidosValidos;
+        }
+
+        System.out.println("Pedidos filtrados: " + pedidosFiltrados.size());
+
+        int cantidadPedidos = pedidosFiltrados.size();
+        double totalRecaudado = pedidosFiltrados.stream()
+                .mapToDouble(Pedido::getTotal)
+                .sum();
+        double promedioVenta = cantidadPedidos > 0 ? totalRecaudado / cantidadPedidos : 0.0;
+
+        return new BalanceDTO(totalRecaudado, cantidadPedidos, promedioVenta);
     }
 }
