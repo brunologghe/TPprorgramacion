@@ -12,6 +12,7 @@ import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaCreateDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaDetailDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteDetailDTO;
+import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResponseDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResumenDTO;
 import com.example.pedidosYA.Security.AuthUtil;
 import com.example.pedidosYA.Service.*;
@@ -78,7 +79,7 @@ public class ClienteController {
 
     @GetMapping("/restaurantes")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<Set<RestauranteResumenDTO>> listAllRestaurantes(){
+    public ResponseEntity<Set<RestauranteResponseDTO>> listAllRestaurantes(){
         return ResponseEntity.ok(restauranteService.findAllRestaurantes());
     }
 
