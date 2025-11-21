@@ -47,9 +47,17 @@ public class DireccionService {
         nueva.setCodigoPostal(direccion.getCodigoPostal());
 
         if (clienteOpt.isPresent()) {
-            nueva.setCliente(clienteOpt.get());
+            Cliente cliente = clienteOpt.get();
+            nueva.setCliente(cliente);
+            
+            // Validar que no exista una dirección duplicada
+            direccionValidations.validarDireccionDuplicadaPorCliente(cliente, nueva);
         } else if (restauranteOpt.isPresent()) {
-            nueva.setRestaurante(restauranteOpt.get());
+            Restaurante restaurante = restauranteOpt.get();
+            nueva.setRestaurante(restaurante);
+            
+            // Validar que no exista una dirección duplicada
+            direccionValidations.validarDireccionDuplicadaPorRestaurante(restaurante, nueva);
         } else {
             throw new BusinessException("Usuario no encontrado");
         }
@@ -68,18 +76,18 @@ public class DireccionService {
 
         if (clienteOpt.isPresent()) {
             Cliente cliente = clienteOpt.get();
-            direccion = direccionRepository.findByClienteIdAndCodigoPostalAndDireccion(
+            direccion = direccionRepository.findFirstByClienteIdAndCodigoPostalAndDireccion(
                     cliente.getId(), dto.getCodigoPostal(), dto.getDireccion());
         } else if (restauranteOpt.isPresent()) {
             Restaurante restaurante = restauranteOpt.get();
-            direccion = direccionRepository.findByRestauranteIdAndCodigoPostalAndDireccion(
+            direccion = direccionRepository.findFirstByRestauranteIdAndCodigoPostalAndDireccion(
                     restaurante.getId(), dto.getCodigoPostal(), dto.getDireccion());
         } else {
             throw new BusinessException("Usuario no encontrado");
         }
 
         if (direccion == null) {
-            throw new RuntimeException("No se encontró la dirección deseada");
+            throw new BusinessException("No se encontró la dirección deseada");
         }
 
         direccionRepository.delete(direccion);
@@ -91,12 +99,12 @@ public class DireccionService {
         Optional<Restaurante> restauranteOpt = restauranteRepository.findByUsuario(username);
 
         Direccion direccion = direccionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("No se encontró esa dirección"));
+                .orElseThrow(() -> new BusinessException("No se encontró esa dirección"));
 
         if (clienteOpt.isPresent()) {
             Cliente cliente = clienteOpt.get();
             if (direccion.getCliente() == null || !direccion.getCliente().getId().equals(cliente.getId())) {
-                throw new RuntimeException("Esa dirección no pertenece al cliente logueado");
+                throw new BusinessException("Esa dirección no pertenece al cliente logueado");
             }
 
             direccion.setDireccion(dto.getDireccion());
@@ -109,12 +117,16 @@ public class DireccionService {
         } else if (restauranteOpt.isPresent()) {
             Restaurante restaurante = restauranteOpt.get();
             if (direccion.getRestaurante() == null || !direccion.getRestaurante().getId().equals(restaurante.getId())) {
-                throw new RuntimeException("Esa dirección no pertenece al restaurante logueado");
+                throw new BusinessException("Esa dirección no pertenece al restaurante logueado");
             }
+            
             direccion.setDireccion(dto.getDireccion());
             direccion.setCiudad(dto.getCiudad());
             direccion.setPais(dto.getPais());
             direccion.setCodigoPostal(dto.getCodigoPostal());
+
+            direccionValidations.validarDireccionDuplicadaPorRestaurante(restaurante, direccion);
+
         } else {
             throw new BusinessException("Usuario no encontrado");
         }

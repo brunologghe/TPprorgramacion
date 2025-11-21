@@ -221,7 +221,7 @@ public class PedidoService {
                 .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese nombre"));
 
         return pedidoRepository.findByRestauranteId(restaurante.getId()).stream()
-                .filter(pedido -> pedido.getEstado() == EstadoPedido.PREPARACION || pedido.getEstado() == EstadoPedido.ENVIADO)
+                .filter(pedido -> pedido.getEstado() == EstadoPedido.PENDIENTE || pedido.getEstado() == EstadoPedido.PREPARACION || pedido.getEstado() == EstadoPedido.ENVIADO)
                 .map(pedido -> new PedidoResumenDTO(pedido.getId(), pedido.getFechaPedido(),
                         pedido.getEstado().toString(), pedido.getTotal())).toList();
     }
@@ -234,5 +234,31 @@ public class PedidoService {
                 .filter(pedido -> pedido.getEstado() == EstadoPedido.ENTREGADO || pedido.getEstado() == EstadoPedido.PREPARACION || pedido.getEstado() == EstadoPedido.ENVIADO)
                 .map(pedido -> new PedidoResumenDTO(pedido.getId(), pedido.getFechaPedido(),
                         pedido.getEstado().toString(), pedido.getTotal())).toList();
+    }
+
+    public List<PedidoDetailDTO> verPedidosCompleto(String usuario) {
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese nombre"));
+
+        return pedidoRepository.findByRestauranteId(restaurante.getId()).stream()
+                .map(pedido -> {
+                    List<DetallePedidoDTO> detalles = pedido.getProductosPedidos().stream()
+                            .map(productoPedido -> new DetallePedidoDTO(
+                                    productoPedido.getProducto().getId(),
+                                    productoPedido.getProducto().getNombre(),
+                                    productoPedido.getProducto().getPrecio(),
+                                    productoPedido.getCantidad()
+                            )).toList();
+
+                    return new PedidoDetailDTO(
+                            pedido.getId(),
+                            pedido.getFechaPedido(),
+                            pedido.getEstado(),
+                            pedido.getTotal(),
+                            restaurante.getNombre(),
+                            pedido.getCliente().getId(),
+                            detalles
+                    );
+                }).toList();
     }
 }

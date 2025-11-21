@@ -116,6 +116,12 @@ public class RestauranteController {
         return ResponseEntity.ok(pedidoService.verHistorialPedidosDeRestaurante(AuthUtil.getUsuarioLogueado()));
     }
 
+    @GetMapping("/pedidos-completo")
+    @PreAuthorize("hasRole('RESTAURANTE')")
+    public ResponseEntity<List<PedidoDetailDTO>> verPedidosCompleto(){
+        return ResponseEntity.ok(pedidoService.verPedidosCompleto(AuthUtil.getUsuarioLogueado()));
+    }
+
     @GetMapping("/resenias")
     public ResponseEntity<List<ReseniaResumenDTO>> verReseniasRestaurante(){
         return ResponseEntity.ok(reseniaService.verReseniasRestaurante(AuthUtil.getUsuarioLogueado()));
