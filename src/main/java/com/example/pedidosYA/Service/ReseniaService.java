@@ -93,4 +93,23 @@ public class ReseniaService {
 
         return resenias;
     }
+
+    public List<ReseniaDetailDTO>verReseniasAdmin(Long idRestaurante)
+    {
+        Restaurante restaurante = restauranteRepository.findById(idRestaurante).orElseThrow(()-> new RuntimeException("No existe ese restaurante"));
+
+        List<ReseniaDetailDTO> resenias = new ArrayList<>();
+
+        for(Resenia r : restaurante.getReseniasRestaurante()){
+            ReseniaDetailDTO resenia = new ReseniaDetailDTO(r.getId(),r.getCliente().getId(),r.getRestaurante().getId(), r.getDescripcion(), r.getPuntuacion());
+            resenias.add(resenia);
+        }
+
+        if(resenias.isEmpty())
+        {
+            throw new RuntimeException("No hay resenias en este restaurante");
+        }
+
+        return resenias;
+    }
 }

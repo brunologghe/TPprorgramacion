@@ -70,6 +70,14 @@ public class RestauranteService {
         return restauranteRepository.findAll().stream().map(r -> new RestauranteResumenDTO(r.getId(), r.getNombre())).collect(Collectors.toSet());
     }
 
+    public Set<RestauranteResponseDTO> findAllRestaurantesAdmin(){
+        List<Restaurante> lista = restauranteRepository.findAll();
+        if (lista.isEmpty()) {
+            throw new BusinessException("No hay restaurantes cargados actualmente");
+        }
+        return restauranteRepository.findAll().stream().map(r -> new RestauranteResponseDTO(r.getId(),r.getUsuario(), r.getNombre(),r.getEmail())).collect(Collectors.toSet());
+    }
+
     public void modificarContraseniaRestaurante (String usuario, RestauranteModificarDTO restauranteNuevo){
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
 
