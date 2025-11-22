@@ -10,6 +10,7 @@ public record ProductoDetailDTO(
         double precio,
         int stock,
         RestauranteResumenDTO restauranteResumen
+        //hola
 
 )
 {}

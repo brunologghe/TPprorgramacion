@@ -32,13 +32,15 @@ public class ProductoService {
     @Autowired
     private RestauranteRepository restauranteRepository;
 
-    public Set<ProductoResumenDTO> findAllProductosByRestaurante(String usuario){
+    public Set<ProductoDetailDTO> findAllProductosByRestaurante(String usuario){
 
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("No existe restaurante con ese nombre"));
         Set<Producto> lista = restaurante.getMenu();
         productoValidations.validarListaVacia(lista);
-        return lista.stream().map(p -> new ProductoResumenDTO(p.getId(), p.getNombre(), p.getPrecio())).collect(Collectors.toSet());
+        return lista.stream().map(p -> new ProductoDetailDTO(p.getId(), p.getNombre(), p.getCaracteristicas(), p.getPrecio(), p.getStock(), null))
+                .collect(Collectors.toSet());
     }
+
 
     public ProductoDetailDTO findProductoBynombre (String usuario, String nombre){
         Restaurante rest = restauranteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("No existe restaurante con ese nombre"));
