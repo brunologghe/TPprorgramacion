@@ -29,21 +29,21 @@ public class DireccionController {
     }
 
     @DeleteMapping
-    @PreAuthorize("hasRole('CLIENTE')or hasRole('RESTAURANTE')")
+    @PreAuthorize("hasRole('CLIENTE') or hasRole('RESTAURANTE')")
     public void eliminarDireccion(@RequestBody DireccionEliminarDTO dire) {
         String username = AuthUtil.getUsuarioLogueado();
         direccionService.eliminarDireccion(username, dire);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('CLIENTE')or hasRole('RESTAURANTE')")
+    @PreAuthorize("hasRole('CLIENTE') or hasRole('RESTAURANTE')")
     public ResponseEntity<DireccionDTO> modificar(@PathVariable Long id, @RequestBody DireccionCrearDTO dto) {
         String username = AuthUtil.getUsuarioLogueado();
         return ResponseEntity.ok(direccionService.modificarDireccion(username, id, dto));
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('CLIENTE')or hasRole('RESTAURANTE')")
+    @PreAuthorize("hasRole('CLIENTE') or hasRole('RESTAURANTE')")
     public List<DireccionDTO> listarDirecciones() {
         String username = AuthUtil.getUsuarioLogueado();
         return direccionService.listarDirecciones(username);

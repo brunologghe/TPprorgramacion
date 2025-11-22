@@ -41,6 +41,7 @@ public class ProductoService {
                 .collect(Collectors.toSet());
     }
 
+
     public ProductoDetailDTO findProductoBynombre (String usuario, String nombre){
         Restaurante rest = restauranteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("No existe restaurante con ese nombre"));
 

@@ -2,6 +2,7 @@ package com.example.pedidosYA.Controller;
 
 import com.example.pedidosYA.DTO.ClienteDTO.ModificarDTO;
 import com.example.pedidosYA.DTO.ClienteDTO.ResponseDTO;
+import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaDetailDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaResumenDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteModificarDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResponseDTO;
@@ -54,8 +55,8 @@ public class AdminController {
 
     @GetMapping("/restaurantes")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Set<RestauranteResumenDTO>> listAllRestaurantes(){
-        return ResponseEntity.ok(restauranteService.findAllRestaurantes());
+    public ResponseEntity<Set<RestauranteResponseDTO>> listAllRestaurantes(){
+        return ResponseEntity.ok(restauranteService.findAllRestaurantesAdmin());
     }
 
     @DeleteMapping("/restaurantes/{id}")
@@ -71,18 +72,18 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body("Usuario y/o Nombre cambiados con exito!");
     }
 
-    @DeleteMapping("/eliminar-reseña/{id-resenia}")
+    @DeleteMapping("/eliminar-resenia/{idResenia}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> eliminarResenia(@PathVariable("id-resenia")Long idResenia)
+    public ResponseEntity<?> eliminarResenia(@PathVariable Long idResenia)
     {
         reseniaService.eliminarResenia(idResenia);
         return ResponseEntity.status(HttpStatus.OK).body("Reseña eliminada con id: "+idResenia);
     }
 
-    @DeleteMapping("/ver-reseñas-restaurante/{id-restaurante}")
+    @GetMapping("/ver-resenias-restaurante/{idRestaurante}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<ReseniaResumenDTO>> verResenias(@PathVariable("id-restaurante")Long idRestaurante)
+    public ResponseEntity<List<ReseniaDetailDTO>> verResenias(@PathVariable Long idRestaurante)
     {
-        return ResponseEntity.status(HttpStatus.OK).body(reseniaService.verResenias(idRestaurante));
+        return ResponseEntity.status(HttpStatus.OK).body(reseniaService.verReseniasAdmin(idRestaurante));
     }
 }

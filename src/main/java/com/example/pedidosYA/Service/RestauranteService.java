@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 @Service
 public class RestauranteService {
 
@@ -51,7 +50,11 @@ public class RestauranteService {
                 .collect(Collectors.toSet());
 
         List<ReseniaResumenDTO> reseniaDTO = restaurante.getReseniasRestaurante().stream()
-                .map(resenia -> new ReseniaResumenDTO(resenia.getCliente().getId(), resenia.getDescripcion(), resenia.getPuntuacion()))
+                .map(resenia -> new ReseniaResumenDTO(
+                        resenia.getCliente().getId(),
+                        resenia.getCliente().getNombreYapellido(),  // AGREGAR NOMBRE DEL CLIENTE
+                        resenia.getDescripcion(),
+                        resenia.getPuntuacion()))
                 .collect(Collectors.toList());
 
         List<DireccionDTO>direccionDTOS = restaurante.getDirecciones().stream().map(direccion ->
@@ -64,12 +67,20 @@ public class RestauranteService {
                 menuDTO,comboResponseDTOS, reseniaDTO, direccionDTOS);
     }
 
-    public Set<RestauranteResumenDTO> findAllRestaurantes(){
+    public Set<RestauranteResponseDTO> findAllRestaurantes(){
         List<Restaurante> lista = restauranteRepository.findAll();
         if (lista.isEmpty()) {
             throw new BusinessException("No hay restaurantes cargados actualmente");
         }
-        return restauranteRepository.findAll().stream().map(r -> new RestauranteResumenDTO(r.getId(), r.getNombre())).collect(Collectors.toSet());
+        return restauranteRepository.findAll().stream().map(r -> new RestauranteResponseDTO(r.getId(), r.getUsuario(), r.getNombre(), r.getEmail())).collect(Collectors.toSet());
+    }
+
+    public Set<RestauranteResponseDTO> findAllRestaurantesAdmin(){
+        List<Restaurante> lista = restauranteRepository.findAll();
+        if (lista.isEmpty()) {
+            throw new BusinessException("No hay restaurantes cargados actualmente");
+        }
+        return restauranteRepository.findAll().stream().map(r -> new RestauranteResponseDTO(r.getId(),r.getUsuario(), r.getNombre(),r.getEmail())).collect(Collectors.toSet());
     }
 
     public void modificarContraseniaRestaurante (String usuario, RestauranteModificarDTO restauranteNuevo){

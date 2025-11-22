@@ -138,27 +138,37 @@ public class PedidoService {
     }
 
     public List<PedidoDetailDTO> verHistorialPedidos(String usuario) {
-        Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
+        Cliente cliente = clienteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         clienteValidations.validarExistencia(cliente.getId());
 
+        List<PedidoDetailDTO> listaDetallePedidos = new ArrayList<>();
 
-        List<PedidoDetailDTO>listaDetallePedidos = new ArrayList<>();
+        for(Pedido pedido : cliente.getPedidos()) {
+            // CREAR UNA NUEVA LISTA DE DETALLES PARA CADA PEDIDO
+            List<DetallePedidoDTO> detalles = new ArrayList<>();
 
-        List<DetallePedidoDTO> detalles = new ArrayList<>();
-        for(Pedido d : cliente.getPedidos())
-        {
-                for(ProductoPedido p : d.getProductosPedidos())
-                {
-                    DetallePedidoDTO detallePedidoDTO = new DetallePedidoDTO();
-                    detallePedidoDTO.setProductoId(p.getProducto().getId());
-                    detallePedidoDTO.setCantidad(p.getCantidad());
-                    detalles.add(detallePedidoDTO);
-                }
-                listaDetallePedidos.add(new PedidoDetailDTO(d.getId(), d.getFechaPedido(), d.getEstado(), d.getTotal(), d.getRestaurante().getNombre(), d.getCliente().getId(), detalles));
+            for(ProductoPedido productoPedido : pedido.getProductosPedidos()) {
+                DetallePedidoDTO detallePedidoDTO = new DetallePedidoDTO();
+                detallePedidoDTO.setProductoId(productoPedido.getProducto().getId());
+                detallePedidoDTO.setNombreProducto(productoPedido.getProducto().getNombre());
+                detallePedidoDTO.setPrecioUnitario(productoPedido.getProducto().getPrecio());
+                detallePedidoDTO.setCantidad(productoPedido.getCantidad());
+                detalles.add(detallePedidoDTO);
+            }
+
+            listaDetallePedidos.add(new PedidoDetailDTO(
+                    pedido.getId(),
+                    pedido.getFechaPedido(),
+                    pedido.getEstado(),
+                    pedido.getTotal(),
+                    pedido.getRestaurante().getNombre(),
+                    pedido.getCliente().getId(),
+                    detalles
+            ));
         }
 
         pedidoValidations.verificarPedidoDetailDTO(listaDetallePedidos);
-
 
         return listaDetallePedidos;
     }
@@ -254,7 +264,7 @@ public class PedidoService {
                 .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese nombre"));
 
         return pedidoRepository.findByRestauranteId(restaurante.getId()).stream()
-                .filter(pedido -> pedido.getEstado() == EstadoPedido.PREPARACION || pedido.getEstado() == EstadoPedido.ENVIADO)
+                .filter(pedido -> pedido.getEstado() == EstadoPedido.PENDIENTE || pedido.getEstado() == EstadoPedido.PREPARACION || pedido.getEstado() == EstadoPedido.ENVIADO)
                 .map(pedido -> new PedidoResumenDTO(pedido.getId(), pedido.getFechaPedido(),
                         pedido.getEstado().toString(), pedido.getTotal())).toList();
     }
@@ -267,5 +277,31 @@ public class PedidoService {
                 .filter(pedido -> pedido.getEstado() == EstadoPedido.ENTREGADO || pedido.getEstado() == EstadoPedido.PREPARACION || pedido.getEstado() == EstadoPedido.ENVIADO)
                 .map(pedido -> new PedidoResumenDTO(pedido.getId(), pedido.getFechaPedido(),
                         pedido.getEstado().toString(), pedido.getTotal())).toList();
+    }
+
+    public List<PedidoDetailDTO> verPedidosCompleto(String usuario) {
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese nombre"));
+
+        return pedidoRepository.findByRestauranteId(restaurante.getId()).stream()
+                .map(pedido -> {
+                    List<DetallePedidoDTO> detalles = pedido.getProductosPedidos().stream()
+                            .map(productoPedido -> new DetallePedidoDTO(
+                                    productoPedido.getProducto().getId(),
+                                    productoPedido.getProducto().getNombre(),
+                                    productoPedido.getProducto().getPrecio(),
+                                    productoPedido.getCantidad()
+                            )).toList();
+
+                    return new PedidoDetailDTO(
+                            pedido.getId(),
+                            pedido.getFechaPedido(),
+                            pedido.getEstado(),
+                            pedido.getTotal(),
+                            restaurante.getNombre(),
+                            pedido.getCliente().getId(),
+                            detalles
+                    );
+                }).toList();
     }
 }
