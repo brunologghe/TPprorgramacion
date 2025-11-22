@@ -22,7 +22,6 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-
 public class ReseniaService {
 
     @Autowired
@@ -61,7 +60,10 @@ public class ReseniaService {
                 .sorted(Comparator.comparingDouble(Resenia::getPuntuacion).reversed()
                         .thenComparing(resenia -> resenia.getCliente().getId()))
                 .map(resenia -> new ReseniaResumenDTO
-                        (resenia.getCliente().getId(), resenia.getDescripcion(), resenia.getPuntuacion())).toList();
+                        (resenia.getCliente().getId(),
+                                resenia.getCliente().getNombreYapellido(),
+                                resenia.getDescripcion(),
+                                resenia.getPuntuacion())).toList();
 
         reseniaValidations.validarResenia(resenias);
 
@@ -82,7 +84,12 @@ public class ReseniaService {
         List<ReseniaResumenDTO> resenias = new ArrayList<>();
 
         for(Resenia r : restaurante.getReseniasRestaurante()){
-            ReseniaResumenDTO resenia = new ReseniaResumenDTO(r.getCliente().getId(), r.getDescripcion(), r.getPuntuacion());
+            ReseniaResumenDTO resenia = new ReseniaResumenDTO(
+                    r.getCliente().getId(),
+                    r.getCliente().getNombreYapellido(),
+                    r.getDescripcion(),
+                    r.getPuntuacion()
+            );
             resenias.add(resenia);
         }
 

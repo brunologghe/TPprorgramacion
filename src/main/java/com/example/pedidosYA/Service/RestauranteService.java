@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 @Service
 public class RestauranteService {
 
@@ -49,7 +48,11 @@ public class RestauranteService {
                 .collect(Collectors.toSet());
 
         List<ReseniaResumenDTO> reseniaDTO = restaurante.getReseniasRestaurante().stream()
-                .map(resenia -> new ReseniaResumenDTO(resenia.getCliente().getId(), resenia.getDescripcion(), resenia.getPuntuacion()))
+                .map(resenia -> new ReseniaResumenDTO(
+                        resenia.getCliente().getId(),
+                        resenia.getCliente().getNombreYapellido(),  // AGREGAR NOMBRE DEL CLIENTE
+                        resenia.getDescripcion(),
+                        resenia.getPuntuacion()))
                 .collect(Collectors.toList());
 
         List<DireccionDTO>direccionDTOS = restaurante.getDirecciones().stream().map(direccion ->
