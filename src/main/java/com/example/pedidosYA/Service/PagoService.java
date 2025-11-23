@@ -2,6 +2,7 @@ package com.example.pedidosYA.Service;
 
 import com.example.pedidosYA.DTO.PagoDTO.TarjetaMuestraDTO;
 import com.example.pedidosYA.DTO.PagoDTO.TarjetaRequestDTO;
+import com.example.pedidosYA.DTO.PagoDTO.TarjetaResponseDTO;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.Cliente;
 import com.example.pedidosYA.Model.Tarjeta;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PagoService {
@@ -52,8 +54,19 @@ public class PagoService {
         tarjetaRepository.delete(pago);
     }
 
-    public List<Tarjeta> mostarTarjetas(String username) {
-        Cliente cliente = clienteRepository.findByUsuario(username).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
-        return cliente.getTarjetas();
+    public List<TarjetaResponseDTO> mostarTarjetas(String username) {
+        Cliente cliente = clienteRepository.findByUsuario(username)
+                .orElseThrow(() -> new BusinessException("Cliente no encontrado"));
+
+        return cliente.getTarjetas().stream()
+                .map(tarjeta -> new TarjetaResponseDTO(
+                        tarjeta.getId(),
+                        tarjeta.getTipo(),
+                        tarjeta.getNumero(),
+                        tarjeta.getTitular(),
+                        tarjeta.getVencimiento(),
+                        tarjeta.getCvv()
+                ))
+                .collect(Collectors.toList());
     }
 }

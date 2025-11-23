@@ -2,6 +2,7 @@ package com.example.pedidosYA.Controller;
 
 import com.example.pedidosYA.DTO.PagoDTO.TarjetaMuestraDTO;
 import com.example.pedidosYA.DTO.PagoDTO.TarjetaRequestDTO;
+import com.example.pedidosYA.DTO.PagoDTO.TarjetaResponseDTO;
 import com.example.pedidosYA.Model.Tarjeta;
 import com.example.pedidosYA.Security.AuthUtil;
 import com.example.pedidosYA.Service.PagoService;
@@ -38,7 +39,7 @@ public class PagoController {
 
     @GetMapping
     @PreAuthorize("hasRole('CLIENTE')")
-    public List<Tarjeta> mostrarTarjetas() {
+    public List<TarjetaResponseDTO> mostrarTarjetas() {
         String username = AuthUtil.getUsuarioLogueado();
         return pagoService.mostarTarjetas(username);
     }
