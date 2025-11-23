@@ -48,6 +48,14 @@ public class PedidoService {
     public PedidoDetailDTO hacerPedido(String usuario, PedidoCreateDTO pedidoCreateDTO) {
         Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         Restaurante restaurante =  restauranteValidations.validarExisteId(pedidoCreateDTO.getRestauranteId());
+        // Validar que la dirección del restaurante exista y pertenezca al restaurante
+        Direccion direccionRestaurante = restaurante.getDirecciones().stream()
+                .filter(dir -> dir.getId().equals(pedidoCreateDTO.getDireccionRestauranteId()))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException("La dirección del restaurante no existe o no pertenece a este restaurante"));
+
+
+
         clienteValidations.validarDireccion(pedidoCreateDTO.getDireccionId(), cliente.getId());
         Tarjeta metodoPago = pagoRepository.findById(pedidoCreateDTO.getPagoId())
                 .orElseThrow(() -> new BusinessException("Método de pago no encontrado"));
@@ -58,7 +66,7 @@ public class PedidoService {
         Pedido pedido = new Pedido();
         pedido.setFechaPedido(LocalDateTime.now());
         pedido.setEstado(EstadoPedido.PENDIENTE);
-
+        pedido.setDireccionRestaurante(direccionRestaurante);
         double total = 0;
         List<ProductoPedido> productosPedido = new ArrayList<>();
 

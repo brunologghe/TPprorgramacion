@@ -18,6 +18,10 @@ public class PedidoCreateDTO {
     @Min(value = 1, message = "El direccionId debe ser mayor o igual a 1")
     private Long direccionId;
 
+    @NotNull(message = "La dirección del restaurante no puede ser nula")
+    @Min(value = 1, message = "El direccionRestauranteId debe ser mayor o igual a 1")
+    private Long direccionRestauranteId;
+
     @NotNull(message = "El pago no puede ser nulo")
     @Min(value = 1, message = "El pagoId debe ser mayor o igual a 1")
     private Long pagoId;
@@ -58,5 +62,13 @@ public class PedidoCreateDTO {
 
     public void setDetalles(@NotNull(message = "Los detalles no puede ser nulos") List<DetallePedidoDTO> detalles) {
         this.detalles = detalles;
+    }
+
+    public Long getDireccionRestauranteId() {
+        return direccionRestauranteId;
+    }
+
+    public void setDireccionRestauranteId(Long direccionRestauranteId) {
+        this.direccionRestauranteId = direccionRestauranteId;
     }
 }
