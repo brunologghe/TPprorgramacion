@@ -49,7 +49,7 @@ public class RestauranteService {
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
 
         Set<ProductoResumenDTO> menuDTO = restaurante.getMenu().stream()
-                .map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio()))
+                .map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio(), producto.getStock()))
                 .collect(Collectors.toSet());
 
         List<ReseniaResumenDTO> reseniaDTO = restaurante.getReseniasRestaurante().stream()
@@ -173,7 +173,7 @@ public class RestauranteService {
         restaurante.getCombos().add(combo);
         restauranteRepository.save(restaurante);
 
-        Set<ProductoResumenDTO> productosResumen = productoSet.stream().map(producto -> new ProductoResumenDTO(producto.getId(),producto.getNombre(),producto.getPrecio())).collect(Collectors.toSet());
+        Set<ProductoResumenDTO> productosResumen = productoSet.stream().map(producto -> new ProductoResumenDTO(producto.getId(),producto.getNombre(),producto.getPrecio(), producto.getStock())).collect(Collectors.toSet());
 
         return new ComboResponseDTO(combo.getNombre(), productosResumen, comboRequestDTO.getDescuento(), combo.getPrecio());
     }
@@ -182,7 +182,7 @@ public class RestauranteService {
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
 
-        List<ComboResponseDTO> listaCombos = restaurante.getCombos().stream().map(combo -> {Set<ProductoResumenDTO> productosResumen = combo.getProductos().stream().map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio())).collect(Collectors.toSet());
+        List<ComboResponseDTO> listaCombos = restaurante.getCombos().stream().map(combo -> {Set<ProductoResumenDTO> productosResumen = combo.getProductos().stream().map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio(), producto.getStock())).collect(Collectors.toSet());
             return new ComboResponseDTO(combo.getNombre(), productosResumen, combo.getDescuento(), combo.getPrecio());}).collect(Collectors.toList());
 
         return listaCombos;
@@ -215,18 +215,14 @@ public class RestauranteService {
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
 
-        // Validar contraseña actual
         restauranteValidations.validarContraseniaActual(restaurante.getId(), contraseniaDTO.getContraseniaActual());
 
-        // Validar que las nuevas contraseñas coincidan
         if (!contraseniaDTO.getContraseniaNueva().equals(contraseniaDTO.getConfirmarContrasenia())) {
             throw new RuntimeException("Las contraseñas nuevas no coinciden");
         }
 
-        // Validar nueva contraseña
         restauranteValidations.validarContrasenia(contraseniaDTO.getContraseniaNueva());
 
-        // Actualizar contraseña
         restaurante.setContrasenia(passwordEncoder.encode(contraseniaDTO.getContraseniaNueva()));
         restauranteRepository.save(restaurante);
     }
