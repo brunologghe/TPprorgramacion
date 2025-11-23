@@ -8,6 +8,7 @@ import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaResumenDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.*;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.*;
+import com.example.pedidosYA.Repository.PedidoRepository;
 import com.example.pedidosYA.Repository.ProductoRepository;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Repository.UsuarioRepository;
@@ -19,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +40,8 @@ public class RestauranteService {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private ProductoRepository productoRepository;
+    @Autowired
+    private PedidoRepository pedidoRepository;
 
     public RestauranteDetailDTO findRestauranteByNombre(String usuario){
 
@@ -188,10 +192,8 @@ public class RestauranteService {
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
 
-        // Verificar contraseña actual
         restauranteValidations.validarContraseniaActual(restaurante.getId(), perfilDTO.getContraseniaActual());
 
-        // Actualizar campos si se proporcionan
         if (perfilDTO.getNombreRestaurante() != null && !perfilDTO.getNombreRestaurante().trim().isEmpty()) {
             restauranteValidations.validarNombreNoDuplicadoConID(restaurante.getId(), perfilDTO.getNombreRestaurante());
             restaurante.setNombre(perfilDTO.getNombreRestaurante());
@@ -224,5 +226,50 @@ public class RestauranteService {
         // Actualizar contraseña
         restaurante.setContrasenia(passwordEncoder.encode(contraseniaDTO.getContraseniaNueva()));
         restauranteRepository.save(restaurante);
+    }
+
+    public BalanceResponseDTO calcularBalance(String usuarioRestaurante, BalanceFiltroDTO filtro) {
+        // Obtener el restaurante
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuarioRestaurante)
+                .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
+
+        List<Pedido> pedidosFiltrados;
+
+        if ("dia".equals(filtro.getTipoFiltro()) && filtro.getFecha() != null) {
+            // Filtrar por día específico - SOLO pedidos ENTREGADOS
+            LocalDate fecha = LocalDate.parse(filtro.getFecha());
+            pedidosFiltrados = pedidoRepository.findByRestauranteAndEstadoAndFechaPedidoBetween(
+                    restaurante, EstadoPedido.ENTREGADO,
+                    fecha.atStartOfDay(),
+                    fecha.plusDays(1).atStartOfDay()
+            );
+        } else if ("mes".equals(filtro.getTipoFiltro()) && filtro.getMes() != null) {
+            // Filtrar por mes - SOLO pedidos ENTREGADOS
+            String[] partes = filtro.getMes().split("-");
+            int year = Integer.parseInt(partes[0]);
+            int month = Integer.parseInt(partes[1]);
+
+            LocalDate inicioMes = LocalDate.of(year, month, 1);
+            LocalDate finMes = inicioMes.plusMonths(1);
+
+            pedidosFiltrados = pedidoRepository.findByRestauranteAndEstadoAndFechaPedidoBetween(
+                    restaurante, EstadoPedido.ENTREGADO,
+                    inicioMes.atStartOfDay(),
+                    finMes.atStartOfDay()
+            );
+        } else {
+            return new BalanceResponseDTO(0.0, 0, 0.0);
+        }
+
+        // Calcular totales
+        Double totalRecaudado = pedidosFiltrados.stream()
+                .mapToDouble(Pedido::getTotal)
+                .sum();
+
+        Integer cantidadPedidos = pedidosFiltrados.size();
+
+        Double promedioVenta = cantidadPedidos > 0 ? totalRecaudado / cantidadPedidos : 0.0;
+
+        return new BalanceResponseDTO(totalRecaudado, cantidadPedidos, promedioVenta);
     }
 }

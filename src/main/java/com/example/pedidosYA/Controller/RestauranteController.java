@@ -141,4 +141,10 @@ public class RestauranteController {
     public ResponseEntity<List<ComboResponseDTO>>verCombos(){
         return ResponseEntity.status(HttpStatus.OK).body(restauranteService.verCombos(AuthUtil.getUsuarioLogueado()));
     }
+
+    @PostMapping("/balance")
+    @PreAuthorize("hasRole('RESTAURANTE')")
+    public ResponseEntity<BalanceResponseDTO> obtenerBalance(@Valid @RequestBody BalanceFiltroDTO filtro) {
+        return ResponseEntity.ok(restauranteService.calcularBalance(AuthUtil.getUsuarioLogueado(), filtro));
+    }
 }
