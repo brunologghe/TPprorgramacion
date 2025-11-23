@@ -19,6 +19,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.pedidosYA.Service.EmailService;
+
 @Service
 public class PedidoService {
 
@@ -39,10 +41,21 @@ public class PedidoService {
     @Autowired
     private TarjetaRepository pagoRepository;
 
+    @Autowired
+    private EmailService emailService;
+
     @Transactional
     public PedidoDetailDTO hacerPedido(String usuario, PedidoCreateDTO pedidoCreateDTO) {
         Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
         Restaurante restaurante =  restauranteValidations.validarExisteId(pedidoCreateDTO.getRestauranteId());
+        // Validar que la dirección del restaurante exista y pertenezca al restaurante
+        Direccion direccionRestaurante = restaurante.getDirecciones().stream()
+                .filter(dir -> dir.getId().equals(pedidoCreateDTO.getDireccionRestauranteId()))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException("La dirección del restaurante no existe o no pertenece a este restaurante"));
+
+
+
         clienteValidations.validarDireccion(pedidoCreateDTO.getDireccionId(), cliente.getId());
         Tarjeta metodoPago = pagoRepository.findById(pedidoCreateDTO.getPagoId())
                 .orElseThrow(() -> new BusinessException("Método de pago no encontrado"));
@@ -53,7 +66,7 @@ public class PedidoService {
         Pedido pedido = new Pedido();
         pedido.setFechaPedido(LocalDateTime.now());
         pedido.setEstado(EstadoPedido.PENDIENTE);
-
+        pedido.setDireccionRestaurante(direccionRestaurante);
         double total = 0;
         List<ProductoPedido> productosPedido = new ArrayList<>();
 
@@ -81,8 +94,28 @@ public class PedidoService {
 
         Pedido pedidohecho = pedidoRepository.save(pedido);
 
+        try {
+            String emailRestaurante = restaurante.getUsuario();
+            String nombreCliente = cliente.getNombreYapellido() != null ? cliente.getNombreYapellido() : cliente.getUsuario();
+            emailService.enviarEmailNuevoPedidoRestaurante(emailRestaurante, pedidohecho.getId(), nombreCliente, pedidohecho.getTotal());
+
+            String emailCliente = cliente.getUsuario();
+            emailService.enviarEmailPedidoConfirmado(emailCliente, pedidohecho.getId(), pedidohecho.getTotal());
+        } catch (Exception e) {
+
+        }
+
+        List<DetallePedidoDTO> detalles = new ArrayList<>();
+        for (ProductoPedido pp : pedidohecho.getProductosPedidos()) {
+            detalles.add(new DetallePedidoDTO(
+                    pp.getProducto().getId(),
+                    pp.getProducto().getNombre(),
+                    pp.getProducto().getPrecio(),
+                    pp.getCantidad()
+            ));
+        }
         return new PedidoDetailDTO(pedidohecho.getId(), pedidohecho.getFechaPedido(), pedidohecho.getEstado(),
-             pedidohecho.getTotal(), pedidohecho.getRestaurante().getNombre(), cliente.getId(), pedidoCreateDTO.getDetalles());
+        pedidohecho.getTotal(), pedidohecho.getRestaurante().getNombre(), cliente.getId(), detalles);
 
     }
 
@@ -176,17 +209,20 @@ public class PedidoService {
 
     @Transactional
     public void cancelarPedido(String usuario, Long idPedido){
-        Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
-        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(()-> new BusinessException("Ese pedido no existe"));
+        Cliente cliente = clienteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Cliente no encontrado"));
+        Pedido pedido = pedidoRepository.findById(idPedido)
+                .orElseThrow(()-> new BusinessException("Ese pedido no existe"));
 
         if(!cliente.getId().equals(pedido.getCliente().getId())){
-            throw new BusinessException("Ese pedido no existe");
+            throw new BusinessException("Ese pedido no te pertenece");
         }
         if (pedido.getEstado() != EstadoPedido.PENDIENTE) {
             throw new BusinessException("No se puede cancelar un pedido que ya fue tomado por el restaurante");
         }
 
-        pedidoRepository.delete(pedido);
+        pedido.setEstado(EstadoPedido.CANCELADO);
+        pedidoRepository.save(pedido);
     }
 
     @Transactional
@@ -208,6 +244,14 @@ public class PedidoService {
 
         pedido.setEstado(estadoPedido);
         pedidoRepository.save(pedido);
+
+        // Notificar al cliente del cambio de estado (asincrónico)
+        try {
+            String emailCliente = pedido.getCliente().getUsuario();
+            emailService.enviarEmailCambioEstado(emailCliente, pedido.getId(), pedido.getEstado().name());
+        } catch (Exception e) {
+            // No interrumpir flujo por errores de notificación
+        }
 
         List<DetallePedidoDTO> detallePedido = new ArrayList<>();
         for (ProductoPedido p : pedido.getProductosPedidos()) {

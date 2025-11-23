@@ -123,6 +123,7 @@ public class RestauranteController {
     }
 
     @GetMapping("/resenias")
+    @PreAuthorize("hasRole('RESTAURANTE')")
     public ResponseEntity<List<ReseniaResumenDTO>> verReseniasRestaurante(){
         return ResponseEntity.ok(reseniaService.verReseniasRestaurante(AuthUtil.getUsuarioLogueado()));
     }

@@ -125,11 +125,11 @@ public class ClienteController {
         return pedidoService.verDetallesPedido(idPedido);
     }
 
-    @DeleteMapping("/{id-pedido}")
+    @PutMapping("/pedido/{id}/cancelar")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<?> cancelarPedido(@PathVariable("id-producto") Long idPedido) {
-        pedidoService.cancelarPedido(AuthUtil.getUsuarioLogueado(),idPedido);
-        return ResponseEntity.status(HttpStatus.OK).body("Pedido con id: "+idPedido+" eliminado");
+    public ResponseEntity<?> cancelarPedido(@PathVariable("id") Long idPedido) {
+        pedidoService.cancelarPedido(AuthUtil.getUsuarioLogueado(), idPedido);
+        return ResponseEntity.status(HttpStatus.OK).body("Pedido cancelado exitosamente");
     }
 
     @PostMapping("agregar-resto-lista/{id-restaurante}")

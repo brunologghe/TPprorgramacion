@@ -32,6 +32,10 @@ public class Pedido {
     @JoinColumn(name = "restaurante_id")
     private Restaurante restaurante;
 
+    @ManyToOne
+    @JoinColumn(name = "direccion_restaurante_id")
+    private Direccion direccionRestaurante;
+
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductoPedido> productosPedidos = new ArrayList<>();
 
@@ -94,5 +98,11 @@ public class Pedido {
         this.productosPedidos = productosPedidos;
     }
 
+    public Direccion getDireccionRestaurante() {
+        return direccionRestaurante;
+    }
 
+    public void setDireccionRestaurante(Direccion direccionRestaurante) {
+        this.direccionRestaurante = direccionRestaurante;
+    }
 }

@@ -1,16 +1,20 @@
 package com.example.pedidosYA.DTO.RestauranteDTO;
 
-import jakarta.validation.constraints.NotBlank;
 
 public class BalanceFiltroDTO {
 
-    @NotBlank(message = "El tipo de filtro es obligatorio")
     private String tipoFiltro; // "dia" o "mes"
 
     private String fecha;      // formato: "2025-11-23" (para filtro por día)
     private String mes;        // formato: "2025-11" (para filtro por mes)
 
     public BalanceFiltroDTO() {}
+
+    public BalanceFiltroDTO(String tipoFiltro, String fecha, String mes) {
+        this.tipoFiltro = tipoFiltro;
+        this.fecha = fecha;
+        this.mes = mes;
+    }
 
     public String getTipoFiltro() {
         return tipoFiltro;
