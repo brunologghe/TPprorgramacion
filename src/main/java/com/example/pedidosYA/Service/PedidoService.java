@@ -176,17 +176,20 @@ public class PedidoService {
 
     @Transactional
     public void cancelarPedido(String usuario, Long idPedido){
-        Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
-        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(()-> new BusinessException("Ese pedido no existe"));
+        Cliente cliente = clienteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Cliente no encontrado"));
+        Pedido pedido = pedidoRepository.findById(idPedido)
+                .orElseThrow(()-> new BusinessException("Ese pedido no existe"));
 
         if(!cliente.getId().equals(pedido.getCliente().getId())){
-            throw new BusinessException("Ese pedido no existe");
+            throw new BusinessException("Ese pedido no te pertenece");
         }
         if (pedido.getEstado() != EstadoPedido.PENDIENTE) {
             throw new BusinessException("No se puede cancelar un pedido que ya fue tomado por el restaurante");
         }
 
-        pedidoRepository.delete(pedido);
+        pedido.setEstado(EstadoPedido.CANCELADO);
+        pedidoRepository.save(pedido);
     }
 
     @Transactional
