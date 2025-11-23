@@ -24,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/restaurantes")
@@ -75,7 +76,7 @@ public class RestauranteController {
     }
 
     @GetMapping ("/productos")
-    public ResponseEntity<?> findALlProducto(){
+    public ResponseEntity<Set<ProductoDetailDTO>> findALlProducto(){
         return ResponseEntity.ok(productoService.findAllProductosByRestaurante(AuthUtil.getUsuarioLogueado()));
     }
 
