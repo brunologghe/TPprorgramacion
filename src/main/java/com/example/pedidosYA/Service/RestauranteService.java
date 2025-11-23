@@ -46,7 +46,7 @@ public class RestauranteService {
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
 
         Set<ProductoResumenDTO> menuDTO = restaurante.getMenu().stream()
-                .map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio()))
+                .map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio(), producto.getStock()))
                 .collect(Collectors.toSet());
 
         List<ReseniaResumenDTO> reseniaDTO = restaurante.getReseniasRestaurante().stream()
@@ -60,7 +60,7 @@ public class RestauranteService {
         List<DireccionDTO>direccionDTOS = restaurante.getDirecciones().stream().map(direccion ->
                 new DireccionDTO(direccion.getId(), direccion.getDireccion(), direccion.getCiudad(), direccion.getPais(), direccion.getCodigoPostal())).collect(Collectors.toList());
 
-        List<ComboResponseDTO> comboResponseDTOS = restaurante.getCombos().stream().map(combo -> new ComboResponseDTO(combo.getNombre(), combo.getProductos().stream().map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio())).collect(Collectors.toSet())
+        List<ComboResponseDTO> comboResponseDTOS = restaurante.getCombos().stream().map(combo -> new ComboResponseDTO(combo.getNombre(), combo.getProductos().stream().map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio(), producto.getStock())).collect(Collectors.toSet())
                 , combo.getDescuento(), combo.getPrecio())).collect(Collectors.toList());
 
         return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(), restaurante.getEmail(),
@@ -170,7 +170,7 @@ public class RestauranteService {
         restaurante.getCombos().add(combo);
         restauranteRepository.save(restaurante);
 
-        Set<ProductoResumenDTO> productosResumen = productoSet.stream().map(producto -> new ProductoResumenDTO(producto.getId(),producto.getNombre(),producto.getPrecio())).collect(Collectors.toSet());
+        Set<ProductoResumenDTO> productosResumen = productoSet.stream().map(producto -> new ProductoResumenDTO(producto.getId(),producto.getNombre(),producto.getPrecio(), producto.getStock())).collect(Collectors.toSet());
 
         return new ComboResponseDTO(combo.getNombre(), productosResumen, comboRequestDTO.getDescuento(), combo.getPrecio());
     }
@@ -179,7 +179,7 @@ public class RestauranteService {
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
 
-        List<ComboResponseDTO> listaCombos = restaurante.getCombos().stream().map(combo -> {Set<ProductoResumenDTO> productosResumen = combo.getProductos().stream().map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio())).collect(Collectors.toSet());
+        List<ComboResponseDTO> listaCombos = restaurante.getCombos().stream().map(combo -> {Set<ProductoResumenDTO> productosResumen = combo.getProductos().stream().map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio(), producto.getStock())).collect(Collectors.toSet());
             return new ComboResponseDTO(combo.getNombre(), productosResumen, combo.getDescuento(), combo.getPrecio());}).collect(Collectors.toList());
 
         return listaCombos;

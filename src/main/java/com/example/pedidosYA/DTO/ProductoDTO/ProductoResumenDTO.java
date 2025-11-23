@@ -6,6 +6,7 @@ public record ProductoResumenDTO(
 
         Long id,
         String nombre,
-        double precio
+        double precio,
+        int stock
 )
 {}
