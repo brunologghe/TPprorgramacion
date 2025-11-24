@@ -8,6 +8,7 @@ import com.example.pedidosYA.Model.Cliente;
 import com.example.pedidosYA.Model.Resenia;
 import com.example.pedidosYA.Model.Restaurante;
 import com.example.pedidosYA.Repository.ClienteRepository;
+import com.example.pedidosYA.Repository.PedidoRepository;
 import com.example.pedidosYA.Repository.ReseniaRepository;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
@@ -34,12 +35,22 @@ public class ReseniaService {
     private RestauranteRepository restauranteRepository;
     @Autowired
     private ReseniaValidations reseniaValidations;
+    @Autowired
+    private PedidoRepository pedidoRepository;
 
     @Transactional
     public ReseniaDetailDTO crearResenia(String usuario, ReseniaCreateDTO reseniaCreateDTO) {
         Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
 
         Restaurante restaurante = restauranteValidations.validarExisteId(reseniaCreateDTO.getRestauranteId());
+
+        boolean tienePedidos = pedidoRepository.findByRestauranteId(restaurante.getId())
+                .stream()
+                .anyMatch(pedido -> pedido.getCliente().getId().equals(cliente.getId()));
+
+        if (!tienePedidos) {
+            throw new BusinessException("No puedes reseñar un restaurante sin haber hecho un pedido");
+        }
 
         Resenia resenia = new Resenia();
         resenia.setDescripcion(reseniaCreateDTO.getResenia());
