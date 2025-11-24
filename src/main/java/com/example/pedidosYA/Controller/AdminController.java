@@ -85,19 +85,19 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(reseniaService.verReseniasAdmin(idRestaurante));
     }
 
-    @GetMapping("/pendientes")
+    @GetMapping("/restaurantes/pendientes")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<RestauranteEstadoDTO>> getPendientes() {
         return ResponseEntity.ok(restauranteService.getRestaurantesPendientes());
     }
 
-    @GetMapping("/pendientes/count")
+    @GetMapping("/restaurantes/pendientes/count")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Long> countPendientes() {
         return ResponseEntity.ok(restauranteService.countPendientes());
     }
 
-    @PutMapping("/{id}/aprobar")
+    @PutMapping("/restaurantes/{id}/aprobar")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> aprobar(@PathVariable Long id) {
 
@@ -106,7 +106,7 @@ public class AdminController {
 
     }
 
-    @PutMapping("/{id}/rechazar")
+    @PutMapping("/restaurantes/{id}/rechazar")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> rechazar(@PathVariable Long id, @Valid @RequestBody RechazarRestauranteDTO dto) {
 
