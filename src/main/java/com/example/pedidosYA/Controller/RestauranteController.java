@@ -108,7 +108,7 @@ public class RestauranteController {
     }
 
     @GetMapping("/pedidos-en-curso")
-    public ResponseEntity<List<PedidoResumenDTO>> verPedidosDeRestauranteEnCurso(){
+    public ResponseEntity<List<PedidoDetailDTO>> verPedidosDeRestauranteEnCurso(){
         return ResponseEntity.ok(pedidoService.verPedidosDeRestauranteEnCurso(AuthUtil.getUsuarioLogueado()));
     }
 

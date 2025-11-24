@@ -270,14 +270,33 @@ public class PedidoService {
     }
 
 
-    public List<PedidoResumenDTO> verPedidosDeRestauranteEnCurso (String usuario){
+    public List<PedidoDetailDTO> verPedidosDeRestauranteEnCurso (String usuario){
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese nombre"));
 
         return pedidoRepository.findByRestauranteId(restaurante.getId()).stream()
-                .filter(pedido -> pedido.getEstado() == EstadoPedido.PENDIENTE || pedido.getEstado() == EstadoPedido.PREPARACION || pedido.getEstado() == EstadoPedido.ENVIADO)
-                .map(pedido -> new PedidoResumenDTO(pedido.getId(), pedido.getFechaPedido(),
-                        pedido.getEstado().toString(), pedido.getTotal())).toList();
+                .filter(pedido ->
+                        pedido.getEstado() == EstadoPedido.PENDIENTE    // 👈 agregar esto
+                                || pedido.getEstado() == EstadoPedido.PREPARACION
+                                || pedido.getEstado() == EstadoPedido.ENVIADO
+                )
+                .map(pedido -> new PedidoDetailDTO(
+                        pedido.getId(),
+                        pedido.getFechaPedido(),
+                        pedido.getEstado(),
+                        pedido.getTotal(),
+                        pedido.getRestaurante().getNombre(),
+                        pedido.getCliente().getId(),
+                        pedido.getProductosPedidos().stream()
+                                .map(pp -> new DetallePedidoDTO(
+                                        pp.getProducto().getId(),
+                                        pp.getProducto().getNombre(),
+                                        pp.getProducto().getPrecio(),
+                                        pp.getCantidad()
+                                ))
+                                .toList()
+                ))
+                .toList();
     }
 
     public List<PedidoResumenDTO> verHistorialPedidosDeRestaurante (String usuario){
