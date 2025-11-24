@@ -31,7 +31,7 @@ public class Restaurante extends Usuario{
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Combo> combos;
 
-<<<<<<< Updated upstream
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EstadoRestaurante estado = EstadoRestaurante.PENDIENTE;
@@ -54,13 +54,13 @@ public class Restaurante extends Usuario{
     public void setMotivoRechazo(String motivoRechazo) {
         this.motivoRechazo = motivoRechazo;
     }
-=======
+
     @Column(name = "hora_apertura")
     private LocalTime horaApertura;
 
     @Column(name = "hora_cierre")
     private LocalTime horaCierre;
->>>>>>> Stashed changes
+
 
     public Restaurante() {
     }

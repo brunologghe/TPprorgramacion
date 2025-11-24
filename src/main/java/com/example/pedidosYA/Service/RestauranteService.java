@@ -129,15 +129,13 @@ public class RestauranteService {
         if (lista.isEmpty()) {
             throw new BusinessException("No hay restaurantes cargados actualmente");
         }
-<<<<<<< Updated upstream
-        return restauranteRepository.findAprobados().stream().map(r -> new RestauranteResponseDTO(r.getId(), r.getUsuario(), r.getNombre(), r.getEmail())).collect(Collectors.toSet());
-=======
+
 
         // 🔁 MODIFICADO: usamos un mapper que incluye horario y estado
         return lista.stream()
                 .map(this::mapToRestauranteResponseDTO)
                 .collect(Collectors.toSet());
->>>>>>> Stashed changes
+
     }
 
     // ============================================================
@@ -425,7 +423,6 @@ public class RestauranteService {
 
         return new BalanceResponseDTO(totalRecaudado, cantidadPedidos, promedioVenta);
     }
-<<<<<<< Updated upstream
 
     // Obtener pendientes
     public List<RestauranteEstadoDTO> getRestaurantesPendientes() {
@@ -520,6 +517,4 @@ public class RestauranteService {
     }
 
 }
-=======
-}
->>>>>>> Stashed changes
+
