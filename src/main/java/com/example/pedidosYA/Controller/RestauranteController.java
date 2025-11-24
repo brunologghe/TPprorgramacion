@@ -113,7 +113,7 @@ public class RestauranteController {
     }
 
     @GetMapping("/historial-pedidos")
-    public ResponseEntity<List<PedidoResumenDTO>> verHistorialPedidosDeRestaurante(){
+    public ResponseEntity<List<PedidoDetailDTO>> verHistorialPedidosDeRestaurante(){
         return ResponseEntity.ok(pedidoService.verHistorialPedidosDeRestaurante(AuthUtil.getUsuarioLogueado()));
     }
 

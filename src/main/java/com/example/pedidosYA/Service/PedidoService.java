@@ -299,14 +299,21 @@ public class PedidoService {
                 .toList();
     }
 
-    public List<PedidoResumenDTO> verHistorialPedidosDeRestaurante (String usuario){
+    public List<PedidoDetailDTO> verHistorialPedidosDeRestaurante (String usuario){
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new BusinessException("No existe ningún restaurante con ese nombre"));
 
         return pedidoRepository.findByRestauranteId(restaurante.getId()).stream()
                 .filter(pedido -> pedido.getEstado() == EstadoPedido.ENTREGADO || pedido.getEstado() == EstadoPedido.PREPARACION || pedido.getEstado() == EstadoPedido.ENVIADO)
-                .map(pedido -> new PedidoResumenDTO(pedido.getId(), pedido.getFechaPedido(),
-                        pedido.getEstado().toString(), pedido.getTotal())).toList();
+                .map(pedido -> new PedidoDetailDTO(pedido.getId(), pedido.getFechaPedido(),
+                        pedido.getEstado(),  pedido.getTotal(), pedido.getRestaurante().getNombre(), pedido.getCliente().getId(),
+                        pedido.getProductosPedidos().stream()
+                        .map(productoPedido -> new DetallePedidoDTO(
+                                productoPedido.getProducto().getId(),
+                                productoPedido.getProducto().getNombre(),
+                                productoPedido.getProducto().getPrecio(),
+                                productoPedido.getCantidad()
+                        )).toList())).toList();
     }
 
     public List<PedidoDetailDTO> verPedidosCompleto(String usuario) {
