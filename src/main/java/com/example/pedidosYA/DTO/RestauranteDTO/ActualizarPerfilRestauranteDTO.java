@@ -1,8 +1,11 @@
 package com.example.pedidosYA.DTO.RestauranteDTO;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+
+import java.time.LocalTime;
 
 public class ActualizarPerfilRestauranteDTO {
     
@@ -14,6 +17,26 @@ public class ActualizarPerfilRestauranteDTO {
     
     @NotBlank(message = "La contraseña actual es obligatoria para verificar la identidad")
     private String contraseniaActual;
+
+    private LocalTime horaApertura;
+
+    private LocalTime horaCierre;
+
+    public LocalTime getHoraApertura() {
+        return horaApertura;
+    }
+
+    public void setHoraApertura(LocalTime horaApertura) {
+        this.horaApertura = horaApertura;
+    }
+
+    public LocalTime getHoraCierre() {
+        return horaCierre;
+    }
+
+    public void setHoraCierre(LocalTime horaCierre) {
+        this.horaCierre = horaCierre;
+    }
 
     public String getNombreRestaurante() {
         return nombreRestaurante;

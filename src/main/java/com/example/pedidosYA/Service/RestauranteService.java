@@ -363,6 +363,14 @@ public class RestauranteService {
             restaurante.setEmail(perfilDTO.getEmail());
         }
 
+        if (perfilDTO.getHoraApertura() != null) {
+            restaurante.setHoraApertura(perfilDTO.getHoraApertura());
+        }
+
+        if (perfilDTO.getHoraCierre() != null) {
+            restaurante.setHoraCierre(perfilDTO.getHoraCierre());
+        }
+
         restauranteRepository.save(restaurante);
     }
 
