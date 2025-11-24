@@ -4,9 +4,7 @@ import com.example.pedidosYA.DTO.ClienteDTO.ModificarDTO;
 import com.example.pedidosYA.DTO.ClienteDTO.ResponseDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaDetailDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaResumenDTO;
-import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteModificarDTO;
-import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResponseDTO;
-import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResumenDTO;
+import com.example.pedidosYA.DTO.RestauranteDTO.*;
 import com.example.pedidosYA.Service.ClienteService;
 import com.example.pedidosYA.Service.ReseniaService;
 import com.example.pedidosYA.Service.RestauranteService;
@@ -85,5 +83,35 @@ public class AdminController {
     public ResponseEntity<List<ReseniaDetailDTO>> verResenias(@PathVariable Long idRestaurante)
     {
         return ResponseEntity.status(HttpStatus.OK).body(reseniaService.verReseniasAdmin(idRestaurante));
+    }
+
+    @GetMapping("/pendientes")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<RestauranteEstadoDTO>> getPendientes() {
+        return ResponseEntity.ok(restauranteService.getRestaurantesPendientes());
+    }
+
+    @GetMapping("/pendientes/count")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Long> countPendientes() {
+        return ResponseEntity.ok(restauranteService.countPendientes());
+    }
+
+    @PutMapping("/{id}/aprobar")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> aprobar(@PathVariable Long id) {
+
+            RestauranteEstadoDTO dto = restauranteService.aprobarRestaurante(id);
+            return ResponseEntity.ok("Restaurante aprobado exitosamente");
+
+    }
+
+    @PutMapping("/{id}/rechazar")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> rechazar(@PathVariable Long id, @Valid @RequestBody RechazarRestauranteDTO dto) {
+
+            RestauranteEstadoDTO result = restauranteService.rechazarRestaurante(id, dto);
+            return ResponseEntity.ok("Restaurante rechazado");
+
     }
 }

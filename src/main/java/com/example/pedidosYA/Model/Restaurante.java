@@ -30,6 +30,29 @@ public class Restaurante extends Usuario{
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Combo> combos;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EstadoRestaurante estado = EstadoRestaurante.PENDIENTE;
+
+    @Column(length = 500)
+    private String motivoRechazo;
+
+    public EstadoRestaurante getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoRestaurante estado) {
+        this.estado = estado;
+    }
+
+    public String getMotivoRechazo() {
+        return motivoRechazo;
+    }
+
+    public void setMotivoRechazo(String motivoRechazo) {
+        this.motivoRechazo = motivoRechazo;
+    }
+
     public Restaurante() {
     }
 

@@ -270,4 +270,76 @@ public class RestauranteService {
 
         return new BalanceResponseDTO(totalRecaudado, cantidadPedidos, promedioVenta);
     }
+
+    // Obtener pendientes
+    public List<RestauranteEstadoDTO> getRestaurantesPendientes() {
+        return restauranteRepository.findByEstado(EstadoRestaurante.PENDIENTE)
+                .stream()
+                .map(this::toEstadoDTO)
+                .toList();
+    }
+
+    // Aprobar
+    @Transactional
+    public RestauranteEstadoDTO aprobarRestaurante(Long id) {
+        Restaurante restaurante = restauranteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
+
+        if (restaurante.getEstado() != EstadoRestaurante.PENDIENTE) {
+            throw new IllegalStateException("Solo se pueden aprobar restaurantes pendientes");
+        }
+
+        restaurante.setEstado(EstadoRestaurante.APROBADO);
+        restaurante.setMotivoRechazo(null); // Limpiar si había rechazo previo
+
+        Restaurante saved = restauranteRepository.save(restaurante);
+
+        return toEstadoDTO(saved);
+    }
+
+    // Rechazar
+    @Transactional
+    public RestauranteEstadoDTO rechazarRestaurante(Long id, RechazarRestauranteDTO dto) {
+        Restaurante restaurante = restauranteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
+
+        if (restaurante.getEstado() != EstadoRestaurante.PENDIENTE) {
+            throw new IllegalStateException("Solo se pueden rechazar restaurantes pendientes");
+        }
+
+        restaurante.setEstado(EstadoRestaurante.RECHAZADO);
+        restaurante.setMotivoRechazo(dto.motivoRechazo());
+
+        Restaurante saved = restauranteRepository.save(restaurante);
+
+        return toEstadoDTO(saved);
+    }
+
+    // Contador para badge en UI
+    public long countPendientes() {
+        return restauranteRepository.countByEstado(EstadoRestaurante.PENDIENTE);
+    }
+
+    private RestauranteEstadoDTO toEstadoDTO(Restaurante r) {
+        return new RestauranteEstadoDTO(
+                r.getId(),
+                r.getUsuario(),
+                r.getNombre(),
+                r.getEstado(),
+                r.getMotivoRechazo()
+        );
+    }
+
+    public RestauranteEstadoDTO verEstado (String usuario){
+
+       Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
+
+        return new RestauranteEstadoDTO(
+                restaurante.getId(),
+                restaurante.getUsuario(),
+                restaurante.getNombre(),
+                restaurante.getEstado(),
+                restaurante.getMotivoRechazo());
+    }
+
 }

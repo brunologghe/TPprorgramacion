@@ -149,4 +149,10 @@ public class RestauranteController {
     public ResponseEntity<BalanceResponseDTO> obtenerBalance(@Valid @RequestBody BalanceFiltroDTO filtro) {
         return ResponseEntity.ok(restauranteService.calcularBalance(AuthUtil.getUsuarioLogueado(), filtro));
     }
+
+    @GetMapping("/mi-estado")
+    @PreAuthorize("hasRole('RESTAURANTE')")
+    public ResponseEntity<RestauranteEstadoDTO> getEstado() {
+        return ResponseEntity.ok(restauranteService.verEstado(AuthUtil.getUsuarioLogueado()));
+    }
 }
