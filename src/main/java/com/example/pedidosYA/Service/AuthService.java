@@ -14,6 +14,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +38,8 @@ public class AuthService {
 
     @Autowired
     ClienteValidations clienteValidations;
+
+    private static final DateTimeFormatter HORA_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     public String login (String usuario){
         UserDetails userDetails = usuarioService.loadUserByUsername(usuario);
@@ -79,11 +84,22 @@ public class AuthService {
                 restauranteValidations.validarContrasenia(request.getContrasenia());
                 restauranteValidations.validarEmail(request.getEmail());
 
+                if (request.getHoraApertura() == null || request.getHoraApertura().isBlank()
+                        || request.getHoraCierre() == null || request.getHoraCierre().isBlank()) {
+                    throw new RuntimeException("La hora de apertura y cierre son obligatorias para restaurantes");
+                }
+
+                LocalTime horaApertura = parseHora(request.getHoraApertura());
+                LocalTime horaCierre = parseHora(request.getHoraCierre());
+
                 restaurante.setUsuario(request.getUsuario());
                 restaurante.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
                 restaurante.setNombre(request.getNombreRestaurante());
                 restaurante.setEmail(request.getEmail());
                 restaurante.setRol(RolUsuario.RESTAURANTE);
+                restaurante.setHoraApertura(horaApertura);
+                restaurante.setHoraCierre(horaCierre);
+
                 nuevoUsuario = restaurante;
                 break;
 
@@ -93,6 +109,14 @@ public class AuthService {
 
         usuarioService.save(nuevoUsuario);
         return nuevoUsuario.getRol().name() + " creado";
+    }
+
+    private LocalTime parseHora(String value) {
+        try {
+            return LocalTime.parse(value, HORA_FORMATTER);
+        } catch (DateTimeParseException e) {
+            throw new RuntimeException("El horario debe tener formato HH:mm (por ejemplo, 09:00)", e);
+        }
     }
 
 

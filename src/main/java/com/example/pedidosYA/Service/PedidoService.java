@@ -291,7 +291,7 @@ public class PedidoService {
 
         return pedidoRepository.findByRestauranteId(restaurante.getId()).stream()
                 .filter(pedido ->
-                        pedido.getEstado() == EstadoPedido.PENDIENTE    // 👈 agregar esto
+                        pedido.getEstado() == EstadoPedido.PENDIENTE
                                 || pedido.getEstado() == EstadoPedido.PREPARACION
                                 || pedido.getEstado() == EstadoPedido.ENVIADO
                 )
