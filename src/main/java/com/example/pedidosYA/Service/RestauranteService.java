@@ -43,6 +43,8 @@ public class RestauranteService {
     private ProductoRepository productoRepository;
     @Autowired
     private PedidoRepository pedidoRepository;
+    @Autowired
+    private EmailService emailService;
 
     public RestauranteDetailDTO findRestauranteByNombre(String usuario){
 
@@ -301,6 +303,13 @@ public class RestauranteService {
 
         Restaurante saved = restauranteRepository.save(restaurante);
 
+        // Notificar al restaurante por email
+        try {
+            emailService.enviarEmailRestauranteAprobado(saved.getEmail(), saved.getNombre());
+        } catch (Exception e) {
+            // No interrumpir el flujo si falla el email
+        }
+
         return toEstadoDTO(saved);
     }
 
@@ -318,6 +327,13 @@ public class RestauranteService {
         restaurante.setMotivoRechazo(dto.motivoRechazo());
 
         Restaurante saved = restauranteRepository.save(restaurante);
+
+        // Notificar al restaurante por email
+        try {
+            emailService.enviarEmailRestauranteRechazado(saved.getEmail(), saved.getNombre(), dto.motivoRechazo());
+        } catch (Exception e) {
+            // No interrumpir el flujo si falla el email
+        }
 
         return toEstadoDTO(saved);
     }

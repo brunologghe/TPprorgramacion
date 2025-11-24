@@ -36,6 +36,12 @@ public class AuthService {
     @Autowired
     ClienteValidations clienteValidations;
 
+    @Autowired
+    EmailService emailService;
+
+    @Autowired
+    UsuarioRepository usuarioRepository;
+
     public String login (String usuario){
         UserDetails userDetails = usuarioService.loadUserByUsername(usuario);
 
@@ -92,6 +98,20 @@ public class AuthService {
         }
 
         usuarioService.save(nuevoUsuario);
+        
+        // Si es un restaurante, notificar al admin
+        if (nuevoUsuario instanceof Restaurante) {
+            try {
+                Usuario admin = usuarioRepository.findByRol(RolUsuario.ADMIN);
+                if (admin != null && admin.getEmail() != null) {
+                    Restaurante rest = (Restaurante) nuevoUsuario;
+                    emailService.enviarEmailNuevaSolicitudAdmin(admin.getEmail(), rest.getNombre(), rest.getId());
+                }
+            } catch (Exception e) {
+                // No interrumpir el flujo si falla el email
+            }
+        }
+        
         return nuevoUsuario.getRol().name() + " creado";
     }
 

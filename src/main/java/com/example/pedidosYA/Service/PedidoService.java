@@ -95,14 +95,14 @@ public class PedidoService {
         Pedido pedidohecho = pedidoRepository.save(pedido);
 
         try {
-            String emailRestaurante = restaurante.getUsuario();
+            String emailRestaurante = restaurante.getEmail();
             String nombreCliente = cliente.getNombreYapellido() != null ? cliente.getNombreYapellido() : cliente.getUsuario();
             emailService.enviarEmailNuevoPedidoRestaurante(emailRestaurante, pedidohecho.getId(), nombreCliente, pedidohecho.getTotal());
 
-            String emailCliente = cliente.getUsuario();
+            String emailCliente = cliente.getEmail();
             emailService.enviarEmailPedidoConfirmado(emailCliente, pedidohecho.getId(), pedidohecho.getTotal());
         } catch (Exception e) {
-
+            // Log error pero no interrumpir el flujo del pedido
         }
 
         List<DetallePedidoDTO> detalles = new ArrayList<>();
@@ -262,7 +262,7 @@ public class PedidoService {
 
         // Notificar al cliente del cambio de estado (asincrónico)
         try {
-            String emailCliente = pedido.getCliente().getUsuario();
+            String emailCliente = pedido.getCliente().getEmail();
             emailService.enviarEmailCambioEstado(emailCliente, pedido.getId(), pedido.getEstado().name());
         } catch (Exception e) {
             // No interrumpir flujo por errores de notificación
