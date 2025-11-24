@@ -91,6 +91,12 @@ public class AdminController {
         return ResponseEntity.ok(restauranteService.getRestaurantesPendientes());
     }
 
+    @GetMapping("/restaurantes/rechazados")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<RestauranteEstadoDTO>> getRechazados() {
+        return ResponseEntity.ok(restauranteService.getRestaurantesRechazados());
+    }
+
     @GetMapping("/restaurantes/pendientes/count")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Long> countPendientes() {

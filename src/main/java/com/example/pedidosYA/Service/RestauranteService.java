@@ -75,7 +75,7 @@ public class RestauranteService {
         if (lista.isEmpty()) {
             throw new BusinessException("No hay restaurantes cargados actualmente");
         }
-        return restauranteRepository.findAll().stream().map(r -> new RestauranteResponseDTO(r.getId(), r.getUsuario(), r.getNombre(), r.getEmail())).collect(Collectors.toSet());
+        return restauranteRepository.findAprobados().stream().map(r -> new RestauranteResponseDTO(r.getId(), r.getUsuario(), r.getNombre(), r.getEmail())).collect(Collectors.toSet());
     }
 
     public Set<RestauranteResponseDTO> findAllRestaurantesAdmin(){
@@ -274,6 +274,13 @@ public class RestauranteService {
     // Obtener pendientes
     public List<RestauranteEstadoDTO> getRestaurantesPendientes() {
         return restauranteRepository.findByEstado(EstadoRestaurante.PENDIENTE)
+                .stream()
+                .map(this::toEstadoDTO)
+                .toList();
+    }
+
+    public List<RestauranteEstadoDTO> getRestaurantesRechazados() {
+        return restauranteRepository.findByEstado(EstadoRestaurante.RECHAZADO)
                 .stream()
                 .map(this::toEstadoDTO)
                 .toList();
