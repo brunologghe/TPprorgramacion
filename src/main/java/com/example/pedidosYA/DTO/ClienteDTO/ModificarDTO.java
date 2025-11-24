@@ -1,11 +1,11 @@
 package com.example.pedidosYA.DTO.ClienteDTO;
 
 public class ModificarDTO {
-    private String usuario;
-    private String nombreYapellido;
-    private String email;
-    private String contraseniaActual;
-    private String contraseniaNueva;
+        private String usuario;
+        private String nombreYapellido;
+        private String email;
+        private String contraseniaActual;
+        private String contraseniaNueva;
 
     public String getUsuario() {
         return usuario;

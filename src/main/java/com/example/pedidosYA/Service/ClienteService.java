@@ -143,7 +143,6 @@ public class ClienteService {
         return listaFav;
     }
 
-<<<<<<< HEAD
     @Transactional
     public void actualizarPerfil(String usuario, ActualizarPerfilDTO perfilDTO) {
         Cliente cliente = clienteRepository.findByUsuario(usuario)

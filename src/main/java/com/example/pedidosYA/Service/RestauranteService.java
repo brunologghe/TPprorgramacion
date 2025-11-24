@@ -8,6 +8,7 @@ import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaResumenDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.*;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.*;
+import com.example.pedidosYA.Repository.PedidoRepository;
 import com.example.pedidosYA.Repository.ProductoRepository;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Repository.UsuarioRepository;
@@ -19,12 +20,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 
 @Service
 public class RestauranteService {
@@ -39,43 +41,51 @@ public class RestauranteService {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private ProductoRepository productoRepository;
+    @Autowired
+    private PedidoRepository pedidoRepository;
 
     public RestauranteDetailDTO findRestauranteByNombre(String usuario){
 
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
 
         Set<ProductoResumenDTO> menuDTO = restaurante.getMenu().stream()
-                .map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio()))
+                .map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio(), producto.getStock()))
                 .collect(Collectors.toSet());
 
         List<ReseniaResumenDTO> reseniaDTO = restaurante.getReseniasRestaurante().stream()
-                .map(resenia -> new ReseniaResumenDTO(resenia.getCliente().getId(), resenia.getDescripcion(), resenia.getPuntuacion()))
+                .map(resenia -> new ReseniaResumenDTO(
+                        resenia.getCliente().getId(),
+                        resenia.getCliente().getNombreYapellido(),  // AGREGAR NOMBRE DEL CLIENTE
+                        resenia.getDescripcion(),
+                        resenia.getPuntuacion()))
                 .collect(Collectors.toList());
 
         List<DireccionDTO>direccionDTOS = restaurante.getDirecciones().stream().map(direccion ->
                 new DireccionDTO(direccion.getId(), direccion.getDireccion(), direccion.getCiudad(), direccion.getPais(), direccion.getCodigoPostal())).collect(Collectors.toList());
 
-<<<<<<< HEAD
-        return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(), restaurante.getEmail(),
-                menuDTO, reseniaDTO, direccionDTOS);
-=======
-        List<ComboResponseDTO> comboResponseDTOS = restaurante.getCombos().stream().map(combo -> new ComboResponseDTO(combo.getNombre(), combo.getProductos().stream().map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio())).collect(Collectors.toSet())
+        List<ComboResponseDTO> comboResponseDTOS = restaurante.getCombos().stream().map(combo -> new ComboResponseDTO(combo.getNombre(), combo.getProductos().stream().map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio(), producto.getStock())).collect(Collectors.toSet())
                 , combo.getDescuento(), combo.getPrecio())).collect(Collectors.toList());
 
-        return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(),
+        return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(), restaurante.getEmail(),
                 menuDTO,comboResponseDTOS, reseniaDTO, direccionDTOS);
->>>>>>> feli-branch
     }
 
-    public Set<RestauranteResumenDTO> findAllRestaurantes(){
+    public Set<RestauranteResponseDTO> findAllRestaurantes(){
         List<Restaurante> lista = restauranteRepository.findAll();
         if (lista.isEmpty()) {
             throw new BusinessException("No hay restaurantes cargados actualmente");
         }
-        return restauranteRepository.findAll().stream().map(r -> new RestauranteResumenDTO(r.getId(), r.getNombre())).collect(Collectors.toSet());
+        return restauranteRepository.findAll().stream().map(r -> new RestauranteResponseDTO(r.getId(), r.getUsuario(), r.getNombre(), r.getEmail())).collect(Collectors.toSet());
     }
 
-    @Transactional
+    public Set<RestauranteResponseDTO> findAllRestaurantesAdmin(){
+        List<Restaurante> lista = restauranteRepository.findAll();
+        if (lista.isEmpty()) {
+            throw new BusinessException("No hay restaurantes cargados actualmente");
+        }
+        return restauranteRepository.findAll().stream().map(r -> new RestauranteResponseDTO(r.getId(),r.getUsuario(), r.getNombre(),r.getEmail())).collect(Collectors.toSet());
+    }
+
     public void modificarContraseniaRestaurante (String usuario, RestauranteModificarDTO restauranteNuevo){
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
 
@@ -87,7 +97,6 @@ public class RestauranteService {
 
     }
 
-    @Transactional
     public void modificarUsuarioNombreRestaurante (String usuario, RestauranteModificarDTO restauranteNuevo){
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
 
@@ -96,15 +105,11 @@ public class RestauranteService {
 
         restaurante.setUsuario(restauranteNuevo.getUsuario());
         restaurante.setNombre(restauranteNuevo.getNombreRestaurante());
-        if (restauranteNuevo.getEmail() != null) {
-            restaurante.setEmail(restauranteNuevo.getEmail());
-        }
 
         Restaurante r = restauranteRepository.save(restaurante);
 
     }
 
-    @Transactional
     public void modificarUsuarioNombreRestauranteAdmin (String usuario, RestauranteModificarDTO restauranteNuevo){
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
 
@@ -112,16 +117,11 @@ public class RestauranteService {
 
         restaurante.setUsuario(restauranteNuevo.getUsuario());
         restaurante.setNombre(restauranteNuevo.getNombreRestaurante());
-        if (restauranteNuevo.getEmail() != null) {
-            restauranteValidations.validarEmailModificacion(restaurante.getId(), restauranteNuevo.getEmail());
-            restaurante.setEmail(restauranteNuevo.getEmail());
-        }
 
         Restaurante r = restauranteRepository.save(restaurante);
 
     }
 
-    @Transactional
     public RestauranteResponseDTO eliminarRestaurante (Long id){
         Restaurante restaurante = restauranteValidations.validarExisteId(id);
 
@@ -173,7 +173,7 @@ public class RestauranteService {
         restaurante.getCombos().add(combo);
         restauranteRepository.save(restaurante);
 
-        Set<ProductoResumenDTO> productosResumen = productoSet.stream().map(producto -> new ProductoResumenDTO(producto.getId(),producto.getNombre(),producto.getPrecio())).collect(Collectors.toSet());
+        Set<ProductoResumenDTO> productosResumen = productoSet.stream().map(producto -> new ProductoResumenDTO(producto.getId(),producto.getNombre(),producto.getPrecio(), producto.getStock())).collect(Collectors.toSet());
 
         return new ComboResponseDTO(combo.getNombre(), productosResumen, comboRequestDTO.getDescuento(), combo.getPrecio());
     }
@@ -182,30 +182,10 @@ public class RestauranteService {
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
 
-        List<ComboResponseDTO> listaCombos = restaurante.getCombos().stream().map(combo -> {Set<ProductoResumenDTO> productosResumen = combo.getProductos().stream().map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio())).collect(Collectors.toSet());
+        List<ComboResponseDTO> listaCombos = restaurante.getCombos().stream().map(combo -> {Set<ProductoResumenDTO> productosResumen = combo.getProductos().stream().map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio(), producto.getStock())).collect(Collectors.toSet());
             return new ComboResponseDTO(combo.getNombre(), productosResumen, combo.getDescuento(), combo.getPrecio());}).collect(Collectors.toList());
 
         return listaCombos;
-    }
-
-    public RestauranteDetailDTO findRestauranteByNombreParaCliente(String nombreRestaurante) {
-        Restaurante restaurante = restauranteRepository.findByNombre(nombreRestaurante);
-        if (restaurante == null) {
-            throw new RuntimeException("Restaurante no encontrado");
-        }
-        
-        Set<ProductoResumenDTO> menuDTO = restaurante.getMenu().stream()
-                .map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio()))
-                .collect(Collectors.toSet());
-        List<ReseniaResumenDTO> reseniaDTO = restaurante.getReseniasRestaurante().stream()
-                .map(resenia -> new ReseniaResumenDTO(resenia.getCliente().getId(), resenia.getDescripcion(), resenia.getPuntuacion()))
-                .collect(Collectors.toList());
-
-        List<DireccionDTO>direccionDTOS = restaurante.getDirecciones().stream().map(direccion ->
-                new DireccionDTO(direccion.getId(), direccion.getDireccion(), direccion.getCiudad(), direccion.getPais(), direccion.getCodigoPostal())).collect(Collectors.toList());
-
-        return new RestauranteDetailDTO(restaurante.getId(), restaurante.getNombre(), restaurante.getEmail(),
-                menuDTO, reseniaDTO, direccionDTOS);
     }
 
     @Transactional
@@ -235,19 +215,59 @@ public class RestauranteService {
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
 
-        // Validar contraseña actual
         restauranteValidations.validarContraseniaActual(restaurante.getId(), contraseniaDTO.getContraseniaActual());
 
-        // Validar que las nuevas contraseñas coincidan
         if (!contraseniaDTO.getContraseniaNueva().equals(contraseniaDTO.getConfirmarContrasenia())) {
             throw new RuntimeException("Las contraseñas nuevas no coinciden");
         }
 
-        // Validar nueva contraseña
         restauranteValidations.validarContrasenia(contraseniaDTO.getContraseniaNueva());
 
-        // Actualizar contraseña
         restaurante.setContrasenia(passwordEncoder.encode(contraseniaDTO.getContraseniaNueva()));
         restauranteRepository.save(restaurante);
+    }
+    public BalanceResponseDTO calcularBalance(String usuarioRestaurante, BalanceFiltroDTO filtro) {
+        // Obtener el restaurante
+        Restaurante restaurante = restauranteRepository.findByUsuario(usuarioRestaurante)
+                .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
+
+        List<Pedido> pedidosFiltrados;
+
+        if ("dia".equals(filtro.getTipoFiltro()) && filtro.getFecha() != null) {
+            // Filtrar por día específico - SOLO pedidos ENTREGADOS
+            LocalDate fecha = LocalDate.parse(filtro.getFecha());
+            pedidosFiltrados = pedidoRepository.findByRestauranteAndEstadoAndFechaPedidoBetween(
+                    restaurante, EstadoPedido.ENTREGADO,
+                    fecha.atStartOfDay(),
+                    fecha.plusDays(1).atStartOfDay()
+            );
+        } else if ("mes".equals(filtro.getTipoFiltro()) && filtro.getMes() != null) {
+            // Filtrar por mes - SOLO pedidos ENTREGADOS
+            String[] partes = filtro.getMes().split("-");
+            int year = Integer.parseInt(partes[0]);
+            int month = Integer.parseInt(partes[1]);
+
+            LocalDate inicioMes = LocalDate.of(year, month, 1);
+            LocalDate finMes = inicioMes.plusMonths(1);
+
+            pedidosFiltrados = pedidoRepository.findByRestauranteAndEstadoAndFechaPedidoBetween(
+                    restaurante, EstadoPedido.ENTREGADO,
+                    inicioMes.atStartOfDay(),
+                    finMes.atStartOfDay()
+            );
+        } else {
+            return new BalanceResponseDTO(0.0, 0, 0.0);
+        }
+
+        // Calcular totales
+        Double totalRecaudado = pedidosFiltrados.stream()
+                .mapToDouble(Pedido::getTotal)
+                .sum();
+
+        Integer cantidadPedidos = pedidosFiltrados.size();
+
+        Double promedioVenta = cantidadPedidos > 0 ? totalRecaudado / cantidadPedidos : 0.0;
+
+        return new BalanceResponseDTO(totalRecaudado, cantidadPedidos, promedioVenta);
     }
 }

@@ -11,17 +11,13 @@ import com.example.pedidosYA.DTO.PedidoDTO.PedidoCreateDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaCreateDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaDetailDTO;
-<<<<<<< HEAD
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteDetailDTO;
-=======
-import com.example.pedidosYA.DTO.RestauranteDTO.MenuComboDTO;
->>>>>>> feli-branch
+import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResponseDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResumenDTO;
 import com.example.pedidosYA.Security.AuthUtil;
 import com.example.pedidosYA.Service.*;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -83,25 +79,22 @@ public class ClienteController {
 
     @GetMapping("/restaurantes")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<Set<RestauranteResumenDTO>> listAllRestaurantes(){
+    public ResponseEntity<Set<RestauranteResponseDTO>> listAllRestaurantes(){
         return ResponseEntity.ok(restauranteService.findAllRestaurantes());
     }
 
-<<<<<<< HEAD
-    @GetMapping ("/ver-menu/{nombre}")
+    @GetMapping ("/ver-menu/{usuario}")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<?> findALlProducto(@PathVariable String nombre){
-        return ResponseEntity.ok(productoService.findAllProductosByRestauranteNombre(nombre));
+    public ResponseEntity<?> findALlProducto(@PathVariable String usuario){
+        return ResponseEntity.ok(productoService.findAllProductosByRestaurante(usuario));
     }
 
-    @GetMapping("/restaurante/{nombre}")
+    @GetMapping("/restaurante/{usuario}")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<RestauranteDetailDTO> verRestauranteCompleto(@PathVariable String nombre) {
-        return ResponseEntity.ok(restauranteService.findRestauranteByNombreParaCliente(nombre));
+    public ResponseEntity<RestauranteDetailDTO> verRestauranteCompleto(@PathVariable String usuario) {
+        return ResponseEntity.ok(restauranteService.findRestauranteByNombre(usuario));
     }
 
-=======
->>>>>>> feli-branch
     @PostMapping("/pedir")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<PedidoDetailDTO> hacerPedido(@Valid @RequestBody PedidoCreateDTO pedido) {
@@ -132,11 +125,11 @@ public class ClienteController {
         return pedidoService.verDetallesPedido(idPedido);
     }
 
-    @DeleteMapping("/{id-pedido}")
+    @PutMapping("/pedido/{id}/cancelar")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<?> cancelarPedido(@PathVariable("id-producto") Long idPedido) {
-        pedidoService.cancelarPedido(AuthUtil.getUsuarioLogueado(),idPedido);
-        return ResponseEntity.status(HttpStatus.OK).body("Pedido con id: "+idPedido+" eliminado");
+    public ResponseEntity<?> cancelarPedido(@PathVariable("id") Long idPedido) {
+        pedidoService.cancelarPedido(AuthUtil.getUsuarioLogueado(), idPedido);
+        return ResponseEntity.status(HttpStatus.OK).body("Pedido cancelado exitosamente");
     }
 
     @PostMapping("agregar-resto-lista/{id-restaurante}")
@@ -151,9 +144,5 @@ public class ClienteController {
         return ResponseEntity.status(HttpStatus.OK).body(clienteService.verListaFavoritos(AuthUtil.getUsuarioLogueado()));
     }
 
-    @GetMapping("/ver-menu/{id-restaurante}")
-    @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<MenuComboDTO>verMenuRestaurante(@PathVariable("id-restaurante") Long idRestaurante){
-        return ResponseEntity.status(HttpStatus.OK).body(clienteService.verMenuRestaurante(idRestaurante));
-    }
+
 }

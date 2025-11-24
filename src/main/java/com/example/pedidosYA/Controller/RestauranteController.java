@@ -24,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/restaurantes")
@@ -75,7 +76,7 @@ public class RestauranteController {
     }
 
     @GetMapping ("/productos")
-    public ResponseEntity<?> findALlProducto(){
+    public ResponseEntity<Set<ProductoDetailDTO>> findALlProducto(){
         return ResponseEntity.ok(productoService.findAllProductosByRestaurante(AuthUtil.getUsuarioLogueado()));
     }
 
@@ -112,11 +113,18 @@ public class RestauranteController {
     }
 
     @GetMapping("/historial-pedidos")
-    public ResponseEntity<List<PedidoDetailDTO>> verHistorialPedidosDeRestaurante(){
+    public ResponseEntity<List<PedidoResumenDTO>> verHistorialPedidosDeRestaurante(){
         return ResponseEntity.ok(pedidoService.verHistorialPedidosDeRestaurante(AuthUtil.getUsuarioLogueado()));
     }
 
+    @GetMapping("/pedidos-completo")
+    @PreAuthorize("hasRole('RESTAURANTE')")
+    public ResponseEntity<List<PedidoDetailDTO>> verPedidosCompleto(){
+        return ResponseEntity.ok(pedidoService.verPedidosCompleto(AuthUtil.getUsuarioLogueado()));
+    }
+
     @GetMapping("/resenias")
+    @PreAuthorize("hasRole('RESTAURANTE')")
     public ResponseEntity<List<ReseniaResumenDTO>> verReseniasRestaurante(){
         return ResponseEntity.ok(reseniaService.verReseniasRestaurante(AuthUtil.getUsuarioLogueado()));
     }
@@ -134,5 +142,11 @@ public class RestauranteController {
     @GetMapping("/combos")
     public ResponseEntity<List<ComboResponseDTO>>verCombos(){
         return ResponseEntity.status(HttpStatus.OK).body(restauranteService.verCombos(AuthUtil.getUsuarioLogueado()));
+    }
+
+    @PostMapping("/balance")
+    @PreAuthorize("hasRole('RESTAURANTE')")
+    public ResponseEntity<BalanceResponseDTO> obtenerBalance(@Valid @RequestBody BalanceFiltroDTO filtro) {
+        return ResponseEntity.ok(restauranteService.calcularBalance(AuthUtil.getUsuarioLogueado(), filtro));
     }
 }

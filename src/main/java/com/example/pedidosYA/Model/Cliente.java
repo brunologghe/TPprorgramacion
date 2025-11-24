@@ -65,4 +65,6 @@ public class Cliente extends Usuario {
     public void setListaRestaurantesFavoritos(List<Restaurante> listaRestaurantesFavoritos) {
         this.listaRestaurantesFavoritos = listaRestaurantesFavoritos;
     }
+
+
 }

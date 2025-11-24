@@ -1,10 +1,7 @@
 package com.example.pedidosYA.Validations;
 
 import com.example.pedidosYA.Exceptions.BusinessException;
-import com.example.pedidosYA.Model.Pedido;
-import com.example.pedidosYA.Model.Producto;
-import com.example.pedidosYA.Model.ProductoPedido;
-import com.example.pedidosYA.Model.Restaurante;
+import com.example.pedidosYA.Model.*;
 import com.example.pedidosYA.Repository.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -48,7 +45,7 @@ public class ProductoValidations {
 
         for (Pedido pedido : pedidos) {
             for (ProductoPedido productoPedido : pedido.getProductosPedidos()) {
-                if (productoPedido.getProducto().getId().equals(producto.getId())) {
+                if (productoPedido.getProducto().getId().equals(producto.getId()) && (!pedido.getEstado().equals(EstadoPedido.CANCELADO) || !pedido.getEstado().equals(EstadoPedido.ENTREGADO))) {
                     throw new BusinessException("No se puede eliminar el producto porque está asociado a pedidos del restaurante.");
                 }
             }
