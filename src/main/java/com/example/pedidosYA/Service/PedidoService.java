@@ -221,6 +221,13 @@ public class PedidoService {
             throw new BusinessException("No se puede cancelar un pedido que ya fue tomado por el restaurante");
         }
 
+        // Restaurar el stock de los productos
+        for (ProductoPedido productoPedido : pedido.getProductosPedidos()) {
+            Producto producto = productoPedido.getProducto();
+            producto.setStock(producto.getStock() + productoPedido.getCantidad());
+            productoRepository.save(producto);
+        }
+
         pedido.setEstado(EstadoPedido.CANCELADO);
         pedidoRepository.save(pedido);
     }
@@ -241,6 +248,14 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(idPedido)
                 .filter(p -> p.getRestaurante().getId().equals(restaurante.getId()))
                 .orElseThrow(() -> new BusinessException("Ese pedido no existe"));
+
+        if (estadoPedido == EstadoPedido.CANCELADO && pedido.getEstado() != EstadoPedido.CANCELADO) {
+            for (ProductoPedido productoPedido : pedido.getProductosPedidos()) {
+                Producto producto = productoPedido.getProducto();
+                producto.setStock(producto.getStock() + productoPedido.getCantidad());
+                productoRepository.save(producto);
+            }
+        }
 
         pedido.setEstado(estadoPedido);
         pedidoRepository.save(pedido);
