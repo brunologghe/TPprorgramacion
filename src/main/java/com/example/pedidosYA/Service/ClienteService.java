@@ -125,6 +125,19 @@ public class ClienteService {
         return new RestauranteResumenDTO(restaurante.getId(), restaurante.getNombre());
     }
 
+    public RestauranteResumenDTO eliminarRestauranteDeLista(String usuario, Long id)
+    {
+        Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
+
+        Restaurante restaurante = restauranteRepository.findById(id).orElseThrow(() -> new BusinessException("Restaurante no encontrado"));
+
+        cliente.getListaRestaurantesFavoritos().remove(restaurante);
+
+        clienteRepository.save(cliente);
+
+        return new RestauranteResumenDTO(restaurante.getId(), restaurante.getNombre());
+    }
+
     public List<RestauranteResumenDTO> verListaFavoritos(String usuario)
     {
         Cliente cliente = clienteRepository.findByUsuario(usuario).orElseThrow(() -> new BusinessException("Cliente no encontrado"));
@@ -134,11 +147,6 @@ public class ClienteService {
         for(Restaurante r : cliente.getListaRestaurantesFavoritos()){
             RestauranteResumenDTO restauranteResumenDTO = new RestauranteResumenDTO(r.getId(), r.getNombre());
             listaFav.add(restauranteResumenDTO);
-        }
-
-        if(listaFav.isEmpty())
-        {
-            throw new RuntimeException("Aun no hay restaurantes en la lista de favoritos");
         }
 
         return listaFav;

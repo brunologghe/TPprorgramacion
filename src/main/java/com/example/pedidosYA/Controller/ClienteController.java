@@ -132,7 +132,7 @@ public class ClienteController {
         return ResponseEntity.status(HttpStatus.OK).body("Pedido cancelado exitosamente");
     }
 
-    @PostMapping("agregar-resto-lista/{id-restaurante}")
+    @PostMapping("/agregar-listafav/{id-restaurante}")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<?> agregarRestauranteALista(@PathVariable("id-restaurante") Long idRestaurante) {
         return ResponseEntity.status(HttpStatus.OK).body(clienteService.agregarRestauranteALista(AuthUtil.getUsuarioLogueado(), idRestaurante));
@@ -142,6 +142,12 @@ public class ClienteController {
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<?> verListaFavoritos() {
         return ResponseEntity.status(HttpStatus.OK).body(clienteService.verListaFavoritos(AuthUtil.getUsuarioLogueado()));
+    }
+
+    @DeleteMapping("/eliminar-listafav/{id-restaurante}")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<?> eliminarRestauranteDeLista(@PathVariable("id-restaurante") Long idRestaurante) {
+        return ResponseEntity.status(HttpStatus.OK).body(clienteService.eliminarRestauranteDeLista(AuthUtil.getUsuarioLogueado(), idRestaurante));
     }
 
 
