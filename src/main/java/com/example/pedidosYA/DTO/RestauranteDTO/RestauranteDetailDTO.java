@@ -18,7 +18,10 @@ public record RestauranteDetailDTO(
         Set<ProductoResumenDTO> menu,
         List<ComboResponseDTO>comboResponseDTOS,
         List<ReseniaResumenDTO> reseniasRestaurante,
-        List<DireccionDTO>direcciones
+        List<DireccionDTO>direcciones,
+        String horaApertura,
+        String horaCierre,
+        Boolean estaAbierto
 )
 {}
 
