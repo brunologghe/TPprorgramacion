@@ -150,17 +150,18 @@ public class RestauranteController {
         return ResponseEntity.ok(restauranteService.calcularBalance(AuthUtil.getUsuarioLogueado(), filtro));
     }
 
-<<<<<<< Updated upstream
+
     @GetMapping("/mi-estado")
     @PreAuthorize("hasRole('RESTAURANTE')")
     public ResponseEntity<RestauranteEstadoDTO> getEstado() {
         return ResponseEntity.ok(restauranteService.verEstado(AuthUtil.getUsuarioLogueado()));
-=======
+    }
+
     @GetMapping("/{id}/estado")
     @PreAuthorize("hasRole('RESTAURANTE')")
-    public ResponseEntity<EstadoRestauranteDTO> getEstado(@PathVariable Long id) {
+    public ResponseEntity<EstadoRestauranteDTO> getApertura(@PathVariable Long id) {
         EstadoRestauranteDTO dto = restauranteService.obtenerEstado(id);
         return ResponseEntity.ok(dto);
->>>>>>> Stashed changes
+
     }
 }
