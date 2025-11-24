@@ -6,8 +6,9 @@ import com.example.pedidosYA.DTO.ClienteDTO.ClienteCrearDTO;
 import com.example.pedidosYA.DTO.ClienteDTO.ClienteDetailDto;
 import com.example.pedidosYA.DTO.ClienteDTO.ModificarDTO;
 import com.example.pedidosYA.DTO.ClienteDTO.ResponseDTO;
-import com.example.pedidosYA.DTO.ProductoDTO.ProductoResumenDTO;
-import com.example.pedidosYA.DTO.RestauranteDTO.*;
+import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteModificarDTO;
+import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResponseDTO;
+import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResumenDTO;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.Cliente;
 import com.example.pedidosYA.Model.Restaurante;
@@ -184,13 +185,5 @@ public class ClienteService {
         // Actualizar contraseña
         cliente.setContrasenia(passwordEncoder.encode(contraseniaDTO.getContraseniaNueva()));
         clienteRepository.save(cliente);
-
-    public MenuComboDTO verMenuRestaurante(Long id)
-    {
-        Restaurante restaurante = restauranteRepository.findById(id).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
-
-        return new MenuComboDTO(restaurante.getMenu().stream().map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio())).collect(Collectors.toList()),
-        restaurante.getCombos().stream().map(combo -> new ComboResponseDTO(combo.getNombre(), combo.getProductos().stream().map(producto -> new ProductoResumenDTO(producto.getId(), producto.getNombre(), producto.getPrecio())).collect(Collectors.toSet()), combo.getDescuento(), combo.getPrecio())).collect(Collectors.toList()));
-
     }
 }
