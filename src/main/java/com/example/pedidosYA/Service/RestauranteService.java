@@ -19,8 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalTime;                     // ⭐ NUEVO
-import java.time.format.DateTimeFormatter;     // ⭐ NUEVO
+import java.time.LocalTime;                     
+import java.time.format.DateTimeFormatter;     
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,14 +44,10 @@ public class RestauranteService {
     @Autowired
     private EmailService emailService;
 
-    // ⭐ NUEVO: formateador de hora para enviar "HH:mm" al frontend
-    private static final DateTimeFormatter HORA_FORMATTER =
+     private static final DateTimeFormatter HORA_FORMATTER =
             DateTimeFormatter.ofPattern("HH:mm");
 
-    // ============================================================
-    //  DETALLE DE RESTAURANTE (vista de cliente)
-    // ============================================================
-    public RestauranteDetailDTO findRestauranteByNombre(String usuario){
+     public RestauranteDetailDTO findRestauranteByNombre(String usuario){
 
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
@@ -95,7 +91,6 @@ public class RestauranteService {
                         combo.getPrecio()))
                 .collect(Collectors.toList());
 
-        // ⭐ NUEVO: calculamos horario y estado
         String horaApertura = restaurante.getHoraApertura() != null
                 ? restaurante.getHoraApertura().format(HORA_FORMATTER)
                 : null;
@@ -106,7 +101,6 @@ public class RestauranteService {
 
         boolean estaAbierto = estaAbierto(restaurante);
 
-        // 🔁 MODIFICADO: ahora pasamos horaApertura, horaCierre, estaAbierto
         return new RestauranteDetailDTO(
                 restaurante.getId(),
                 restaurante.getNombre(),
@@ -121,40 +115,31 @@ public class RestauranteService {
         );
     }
 
-    // ============================================================
-    //  LISTA DE RESTAURANTES PARA CLIENTE
-    // ============================================================
-    public Set<RestauranteResponseDTO> findAllRestaurantes(){
+     public Set<RestauranteResponseDTO> findAllRestaurantes(){
         List<Restaurante> lista = restauranteRepository.findAll();
         if (lista.isEmpty()) {
             throw new BusinessException("No hay restaurantes cargados actualmente");
         }
 
 
-        // 🔁 MODIFICADO: usamos un mapper que incluye horario y estado
         return lista.stream()
                 .map(this::mapToRestauranteResponseDTO)
                 .collect(Collectors.toSet());
 
     }
 
-    // ============================================================
-    //  LISTA DE RESTAURANTES PARA ADMIN
-    // ============================================================
-    public Set<RestauranteResponseDTO> findAllRestaurantesAdmin(){
+     public Set<RestauranteResponseDTO> findAllRestaurantesAdmin(){
         List<Restaurante> lista = restauranteRepository.findAll();
         if (lista.isEmpty()) {
             throw new BusinessException("No hay restaurantes cargados actualmente");
         }
 
-        // 🔁 MODIFICADO: reusamos el mismo mapper
-        return lista.stream()
+         return lista.stream()
                 .map(this::mapToRestauranteResponseDTO)
                 .collect(Collectors.toSet());
     }
 
-    // ⭐ NUEVO: mapper común para RestauranteResponseDTO
-    private RestauranteResponseDTO mapToRestauranteResponseDTO(Restaurante r) {
+   private RestauranteResponseDTO mapToRestauranteResponseDTO(Restaurante r) {
         String horaApertura = r.getHoraApertura() != null
                 ? r.getHoraApertura().format(HORA_FORMATTER)
                 : null;
@@ -176,14 +161,8 @@ public class RestauranteService {
         );
     }
 
-    // ============================================================
-    //  LÓGICA DE HORARIOS Y ESTADO
-    // ============================================================
-
-    // ⭐ NUEVO: dice si el restaurante está abierto según hora actual
-    public boolean estaAbierto(Restaurante restaurante) {
+   public boolean estaAbierto(Restaurante restaurante) {
         if (restaurante.getHoraApertura() == null || restaurante.getHoraCierre() == null) {
-            // Si no configuraste horario, lo tomamos como siempre abierto
             return true;
         }
 
@@ -191,16 +170,13 @@ public class RestauranteService {
         LocalTime apertura = restaurante.getHoraApertura();
         LocalTime cierre = restaurante.getHoraCierre();
 
-        // Caso normal: abre y cierra el mismo día (ej: 09:00 - 23:00)
         if (!apertura.isAfter(cierre)) {
             return !ahora.isBefore(apertura) && !ahora.isAfter(cierre);
         }
 
-        // Caso especial: cruza la medianoche (ej: 20:00 - 02:00)
         return !ahora.isBefore(apertura) || !ahora.isAfter(cierre);
     }
 
-    // ⭐ NUEVO: cancelar pedidos pendientes si el restaurante está cerrado
     public void cancelarPedidosPendientes(Restaurante restaurante) {
         List<Pedido> pendientes = pedidoRepository
                 .findByRestauranteAndEstado(restaurante, EstadoPedido.PENDIENTE);
@@ -466,8 +442,7 @@ public class RestauranteService {
         try {
             emailService.enviarEmailRestauranteAprobado(saved.getEmail(), saved.getNombre());
         } catch (Exception e) {
-            // No interrumpir el flujo si falla el email
-        }
+         }
 
         return toEstadoDTO(saved);
     }
@@ -491,8 +466,7 @@ public class RestauranteService {
         try {
             emailService.enviarEmailRestauranteRechazado(saved.getEmail(), saved.getNombre(), dto.motivoRechazo());
         } catch (Exception e) {
-            // No interrumpir el flujo si falla el email
-        }
+           }
 
         return toEstadoDTO(saved);
     }

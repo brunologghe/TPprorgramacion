@@ -15,6 +15,9 @@ public class Resenia {
     @JoinColumn(name = "restaurante_id")
     private Restaurante restaurante;
     @ManyToOne
+    @JoinColumn(name = "repartidor_id")
+    private Repartidor repartidor;
+    @ManyToOne
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
@@ -51,6 +54,14 @@ public class Resenia {
 
     public void setRestaurante(Restaurante restaurante) {
         this.restaurante = restaurante;
+    }
+
+    public Repartidor getRepartidor() {
+        return repartidor;
+    }
+
+    public void setRepartidor(Repartidor repartidor) {
+        this.repartidor = repartidor;
     }
 
     public Cliente getCliente() {
