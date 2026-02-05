@@ -24,5 +24,6 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByRestauranteAndEstado(Restaurante restaurante, EstadoPedido estado); // NUEVO
 
     List<Pedido> findByRestauranteAndEstadoIn(Restaurante restaurante, Collection<EstadoPedido> estados);
+    List<Pedido> findByEstado(EstadoPedido estado);
 }
 
