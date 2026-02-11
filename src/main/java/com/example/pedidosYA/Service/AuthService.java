@@ -7,6 +7,7 @@ import com.example.pedidosYA.Repository.UsuarioRepository;
 import com.example.pedidosYA.Security.JwtUtil;
 import com.example.pedidosYA.Validations.AdminValidations;
 import com.example.pedidosYA.Validations.ClienteValidations;
+import com.example.pedidosYA.Validations.RepartidorValidations;
 import com.example.pedidosYA.Validations.RestauranteValidations;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ public class AuthService {
 
     @Autowired
     ClienteValidations clienteValidations;
+
+    @Autowired
+    RepartidorValidations repartidorValidations;
 
     @Autowired
     EmailService emailService;
@@ -109,8 +113,34 @@ public class AuthService {
                 nuevoUsuario = restaurante;
                 break;
 
+            case "REPARTIDOR":
+                Repartidor repartidor = new Repartidor();
+
+                repartidorValidations.validarNombreYApellido(request.getNombreYapellido());
+                repartidorValidations.validarUsuario(request.getUsuario());
+                repartidorValidations.validarContrasenia(request.getContrasenia());
+                repartidorValidations.validarEmail(request.getEmail());
+                repartidorValidations.validarPais(request.getPais());
+                repartidorValidations.validarTipoVehiculo(request.getTipoVehiculo());
+
+                repartidor.setUsuario(request.getUsuario());
+                repartidor.setContrasenia(passwordEncoder.encode(request.getContrasenia()));
+                repartidor.setNombreYapellido(request.getNombreYapellido());
+                repartidor.setEmail(request.getEmail());
+                repartidor.setPais(request.getPais());
+                repartidor.setTipoVehiculo(request.getTipoVehiculo());
+                repartidor.setRol(RolUsuario.REPARTIDOR);
+                repartidor.setDisponible(false);
+                repartidor.setTrabajando(false);
+                repartidor.setTotalPedidosEntregados(0);
+                repartidor.setCalificacionPromedio(0.0);
+                repartidor.setActivo(true);
+
+                nuevoUsuario = repartidor;
+                break;
+
             default:
-                throw new RuntimeException("Solo se pueden registrar usuarios con rol CLIENTE o RESTAURANTE.");
+                throw new RuntimeException("Solo se pueden registrar usuarios con rol CLIENTE, RESTAURANTE o REPARTIDOR.");
         }
 
         usuarioService.save(nuevoUsuario);

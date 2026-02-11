@@ -1,5 +1,6 @@
 package com.example.pedidosYA.DTO.AuthDTO;
 
+import com.example.pedidosYA.Model.TipoVehiculo;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -19,7 +20,7 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank(message = "El rol es obligatorio")
-    @Pattern(regexp = "CLIENTE|ADMIN|RESTAURANTE", flags = Pattern.Flag.CASE_INSENSITIVE, message = "El rol debe ser CLIENTE o RESTAURANTE")
+    @Pattern(regexp = "CLIENTE|ADMIN|RESTAURANTE|REPARTIDOR", flags = Pattern.Flag.CASE_INSENSITIVE, message = "El rol debe ser CLIENTE, RESTAURANTE o REPARTIDOR")
     private String rol;
 
     @Size(min = 3, max = 100, message = "El nombre y apellido debe tener entre 3 y 100 caracteres")
@@ -30,6 +31,10 @@ public class RegisterRequest {
 
     private String horaApertura;
     private String horaCierre;
+
+    private String pais;
+
+    private TipoVehiculo tipoVehiculo;
 
     public String getHoraApertura() {
         return horaApertura;
@@ -45,6 +50,22 @@ public class RegisterRequest {
 
     public void setHoraCierre(String horaCierre) {
         this.horaCierre = horaCierre;
+    }
+
+    public String getPais() {
+        return pais;
+    }
+
+    public void setPais(String pais) {
+        this.pais = pais;
+    }
+
+    public TipoVehiculo getTipoVehiculo() {
+        return tipoVehiculo;
+    }
+
+    public void setTipoVehiculo(TipoVehiculo tipoVehiculo) {
+        this.tipoVehiculo = tipoVehiculo;
     }
 
     public String getUsuario() { return usuario; }

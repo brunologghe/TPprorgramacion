@@ -4,6 +4,8 @@ import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.EstadoPedido;
 import com.example.pedidosYA.Model.Pedido;
 import com.example.pedidosYA.Model.Repartidor;
+import com.example.pedidosYA.Model.TipoVehiculo;
+import com.example.pedidosYA.Model.Usuario;
 import com.example.pedidosYA.Repository.PedidoRepository;
 import com.example.pedidosYA.Repository.RepartidorRepository;
 import com.example.pedidosYA.Repository.UsuarioRepository;
@@ -24,8 +26,14 @@ public class RepartidorValidations {
     private UsuarioRepository usuarioRepository;
 
     public Repartidor validarExistencia(Long id) {
-        return repartidorRepository.findById(id)
+        Repartidor repartidor = repartidorRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("No existe ningún repartidor con ese id"));
+        
+        if (repartidor.getActivo() != null && !repartidor.getActivo()) {
+            throw new BusinessException("El repartidor no está activo en el sistema.");
+        }
+        
+        return repartidor;
     }
 
     public void validarContraseniaActual(Long id, String contrasenia) {
@@ -57,6 +65,19 @@ public class RepartidorValidations {
             throw new BusinessException("El formato del email no es válido.");
         }
         if (usuarioRepository.existsByEmail(email)) {
+            throw new BusinessException("El email ya está registrado en el sistema.");
+        }
+    }
+
+    public void validarEmailModificacion(Long id, String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new BusinessException("El email es obligatorio.");
+        }
+        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            throw new BusinessException("El formato del email no es válido.");
+        }
+        Usuario usuarioConEmail = usuarioRepository.findByEmail(email).orElse(null);
+        if (usuarioConEmail != null && !usuarioConEmail.getId().equals(id)) {
             throw new BusinessException("El email ya está registrado en el sistema.");
         }
     }
@@ -118,7 +139,7 @@ public class RepartidorValidations {
         }
     }
 
-    public void validarTipoVehiculo(String tipoVehiculo) {
+    public void validarTipoVehiculo(TipoVehiculo tipoVehiculo) {
         if (tipoVehiculo == null) {
             throw new BusinessException("El tipo de vehículo es obligatorio.");
         }

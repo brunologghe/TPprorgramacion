@@ -28,6 +28,11 @@ public class Repartidor extends Usuario {
     @Column
     private Long pedidoActualId;
 
+    @ElementCollection
+    @CollectionTable(name = "repartidor_zonas", joinColumns = @JoinColumn(name = "repartidor_id"))
+    @Column(name = "codigo_postal")
+    private List<String> zonas = new ArrayList<>();
+
     @OneToMany(mappedBy = "repartidor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Resenia> reseniasRepartidor;
 
@@ -36,6 +41,9 @@ public class Repartidor extends Usuario {
 
     @Column
     private Double calificacionPromedio;
+
+    @Column
+    private Boolean activo;
 
     public Repartidor() {
     }
@@ -110,5 +118,21 @@ public class Repartidor extends Usuario {
 
     public void setReseniasRepartidor(List<Resenia> reseniasRepartidor) {
         this.reseniasRepartidor = reseniasRepartidor;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
+
+    public List<String> getZonas() {
+        return zonas;
+    }
+
+    public void setZonas(List<String> zonas) {
+        this.zonas = zonas;
     }
 }

@@ -1,11 +1,13 @@
 package com.example.pedidosYA.Service;
 
-import com.example.pedidosYA.DTO.RepartidorDTO.*;
+import com.example.pedidosYA.DTO.RepartidorDTO.ActualizarPerfilRepartidorDTO;
+import com.example.pedidosYA.DTO.RepartidorDTO.CambiarContraseniaRepartidorDTO;
+import com.example.pedidosYA.DTO.RepartidorDTO.RepartidorDetailDTO;
+import com.example.pedidosYA.DTO.RepartidorDTO.RepartidorResumenDTO;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.EstadoPedido;
 import com.example.pedidosYA.Model.Pedido;
 import com.example.pedidosYA.Model.Repartidor;
-import com.example.pedidosYA.Model.RolUsuario;
 import com.example.pedidosYA.Repository.PedidoRepository;
 import com.example.pedidosYA.Repository.RepartidorRepository;
 import com.example.pedidosYA.Validations.RepartidorValidations;
@@ -27,47 +29,14 @@ public class RepartidorService {
     @Autowired
     private RepartidorValidations repartidorValidations;
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    PasswordEncoder passwordEncoder;
+    public RepartidorDetailDTO obtenerPerfilRepartidor(String usuario) {
+        Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
 
-    @Transactional
-    public RepartidorDetailDTO crearRepartidor(RepartidorCrearDTO dto) {
-        repartidorValidations.validarUsuario(dto.getUsuario());
-        repartidorValidations.validarEmail(dto.getEmail());
-        repartidorValidations.validarNombreYApellido(dto.getNombreYapellido());
-        repartidorValidations.validarContrasenia(dto.getContrasenia());
-        repartidorValidations.validarPais(dto.getPais());
-
-        Repartidor repartidor = new Repartidor();
-        repartidor.setUsuario(dto.getUsuario());
-        repartidor.setContrasenia(passwordEncoder.encode(dto.getContrasenia()));
-        repartidor.setEmail(dto.getEmail());
-        repartidor.setNombreYapellido(dto.getNombreYapellido());
-        repartidor.setPais(dto.getPais());
-        repartidor.setTipoVehiculo(dto.getTipoVehiculo());
-        repartidor.setRol(RolUsuario.REPARTIDOR);
-        repartidor.setDisponible(false);
-        repartidor.setTrabajando(false);
-        repartidor.setTotalPedidosEntregados(0);
-        repartidor.setCalificacionPromedio(0.0);
-
-        Repartidor saved = repartidorRepository.save(repartidor);
-
-        return new RepartidorDetailDTO(
-                saved.getId(),
-                saved.getUsuario(),
-                saved.getNombreYapellido(),
-                saved.getEmail(),
-                saved.getPais(),
-                saved.getTipoVehiculo(),
-                saved.getDisponible(),
-                saved.getTrabajando(),
-                saved.getTotalPedidosEntregados(),
-                saved.getCalificacionPromedio()
-        );
-    }
-
-    public RepartidorDetailDTO obtenerPerfilRepartidor(Long id) {
-        Repartidor repartidor = repartidorValidations.validarExistencia(id);
+        if (repartidor.getActivo() != null && !repartidor.getActivo()) {
+            throw new BusinessException("El repartidor no está activo en el sistema.");
+        }
 
         return new RepartidorDetailDTO(
                 repartidor.getId(),
@@ -84,9 +53,10 @@ public class RepartidorService {
     }
 
     @Transactional
-    public RepartidorDetailDTO actualizarPerfil(Long id, ActualizarPerfilRepartidorDTO dto) {
-        Repartidor repartidor = repartidorValidations.validarExistencia(id);
-        repartidorValidations.validarContraseniaActual(id, dto.getContraseniaActual());
+    public RepartidorDetailDTO actualizarPerfil(String usuario, ActualizarPerfilRepartidorDTO dto) {
+        Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
+        repartidorValidations.validarContraseniaActual(repartidor.getId(), dto.getContraseniaActual());
 
         if (dto.getNombreYapellido() != null) {
             repartidorValidations.validarNombreYApellido(dto.getNombreYapellido());
@@ -94,7 +64,7 @@ public class RepartidorService {
         }
 
         if (dto.getEmail() != null && !dto.getEmail().equals(repartidor.getEmail())) {
-            repartidorValidations.validarEmail(dto.getEmail());
+            repartidorValidations.validarEmailModificacion(repartidor.getId(), dto.getEmail());
             repartidor.setEmail(dto.getEmail());
         }
 
@@ -123,9 +93,10 @@ public class RepartidorService {
     }
 
     @Transactional
-    public void cambiarContrasenia(Long id, CambiarContraseniaRepartidorDTO dto) {
-        Repartidor repartidor = repartidorValidations.validarExistencia(id);
-        repartidorValidations.validarContraseniaActual(id, dto.getContraseniaActual());
+    public void cambiarContrasenia(String usuario, CambiarContraseniaRepartidorDTO dto) {
+        Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
+        repartidorValidations.validarContraseniaActual(repartidor.getId(), dto.getContraseniaActual());
 
         if (!dto.getContraseniaNueva().equals(dto.getConfirmarContrasenia())) {
             throw new BusinessException("Las contraseñas no coinciden.");
@@ -138,8 +109,9 @@ public class RepartidorService {
     }
 
     @Transactional
-    public void cambiarDisponibilidad(Long id, Boolean disponible) {
-        Repartidor repartidor = repartidorValidations.validarExistencia(id);
+    public void cambiarDisponibilidad(String usuario, Boolean disponible) {
+        Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
 
         if (disponible && repartidor.getPedidoActualId() != null) {
             throw new BusinessException("No puede ponerse disponible mientras tenga un pedido en curso.");
@@ -149,25 +121,24 @@ public class RepartidorService {
         repartidorRepository.save(repartidor);
     }
 
-    public List<Pedido> obtenerPedidosDisponibles(Long repartidorId) {
-        Repartidor repartidor = repartidorValidations.validarExistencia(repartidorId);
+    public List<Pedido> obtenerPedidosDisponibles(String usuario) {
+        Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
 
         // Obtener pedidos en estado PREPARACION sin repartidor asignado
         List<Pedido> pedidosDisponibles = pedidoRepository.findByEstado(EstadoPedido.PREPARACION);
-
-        // Filtrar por zona si el repartidor tiene zonas configuradas
-        // (Por ahora retorna todos, la lógica de zonas se puede agregar después)
 
         return pedidosDisponibles;
     }
 
     @Transactional
-    public void tomarPedido(Long repartidorId, Long pedidoId) {
-        repartidorValidations.validarDisponible(repartidorId);
-        repartidorValidations.validarNoTienePedidoEnCurso(repartidorId);
+    public void tomarPedido(String usuario, Long pedidoId) {
+        Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
+        
+        repartidorValidations.validarDisponible(repartidor.getId());
+        repartidorValidations.validarNoTienePedidoEnCurso(repartidor.getId());
         repartidorValidations.validarPedidoDisponible(pedidoId);
-
-        Repartidor repartidor = repartidorValidations.validarExistencia(repartidorId);
         Pedido pedido = pedidoRepository.findById(pedidoId)
                 .orElseThrow(() -> new BusinessException("Pedido no encontrado"));
 
@@ -180,8 +151,9 @@ public class RepartidorService {
         repartidorRepository.save(repartidor);
     }
 
-    public Pedido obtenerPedidoActual(Long repartidorId) {
-        Repartidor repartidor = repartidorValidations.validarExistencia(repartidorId);
+    public Pedido obtenerPedidoActual(String usuario) {
+        Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
 
         if (repartidor.getPedidoActualId() == null) {
             throw new BusinessException("El repartidor no tiene ningún pedido asignado actualmente.");
@@ -192,11 +164,12 @@ public class RepartidorService {
     }
 
     @Transactional
-    public void marcarComoEntregado(Long repartidorId, Long pedidoId) {
-        repartidorValidations.validarPedidoAsignadoARepartidor(pedidoId, repartidorId);
+    public void marcarComoEntregado(String usuario, Long pedidoId) {
+        Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
+        
+        repartidorValidations.validarPedidoAsignadoARepartidor(pedidoId, repartidor.getId());
         repartidorValidations.validarPedidoEnviado(pedidoId);
-
-        Repartidor repartidor = repartidorValidations.validarExistencia(repartidorId);
         Pedido pedido = pedidoRepository.findById(pedidoId)
                 .orElseThrow(() -> new BusinessException("Pedido no encontrado"));
 
@@ -210,16 +183,18 @@ public class RepartidorService {
         repartidorRepository.save(repartidor);
     }
 
-    public List<Pedido> obtenerHistorialEntregas(Long repartidorId) {
-        repartidorValidations.validarExistencia(repartidorId);
+    public List<Pedido> obtenerHistorialEntregas(String usuario) {
+        Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
 
         // Por ahora retorna todos los pedidos ENTREGADO
         // Luego se puede agregar filtro por repartidor cuando se agregue la relación en Pedido
         return pedidoRepository.findByEstado(EstadoPedido.ENTREGADO);
     }
 
-    public RepartidorDetailDTO obtenerEstadisticas(Long repartidorId) {
-        Repartidor repartidor = repartidorValidations.validarExistencia(repartidorId);
+    public RepartidorDetailDTO obtenerEstadisticas(String usuario) {
+        Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
 
         // Las estadísticas ya están en el modelo
         return new RepartidorDetailDTO(
@@ -238,6 +213,7 @@ public class RepartidorService {
 
     public List<RepartidorResumenDTO> listarTodos() {
         return repartidorRepository.findAll().stream()
+                .filter(r -> r.getActivo() != null && r.getActivo())
                 .map(r -> new RepartidorResumenDTO(
                         r.getId(),
                         r.getNombreYapellido(),
@@ -246,5 +222,48 @@ public class RepartidorService {
                         r.getTipoVehiculo()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    // Métodos para Admin
+    public RepartidorDetailDTO obtenerRepartidorPorIdAdmin(Long id) {
+        Repartidor repartidor = repartidorValidations.validarExistencia(id);
+
+        return new RepartidorDetailDTO(
+                repartidor.getId(),
+                repartidor.getUsuario(),
+                repartidor.getNombreYapellido(),
+                repartidor.getEmail(),
+                repartidor.getPais(),
+                repartidor.getTipoVehiculo(),
+                repartidor.getDisponible(),
+                repartidor.getTrabajando(),
+                repartidor.getTotalPedidosEntregados(),
+                repartidor.getCalificacionPromedio()
+        );
+    }
+
+    @Transactional
+    public RepartidorResumenDTO eliminarRepartidor(Long id) {
+        Repartidor repartidor = repartidorValidations.validarExistencia(id);
+
+        if (repartidor.getPedidoActualId() != null) {
+            throw new BusinessException("No se puede eliminar un repartidor con pedido en curso.");
+        }
+
+        RepartidorResumenDTO resumen = new RepartidorResumenDTO(
+                repartidor.getId(),
+                repartidor.getNombreYapellido(),
+                repartidor.getEmail(),
+                repartidor.getPais(),
+                repartidor.getTipoVehiculo()
+        );
+
+        // Eliminación pasiva
+        repartidor.setActivo(false);
+        repartidor.setDisponible(false);
+        repartidor.setTrabajando(false);
+        repartidorRepository.save(repartidor);
+
+        return resumen;
     }
 }

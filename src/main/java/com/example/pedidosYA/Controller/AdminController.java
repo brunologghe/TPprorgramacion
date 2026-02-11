@@ -2,10 +2,13 @@ package com.example.pedidosYA.Controller;
 
 import com.example.pedidosYA.DTO.ClienteDTO.ModificarDTO;
 import com.example.pedidosYA.DTO.ClienteDTO.ResponseDTO;
+import com.example.pedidosYA.DTO.RepartidorDTO.RepartidorDetailDTO;
+import com.example.pedidosYA.DTO.RepartidorDTO.RepartidorResumenDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaDetailDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaResumenDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.*;
 import com.example.pedidosYA.Service.ClienteService;
+import com.example.pedidosYA.Service.RepartidorService;
 import com.example.pedidosYA.Service.ReseniaService;
 import com.example.pedidosYA.Service.RestauranteService;
 import jakarta.persistence.DiscriminatorValue;
@@ -31,6 +34,8 @@ public class AdminController {
     private RestauranteService restauranteService;
     @Autowired
     private ReseniaService reseniaService;
+    @Autowired
+    private RepartidorService repartidorService;
 
     @GetMapping("/clientes")
     @PreAuthorize("hasRole('ADMIN')")
@@ -119,5 +124,24 @@ public class AdminController {
             RestauranteEstadoDTO result = restauranteService.rechazarRestaurante(id, dto);
             return ResponseEntity.ok("Restaurante rechazado");
 
+    }
+
+    // Endpoints de Repartidores
+    @GetMapping("/repartidores")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<RepartidorResumenDTO>> listarRepartidores() {
+        return ResponseEntity.ok(repartidorService.listarTodos());
+    }
+
+    @GetMapping("/repartidores/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<RepartidorDetailDTO> verRepartidor(@PathVariable Long id) {
+        return ResponseEntity.ok(repartidorService.obtenerRepartidorPorIdAdmin(id));
+    }
+
+    @DeleteMapping("/repartidores/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<RepartidorResumenDTO> eliminarRepartidor(@PathVariable Long id) {
+        return ResponseEntity.ok(repartidorService.eliminarRepartidor(id));
     }
 }
