@@ -57,6 +57,11 @@ public class PedidoService {
 
 
         clienteValidations.validarDireccion(pedidoCreateDTO.getDireccionId(), cliente.getId());
+        Direccion direccionEntrega = cliente.getDirecciones().stream()
+                .filter(dir -> dir.getId().equals(pedidoCreateDTO.getDireccionId()))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException("La dirección de entrega no existe o no pertenece al cliente"));
+        
         Tarjeta metodoPago = pagoRepository.findById(pedidoCreateDTO.getPagoId())
                 .orElseThrow(() -> new BusinessException("Método de pago no encontrado"));
         if (!metodoPago.getCliente().getId().equals(cliente.getId())) {
@@ -67,6 +72,7 @@ public class PedidoService {
         pedido.setFechaPedido(LocalDateTime.now());
         pedido.setEstado(EstadoPedido.PENDIENTE);
         pedido.setDireccionRestaurante(direccionRestaurante);
+        pedido.setDireccionEntrega(direccionEntrega);
         double total = 0;
         List<ProductoPedido> productosPedido = new ArrayList<>();
 

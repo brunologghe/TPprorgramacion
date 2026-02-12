@@ -29,6 +29,7 @@ public abstract class Usuario implements UserDetails {
     private String email;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private RolUsuario rol;
 
     public Usuario() {

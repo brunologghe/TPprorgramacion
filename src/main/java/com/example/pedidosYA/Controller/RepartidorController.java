@@ -1,5 +1,6 @@
 package com.example.pedidosYA.Controller;
 
+import com.example.pedidosYA.DTO.PedidoDTO.PedidoRepartidorDTO;
 import com.example.pedidosYA.DTO.RepartidorDTO.ActualizarPerfilRepartidorDTO;
 import com.example.pedidosYA.DTO.RepartidorDTO.CambiarContraseniaRepartidorDTO;
 import com.example.pedidosYA.DTO.RepartidorDTO.RepartidorDetailDTO;
@@ -51,7 +52,7 @@ public class RepartidorController {
 
     @GetMapping("/pedidos-disponibles")
     @PreAuthorize("hasRole('REPARTIDOR')")
-    public ResponseEntity<List<Pedido>> obtenerPedidosDisponibles() {
+    public ResponseEntity<List<PedidoRepartidorDTO>> obtenerPedidosDisponibles() {
         return ResponseEntity.ok(repartidorService.obtenerPedidosDisponibles(AuthUtil.getUsuarioLogueado()));
     }
 
@@ -64,7 +65,7 @@ public class RepartidorController {
 
     @GetMapping("/pedido-actual")
     @PreAuthorize("hasRole('REPARTIDOR')")
-    public ResponseEntity<Pedido> obtenerPedidoActual() {
+    public ResponseEntity<PedidoRepartidorDTO> obtenerPedidoActual() {
         return ResponseEntity.ok(repartidorService.obtenerPedidoActual(AuthUtil.getUsuarioLogueado()));
     }
 
@@ -77,7 +78,7 @@ public class RepartidorController {
 
     @GetMapping("/historial")
     @PreAuthorize("hasRole('REPARTIDOR')")
-    public ResponseEntity<List<Pedido>> obtenerHistorial() {
+    public ResponseEntity<List<PedidoRepartidorDTO>> obtenerHistorial() {
         return ResponseEntity.ok(repartidorService.obtenerHistorialEntregas(AuthUtil.getUsuarioLogueado()));
     }
 

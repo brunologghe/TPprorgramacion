@@ -34,7 +34,7 @@ public class Repartidor extends Usuario {
     private List<String> zonas = new ArrayList<>();
 
     @OneToMany(mappedBy = "repartidor", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Resenia> reseniasRepartidor;
+    private List<Resenia> reseniasRepartidor = new ArrayList<>();
 
     @Column
     private Integer totalPedidosEntregados;

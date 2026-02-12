@@ -1,5 +1,6 @@
 package com.example.pedidosYA.Service;
 
+import com.example.pedidosYA.DTO.PedidoDTO.PedidoRepartidorDTO;
 import com.example.pedidosYA.DTO.RepartidorDTO.ActualizarPerfilRepartidorDTO;
 import com.example.pedidosYA.DTO.RepartidorDTO.CambiarContraseniaRepartidorDTO;
 import com.example.pedidosYA.DTO.RepartidorDTO.RepartidorDetailDTO;
@@ -121,14 +122,16 @@ public class RepartidorService {
         repartidorRepository.save(repartidor);
     }
 
-    public List<Pedido> obtenerPedidosDisponibles(String usuario) {
+    public List<PedidoRepartidorDTO> obtenerPedidosDisponibles(String usuario) {
         Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
 
         // Obtener pedidos en estado PREPARACION sin repartidor asignado
         List<Pedido> pedidosDisponibles = pedidoRepository.findByEstado(EstadoPedido.PREPARACION);
 
-        return pedidosDisponibles;
+        return pedidosDisponibles.stream()
+                .map(this::convertirAPedidoRepartidorDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -151,7 +154,7 @@ public class RepartidorService {
         repartidorRepository.save(repartidor);
     }
 
-    public Pedido obtenerPedidoActual(String usuario) {
+    public PedidoRepartidorDTO obtenerPedidoActual(String usuario) {
         Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
 
@@ -159,8 +162,10 @@ public class RepartidorService {
             throw new BusinessException("El repartidor no tiene ningún pedido asignado actualmente.");
         }
 
-        return pedidoRepository.findById(repartidor.getPedidoActualId())
+        Pedido pedido = pedidoRepository.findById(repartidor.getPedidoActualId())
                 .orElseThrow(() -> new BusinessException("Pedido actual no encontrado"));
+        
+        return convertirAPedidoRepartidorDTO(pedido);
     }
 
     @Transactional
@@ -183,13 +188,17 @@ public class RepartidorService {
         repartidorRepository.save(repartidor);
     }
 
-    public List<Pedido> obtenerHistorialEntregas(String usuario) {
+    public List<PedidoRepartidorDTO> obtenerHistorialEntregas(String usuario) {
         Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
 
         // Por ahora retorna todos los pedidos ENTREGADO
         // Luego se puede agregar filtro por repartidor cuando se agregue la relación en Pedido
-        return pedidoRepository.findByEstado(EstadoPedido.ENTREGADO);
+        List<Pedido> historial = pedidoRepository.findByEstado(EstadoPedido.ENTREGADO);
+        
+        return historial.stream()
+                .map(this::convertirAPedidoRepartidorDTO)
+                .collect(Collectors.toList());
     }
 
     public RepartidorDetailDTO obtenerEstadisticas(String usuario) {
@@ -265,5 +274,36 @@ public class RepartidorService {
         repartidorRepository.save(repartidor);
 
         return resumen;
+    }
+
+    // Método privado para convertir Pedido a DTO (evita recursión infinita)
+    private PedidoRepartidorDTO convertirAPedidoRepartidorDTO(Pedido pedido) {
+        String direccionRestaurante = "";
+        String direccionEntrega = "";
+        String codigoPostal = "";
+        
+        if (pedido.getDireccionRestaurante() != null) {
+            direccionRestaurante = pedido.getDireccionRestaurante().getDireccion();
+        }
+        
+        if (pedido.getDireccionEntrega() != null) {
+            direccionEntrega = pedido.getDireccionEntrega().getDireccion();
+            codigoPostal = pedido.getDireccionEntrega().getCodigoPostal();
+        }
+        
+        return new PedidoRepartidorDTO(
+                pedido.getId(),
+                pedido.getFechaPedido(),
+                pedido.getTotal(),
+                pedido.getEstado(),
+                pedido.getCliente().getId(),
+                pedido.getCliente().getNombreYapellido(),
+                pedido.getCliente().getEmail(),
+                pedido.getRestaurante().getId(),
+                pedido.getRestaurante().getNombre(),
+                direccionRestaurante,
+                direccionEntrega,
+                codigoPostal
+        );
     }
 }
