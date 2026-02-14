@@ -91,7 +91,7 @@ public class RepartidorValidations {
 
     public void validarNoTienePedidoEnCurso(Long repartidorId) {
         Repartidor repartidor = validarExistencia(repartidorId);
-        if (repartidor.getPedidoActualId() != null) {
+        if (repartidor.getPedidoActual() != null) {
             throw new BusinessException("El repartidor ya tiene un pedido en curso. Debe entregarlo antes de tomar otro.");
         }
     }
@@ -107,7 +107,7 @@ public class RepartidorValidations {
 
     public void validarPedidoAsignadoARepartidor(Long pedidoId, Long repartidorId) {
         Repartidor repartidor = validarExistencia(repartidorId);
-        if (repartidor.getPedidoActualId() == null || !repartidor.getPedidoActualId().equals(pedidoId)) {
+        if (repartidor.getPedidoActual() == null || !repartidor.getPedidoActual().getId().equals(pedidoId)) {
             throw new BusinessException("Este pedido no está asignado a este repartidor.");
         }
     }

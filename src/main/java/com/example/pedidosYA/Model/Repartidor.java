@@ -25,8 +25,9 @@ public class Repartidor extends Usuario {
     @Column
     private Boolean trabajando;
 
-    @Column
-    private Long pedidoActualId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pedido_actual_id")
+    private Pedido pedidoActual;
 
     @ElementCollection
     @CollectionTable(name = "repartidor_zonas", joinColumns = @JoinColumn(name = "repartidor_id"))
@@ -88,12 +89,12 @@ public class Repartidor extends Usuario {
         this.trabajando = trabajando;
     }
 
-    public Long getPedidoActualId() {
-        return pedidoActualId;
+    public Pedido getPedidoActual() {
+        return pedidoActual;
     }
 
-    public void setPedidoActualId(Long pedidoActualId) {
-        this.pedidoActualId = pedidoActualId;
+    public void setPedidoActual(Pedido pedidoActual) {
+        this.pedidoActual = pedidoActual;
     }
 
     public Integer getTotalPedidosEntregados() {

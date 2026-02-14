@@ -40,6 +40,10 @@ public class Pedido {
     @JoinColumn(name = "direccion_entrega_id")
     private Direccion direccionEntrega;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "repartidor_id")
+    private Repartidor repartidor;
+
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductoPedido> productosPedidos = new ArrayList<>();
 
@@ -117,5 +121,13 @@ public class Pedido {
 
     public void setDireccionEntrega(Direccion direccionEntrega) {
         this.direccionEntrega = direccionEntrega;
+    }
+
+    public Repartidor getRepartidor() {
+        return repartidor;
+    }
+
+    public void setRepartidor(Repartidor repartidor) {
+        this.repartidor = repartidor;
     }
 }

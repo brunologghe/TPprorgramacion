@@ -114,7 +114,7 @@ public class RepartidorService {
         Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
 
-        if (disponible && repartidor.getPedidoActualId() != null) {
+        if (disponible && repartidor.getPedidoActual() != null) {
             throw new BusinessException("No puede ponerse disponible mientras tenga un pedido en curso.");
         }
 
@@ -123,7 +123,8 @@ public class RepartidorService {
     }
 
     public List<PedidoRepartidorDTO> obtenerPedidosDisponibles(String usuario) {
-        Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
+        // Validar que el repartidor existe
+        repartidorRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
 
         // Obtener pedidos en estado PREPARACION sin repartidor asignado
@@ -147,7 +148,8 @@ public class RepartidorService {
 
         // Asignar pedido
         pedido.setEstado(EstadoPedido.ENVIADO);
-        repartidor.setPedidoActualId(pedidoId);
+        pedido.setRepartidor(repartidor);
+        repartidor.setPedidoActual(pedido);
         repartidor.setTrabajando(true);
 
         pedidoRepository.save(pedido);
@@ -158,12 +160,11 @@ public class RepartidorService {
         Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
 
-        if (repartidor.getPedidoActualId() == null) {
+        if (repartidor.getPedidoActual() == null) {
             throw new BusinessException("El repartidor no tiene ningún pedido asignado actualmente.");
         }
 
-        Pedido pedido = pedidoRepository.findById(repartidor.getPedidoActualId())
-                .orElseThrow(() -> new BusinessException("Pedido actual no encontrado"));
+        Pedido pedido = repartidor.getPedidoActual();
         
         return convertirAPedidoRepartidorDTO(pedido);
     }
@@ -180,7 +181,7 @@ public class RepartidorService {
 
         // Marcar como entregado
         pedido.setEstado(EstadoPedido.ENTREGADO);
-        repartidor.setPedidoActualId(null);
+        repartidor.setPedidoActual(null);
         repartidor.setTrabajando(false);
         repartidor.setTotalPedidosEntregados(repartidor.getTotalPedidosEntregados() + 1);
 
@@ -189,7 +190,8 @@ public class RepartidorService {
     }
 
     public List<PedidoRepartidorDTO> obtenerHistorialEntregas(String usuario) {
-        Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
+        // Validar que el repartidor existe
+        repartidorRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
 
         // Por ahora retorna todos los pedidos ENTREGADO
@@ -255,7 +257,7 @@ public class RepartidorService {
     public RepartidorResumenDTO eliminarRepartidor(Long id) {
         Repartidor repartidor = repartidorValidations.validarExistencia(id);
 
-        if (repartidor.getPedidoActualId() != null) {
+        if (repartidor.getPedidoActual() != null) {
             throw new BusinessException("No se puede eliminar un repartidor con pedido en curso.");
         }
 

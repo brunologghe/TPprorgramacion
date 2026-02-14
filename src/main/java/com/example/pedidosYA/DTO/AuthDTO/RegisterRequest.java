@@ -34,7 +34,7 @@ public class RegisterRequest {
 
     private String pais;
 
-    private TipoVehiculo tipoVehiculo;
+    private String tipoVehiculo;
 
     public String getHoraApertura() {
         return horaApertura;
@@ -61,10 +61,17 @@ public class RegisterRequest {
     }
 
     public TipoVehiculo getTipoVehiculo() {
-        return tipoVehiculo;
+        if (tipoVehiculo == null || tipoVehiculo.isBlank()) {
+            return null;
+        }
+        try {
+            return TipoVehiculo.valueOf(tipoVehiculo.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Tipo de vehículo inválido: " + tipoVehiculo);
+        }
     }
 
-    public void setTipoVehiculo(TipoVehiculo tipoVehiculo) {
+    public void setTipoVehiculo(String tipoVehiculo) {
         this.tipoVehiculo = tipoVehiculo;
     }
 
