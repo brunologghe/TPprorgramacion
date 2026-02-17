@@ -1,6 +1,8 @@
 package com.example.pedidosYA.DTO.AuthDTO;
 
 import com.example.pedidosYA.Model.TipoVehiculo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -60,6 +62,7 @@ public class RegisterRequest {
         this.pais = pais;
     }
 
+    @JsonIgnore  // No usar este getter en serialización/deserialización JSON
     public TipoVehiculo getTipoVehiculo() {
         if (tipoVehiculo == null || tipoVehiculo.isBlank()) {
             return null;
@@ -71,8 +74,15 @@ public class RegisterRequest {
         }
     }
 
+    @JsonProperty("tipoVehiculo")  // Usar este setter para deserialización JSON
     public void setTipoVehiculo(String tipoVehiculo) {
         this.tipoVehiculo = tipoVehiculo;
+    }
+
+    // Getter adicional para obtener el String directamente
+    @JsonProperty("tipoVehiculo")  // Usar este getter para serialización JSON
+    public String getTipoVehiculoString() {
+        return tipoVehiculo;
     }
 
     public String getUsuario() { return usuario; }

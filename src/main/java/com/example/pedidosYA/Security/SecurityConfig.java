@@ -14,6 +14,7 @@ import org.springframework.security.web.*;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -24,21 +25,24 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final CorsConfigurationSource corsConfigurationSource;
 
     public SecurityConfig(CustomUserDetailsService usuarioService,
                           JwtAuthFilter jwtAuthFilter,
                           CustomAuthenticationEntryPoint authenticationEntryPoint,
-                          CustomAccessDeniedHandler accessDeniedHandler) {
+                          CustomAccessDeniedHandler accessDeniedHandler,
+                          CorsConfigurationSource corsConfigurationSource) {
         this.usuarioService = usuarioService;
         this.jwtAuthFilter = jwtAuthFilter;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.accessDeniedHandler = accessDeniedHandler;
+        this.corsConfigurationSource = corsConfigurationSource;
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/cliente").permitAll()
