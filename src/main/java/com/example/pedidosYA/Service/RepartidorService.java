@@ -110,15 +110,15 @@ public class RepartidorService {
     }
 
     @Transactional
-    public void cambiarDisponibilidad(String usuario, Boolean disponible) {
+    public void cambiarDisponibilidad(String usuario, Boolean trabajando) {
         Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
 
-        if (disponible && repartidor.getPedidoActual() != null) {
-            throw new BusinessException("No puede ponerse disponible mientras tenga un pedido en curso.");
+        if (!trabajando && repartidor.getPedidoActual() != null) {
+            throw new BusinessException("No puede ponerse no disponible mientras tenga un pedido en curso.");
         }
 
-        repartidor.setDisponible(disponible);
+        repartidor.setTrabajando(trabajando);
         repartidorRepository.save(repartidor);
     }
 
@@ -141,7 +141,6 @@ public class RepartidorService {
                 .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
         
         repartidorValidations.validarDisponible(repartidor.getId());
-        repartidorValidations.validarNoTienePedidoEnCurso(repartidor.getId());
         repartidorValidations.validarPedidoDisponible(pedidoId);
         Pedido pedido = pedidoRepository.findById(pedidoId)
                 .orElseThrow(() -> new BusinessException("Pedido no encontrado"));
@@ -150,7 +149,7 @@ public class RepartidorService {
         pedido.setEstado(EstadoPedido.ENVIADO);
         pedido.setRepartidor(repartidor);
         repartidor.setPedidoActual(pedido);
-        repartidor.setTrabajando(true);
+        repartidor.setDisponible(false);  // Ya no está disponible, tiene un pedido
 
         pedidoRepository.save(pedido);
         repartidorRepository.save(repartidor);
@@ -182,7 +181,7 @@ public class RepartidorService {
         // Marcar como entregado
         pedido.setEstado(EstadoPedido.ENTREGADO);
         repartidor.setPedidoActual(null);
-        repartidor.setTrabajando(false);
+        repartidor.setDisponible(true);  // Vuelve a estar disponible
         repartidor.setTotalPedidosEntregados(repartidor.getTotalPedidosEntregados() + 1);
 
         pedidoRepository.save(pedido);
@@ -307,5 +306,14 @@ public class RepartidorService {
                 direccionEntrega,
                 codigoPostal
         );
+    }
+
+    // Método para activar cuenta sin validar estado activo previo
+    public void activarCuenta(String usuario) {
+        Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
+        
+        repartidor.setActivo(true);
+        repartidorRepository.save(repartidor);
     }
 }

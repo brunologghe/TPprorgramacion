@@ -130,8 +130,8 @@ public class AuthService {
                 repartidor.setPais(request.getPais());
                 repartidor.setTipoVehiculo(request.getTipoVehiculo());
                 repartidor.setRol(RolUsuario.REPARTIDOR);
-                repartidor.setDisponible(false);
-                repartidor.setTrabajando(false);
+                repartidor.setDisponible(true);  // Comienza disponible (sin pedido asignado)
+                repartidor.setTrabajando(false);  // No está de turno hasta que active
                 repartidor.setTotalPedidosEntregados(0);
                 repartidor.setCalificacionPromedio(0.0);
                 repartidor.setActivo(true);

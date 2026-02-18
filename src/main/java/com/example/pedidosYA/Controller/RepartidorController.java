@@ -45,9 +45,9 @@ public class RepartidorController {
 
     @PutMapping("/disponibilidad")
     @PreAuthorize("hasRole('REPARTIDOR')")
-    public ResponseEntity<?> cambiarDisponibilidad(@RequestParam Boolean disponible) {
-        repartidorService.cambiarDisponibilidad(AuthUtil.getUsuarioLogueado(), disponible);
-        return ResponseEntity.status(HttpStatus.OK).body("Disponibilidad actualizada!");
+    public ResponseEntity<?> cambiarDisponibilidad(@RequestParam Boolean trabajando) {
+        repartidorService.cambiarDisponibilidad(AuthUtil.getUsuarioLogueado(), trabajando);
+        return ResponseEntity.status(HttpStatus.OK).body("Estado de turno actualizado!");
     }
 
     @GetMapping("/pedidos-disponibles")
@@ -86,5 +86,12 @@ public class RepartidorController {
     @PreAuthorize("hasRole('REPARTIDOR')")
     public ResponseEntity<RepartidorDetailDTO> obtenerEstadisticas() {
         return ResponseEntity.ok(repartidorService.obtenerEstadisticas(AuthUtil.getUsuarioLogueado()));
+    }
+
+    @PutMapping("/activar")
+    @PreAuthorize("hasRole('REPARTIDOR')")
+    public ResponseEntity<?> activarCuenta() {
+        repartidorService.activarCuenta(AuthUtil.getUsuarioLogueado());
+        return ResponseEntity.status(HttpStatus.OK).body("Cuenta activada exitosamente!");
     }
 }
