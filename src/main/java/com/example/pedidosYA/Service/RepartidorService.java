@@ -49,7 +49,9 @@ public class RepartidorService {
                 repartidor.getDisponible(),
                 repartidor.getTrabajando(),
                 repartidor.getTotalPedidosEntregados(),
-                repartidor.getCalificacionPromedio()
+                repartidor.getCalificacionPromedio(),
+                repartidor.getActivo(),
+                repartidor.getZonas()
         );
     }
 
@@ -89,7 +91,9 @@ public class RepartidorService {
                 updated.getDisponible(),
                 updated.getTrabajando(),
                 updated.getTotalPedidosEntregados(),
-                updated.getCalificacionPromedio()
+                updated.getCalificacionPromedio(),
+                updated.getActivo(),
+                updated.getZonas()
         );
     }
 
@@ -110,16 +114,29 @@ public class RepartidorService {
     }
 
     @Transactional
-    public void cambiarDisponibilidad(String usuario, Boolean trabajando) {
+    public void cambiarDisponibilidad(String usuario, Boolean disponible) {
+        System.out.println("🔄 [RepartidorService] Cambiando disponibilidad");
+        System.out.println("👤 Usuario: " + usuario);
+        System.out.println("📍 Nuevo estado disponible: " + disponible);
+        
         Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
-                .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
+                .orElseThrow(() -> {
+                    System.out.println("❌ Repartidor no encontrado");
+                    return new BusinessException("Repartidor no encontrado");
+                });
 
-        if (!trabajando && repartidor.getPedidoActual() != null) {
+        System.out.println("✅ Repartidor encontrado: " + repartidor.getNombreYapellido());
+        System.out.println("📊 Estado anterior disponible: " + repartidor.getDisponible());
+
+        if (!disponible && repartidor.getPedidoActual() != null) {
+            System.out.println("❌ No puede ponerse no disponible con pedido en curso");
             throw new BusinessException("No puede ponerse no disponible mientras tenga un pedido en curso.");
         }
 
-        repartidor.setTrabajando(trabajando);
+        repartidor.setDisponible(disponible);
         repartidorRepository.save(repartidor);
+        
+        System.out.println("✅ Disponibilidad actualizada a: " + disponible);
     }
 
     public List<PedidoRepartidorDTO> obtenerPedidosDisponibles(String usuario) {
@@ -217,7 +234,9 @@ public class RepartidorService {
                 repartidor.getDisponible(),
                 repartidor.getTrabajando(),
                 repartidor.getTotalPedidosEntregados(),
-                repartidor.getCalificacionPromedio()
+                repartidor.getCalificacionPromedio(),
+                repartidor.getActivo(),
+                repartidor.getZonas()
         );
     }
 
@@ -248,7 +267,9 @@ public class RepartidorService {
                 repartidor.getDisponible(),
                 repartidor.getTrabajando(),
                 repartidor.getTotalPedidosEntregados(),
-                repartidor.getCalificacionPromedio()
+                repartidor.getCalificacionPromedio(),
+                repartidor.getActivo(),
+                repartidor.getZonas()
         );
     }
 

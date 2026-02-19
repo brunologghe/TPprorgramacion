@@ -1,8 +1,6 @@
 package com.example.pedidosYA.Model;
 
-import com.example.pedidosYA.DTO.PedidoDTO.DetallePedidoDTO;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

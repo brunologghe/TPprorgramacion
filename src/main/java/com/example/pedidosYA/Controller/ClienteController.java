@@ -3,17 +3,14 @@ package com.example.pedidosYA.Controller;
 
 import com.example.pedidosYA.DTO.ClienteDTO.ActualizarPerfilDTO;
 import com.example.pedidosYA.DTO.ClienteDTO.CambiarContraseniaDTO;
-import com.example.pedidosYA.DTO.ClienteDTO.ClienteCrearDTO;
 import com.example.pedidosYA.DTO.ClienteDTO.ClienteDetailDto;
 import com.example.pedidosYA.DTO.ClienteDTO.ModificarDTO;
-import com.example.pedidosYA.DTO.ClienteDTO.ResponseDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoCreateDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaCreateDTO;
 import com.example.pedidosYA.DTO.ReseniaDTO.ReseniaDetailDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteDetailDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResponseDTO;
-import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResumenDTO;
 import com.example.pedidosYA.Security.AuthUtil;
 import com.example.pedidosYA.Service.*;
 import jakarta.persistence.DiscriminatorValue;
