@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/repartidores")
@@ -158,6 +159,31 @@ public class RepartidorController {
     @PreAuthorize("hasRole('REPARTIDOR')")
     public ResponseEntity<RepartidorDetailDTO> obtenerEstadisticas() {
         return ResponseEntity.ok(repartidorService.obtenerEstadisticas(AuthUtil.getUsuarioLogueado()));
+    }
+
+    @PutMapping("/pedidos/{id}/estado")
+    @PreAuthorize("hasRole('REPARTIDOR')")
+    public ResponseEntity<?> cambiarEstadoPedido(@PathVariable("id") Long pedidoId, @RequestBody Map<String, String> requestBody) {
+        try {
+            String usuario = AuthUtil.getUsuarioLogueado();
+            String estado = requestBody.get("estado");
+            
+            System.out.println("✅ [RepartidorController] Cambiando estado del pedido");
+            System.out.println("👤 Usuario: " + usuario);
+            System.out.println("📦 Pedido ID: " + pedidoId);
+            System.out.println("🔄 Nuevo estado: " + estado);
+
+            repartidorService.cambiarEstadoPedido(usuario, pedidoId, estado);
+
+            System.out.println("✅ Estado del pedido actualizado");
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(ResponseBuilder.success("Estado del pedido actualizado a: " + estado));
+        } catch (Exception e) {
+            System.out.println("❌ Error: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ResponseBuilder.error(e.getMessage()));
+        }
     }
 
     @PutMapping("/activar")

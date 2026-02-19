@@ -337,4 +337,27 @@ public class RepartidorService {
         repartidor.setActivo(true);
         repartidorRepository.save(repartidor);
     }
+
+    @Transactional
+    public void cambiarEstadoPedido(String usuario, Long pedidoId, String nuevoEstado) {
+        Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
+
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new BusinessException("Pedido no encontrado"));
+
+        // Verificar que el repartidor tenga este pedido
+        if (!pedido.getRepartidor().getId().equals(repartidor.getId())) {
+            throw new BusinessException("No tienes permiso para modificar este pedido");
+        }
+
+        try {
+            EstadoPedido estado = EstadoPedido.valueOf(nuevoEstado);
+            pedido.setEstado(estado);
+            pedidoRepository.save(pedido);
+            System.out.println("✅ Estado del pedido actualizado a: " + estado);
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException("Estado de pedido inválido: " + nuevoEstado);
+        }
+    }
 }
