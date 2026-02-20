@@ -1,5 +1,5 @@
 package com.example.pedidosYA.Model;
 
 public enum EstadoPedido {
-    PREPARACION, ENVIADO, ENTREGADO, CANCELADO, PENDIENTE
+    PREPARACION, ENVIADO, EN_ENTREGA, ENTREGADO, CANCELADO, PENDIENTE
 }

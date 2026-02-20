@@ -121,7 +121,7 @@ public class RepartidorValidations {
         Pedido pedido = pedidoRepository.findById(pedidoId)
                 .orElseThrow(() -> new BusinessException("No existe ningún pedido con ese id"));
 
-        if (pedido.getEstado() != EstadoPedido.ENVIADO) {
+        if (pedido.getEstado() != EstadoPedido.ENVIADO && pedido.getEstado() != EstadoPedido.EN_ENTREGA) {
             throw new BusinessException("El pedido no puede ser marcado como entregado. Estado actual: " + pedido.getEstado());
         }
     }
