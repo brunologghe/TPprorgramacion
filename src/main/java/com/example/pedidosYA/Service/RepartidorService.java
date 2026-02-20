@@ -225,13 +225,14 @@ public class RepartidorService {
     }
 
     public List<PedidoRepartidorDTO> obtenerHistorialEntregas(String usuario) {
-        // Validar que el repartidor existe
-        repartidorRepository.findByUsuario(usuario)
+        // Obtener el repartidor
+        Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
 
-        // Por ahora retorna todos los pedidos ENTREGADO
-        // Luego se puede agregar filtro por repartidor cuando se agregue la relación en Pedido
-        List<Pedido> historial = pedidoRepository.findByEstado(EstadoPedido.ENTREGADO);
+        // Obtener SOLO los pedidos ENTREGADOS de este repartidor específico
+        List<Pedido> historial = pedidoRepository.findByEstado(EstadoPedido.ENTREGADO).stream()
+                .filter(p -> p.getRepartidor() != null && p.getRepartidor().getId().equals(repartidor.getId()))
+                .toList();
         
         return historial.stream()
                 .map(this::convertirAPedidoRepartidorDTO)
