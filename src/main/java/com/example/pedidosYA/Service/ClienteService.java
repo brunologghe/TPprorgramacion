@@ -11,10 +11,17 @@ import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResponseDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResumenDTO;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.Cliente;
+import com.example.pedidosYA.Model.EstadoPedido;
+import com.example.pedidosYA.Model.Pedido;
+import com.example.pedidosYA.Model.Repartidor;
+import com.example.pedidosYA.Model.Resenia;
 import com.example.pedidosYA.Model.Restaurante;
 import com.example.pedidosYA.Model.RolUsuario;
 import com.example.pedidosYA.Model.Usuario;
 import com.example.pedidosYA.Repository.ClienteRepository;
+import com.example.pedidosYA.Repository.PedidoRepository;
+import com.example.pedidosYA.Repository.RepartidorRepository;
+import com.example.pedidosYA.Repository.ReseniaRepository;
 import com.example.pedidosYA.Repository.RestauranteRepository;
 import com.example.pedidosYA.Validations.ClienteValidations;
 import jakarta.transaction.Transactional;
@@ -37,6 +44,12 @@ public class ClienteService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private RestauranteRepository restauranteRepository;
+    @Autowired
+    private PedidoRepository pedidoRepository;
+    @Autowired
+    private ReseniaRepository reseniaRepository;
+    @Autowired
+    private RepartidorRepository repartidorRepository;
 
     public List<ResponseDTO> listAll(){
 
@@ -193,5 +206,60 @@ public class ClienteService {
         // Actualizar contraseña
         cliente.setContrasenia(passwordEncoder.encode(contraseniaDTO.getContraseniaNueva()));
         clienteRepository.save(cliente);
+    }
+
+    @Transactional
+    public void calificarRepartidor(String usuario, Long pedidoId, double calificacion) {
+        // Obtener cliente
+        Cliente cliente = clienteRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new BusinessException("Cliente no encontrado"));
+
+        // Obtener pedido
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new BusinessException("Pedido no encontrado"));
+
+        // Validar que el pedido pertenece al cliente
+        if (!pedido.getCliente().getId().equals(cliente.getId())) {
+            throw new BusinessException("No tienes permiso para calificar este pedido");
+        }
+
+        // Validar que el pedido esté entregado
+        if (!pedido.getEstado().equals(EstadoPedido.ENTREGADO)) {
+            throw new BusinessException("Solo puedes calificar pedidos entregados");
+        }
+
+        // Validar calificación
+        if (calificacion < 1 || calificacion > 5) {
+            throw new BusinessException("La calificación debe estar entre 1 y 5");
+        }
+
+        // Crear reseña para el repartidor
+        Resenia resenia = new Resenia();
+        resenia.setCliente(cliente);
+        resenia.setRepartidor(pedido.getRepartidor());
+        resenia.setPuntuacion(calificacion);
+        resenia.setDescripcion("Calificación de entrega");
+        
+        // GUARDAR LA RESEÑA PRIMERO
+        reseniaRepository.save(resenia);
+
+        // LUEGO actualizar promedio de calificación del repartidor
+        Repartidor repartidor = pedido.getRepartidor();
+        
+        // Obtener todas las reseñas (ahora incluye la nueva)
+        List<Resenia> reseniasRepartidor = reseniaRepository.findAll().stream()
+                .filter(r -> r.getRepartidor() != null && 
+                           r.getRepartidor().getId().equals(repartidor.getId()))
+                .toList();
+        
+        if (!reseniasRepartidor.isEmpty()) {
+            double promedio = reseniasRepartidor.stream()
+                    .mapToDouble(Resenia::getPuntuacion)
+                    .average()
+                    .orElse(0.0);
+            repartidor.setCalificacionPromedio(promedio);
+            repartidorRepository.save(repartidor);
+            System.out.println("✅ Repartidor ID " + repartidor.getId() + " calificado. Nuevo promedio: " + promedio);
+        }
     }
 }

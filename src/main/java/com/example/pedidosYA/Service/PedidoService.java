@@ -248,6 +248,12 @@ public class PedidoService {
             throw new BusinessException("Ese estado no es válido");
         }
 
+        // Impedir que el restaurante marque como ENTREGADO
+        // Solo el repartidor puede hacerlo
+        if (estadoPedido == EstadoPedido.ENTREGADO) {
+            throw new BusinessException("Solo el repartidor puede marcar un pedido como entregado");
+        }
+
         String username = AuthUtil.getUsuarioLogueado();
         Restaurante restaurante = restauranteRepository.findByUsuario(username).orElseThrow();
 

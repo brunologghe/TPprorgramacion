@@ -13,6 +13,7 @@ import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteDetailDTO;
 import com.example.pedidosYA.DTO.RestauranteDTO.RestauranteResponseDTO;
 import com.example.pedidosYA.Security.AuthUtil;
 import com.example.pedidosYA.Service.*;
+import com.example.pedidosYA.Utils.ResponseBuilder;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -147,5 +149,21 @@ public class ClienteController {
         return ResponseEntity.status(HttpStatus.OK).body(clienteService.eliminarRestauranteDeLista(AuthUtil.getUsuarioLogueado(), idRestaurante));
     }
 
+    @PostMapping("/calificar-repartidor")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<?> calificarRepartidor(@RequestBody Map<String, Object> requestBody) {
+        try {
+            Long pedidoId = ((Number) requestBody.get("pedidoId")).longValue();
+            double calificacion = ((Number) requestBody.get("calificacion")).doubleValue();
+
+            clienteService.calificarRepartidor(AuthUtil.getUsuarioLogueado(), pedidoId, calificacion);
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(ResponseBuilder.success("Repartidor calificado exitosamente"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ResponseBuilder.error(e.getMessage()));
+        }
+    }
 
 }

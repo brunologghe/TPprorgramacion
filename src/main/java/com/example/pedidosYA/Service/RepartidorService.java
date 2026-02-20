@@ -9,8 +9,10 @@ import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.EstadoPedido;
 import com.example.pedidosYA.Model.Pedido;
 import com.example.pedidosYA.Model.Repartidor;
+import com.example.pedidosYA.Model.Resenia;
 import com.example.pedidosYA.Repository.PedidoRepository;
 import com.example.pedidosYA.Repository.RepartidorRepository;
+import com.example.pedidosYA.Repository.ReseniaRepository;
 import com.example.pedidosYA.Validations.RepartidorValidations;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,15 +30,32 @@ public class RepartidorService {
     @Autowired
     private PedidoRepository pedidoRepository;
     @Autowired
+    private ReseniaRepository reseniaRepository;
+    @Autowired
     private RepartidorValidations repartidorValidations;
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Transactional
     public RepartidorDetailDTO obtenerPerfilRepartidor(String usuario) {
         Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
 
         if (repartidor.getActivo() != null && !repartidor.getActivo()) {
             throw new BusinessException("El repartidor no está activo en el sistema.");
+        }
+
+        // Actualizar promedio de calificación dinámicamente
+        List<Resenia> resenias = reseniaRepository.findAll().stream()
+                .filter(r -> r.getRepartidor() != null && r.getRepartidor().getId().equals(repartidor.getId()))
+                .toList();
+        
+        if (!resenias.isEmpty()) {
+            double promedio = resenias.stream()
+                    .mapToDouble(Resenia::getPuntuacion)
+                    .average()
+                    .orElse(0.0);
+            repartidor.setCalificacionPromedio(promedio);
+            repartidorRepository.save(repartidor);
         }
 
         return new RepartidorDetailDTO(
