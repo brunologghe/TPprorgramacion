@@ -84,9 +84,9 @@ public class RepartidorValidations {
 
     public void validarDisponible(Long repartidorId) {
         Repartidor repartidor = validarExistencia(repartidorId);
-        // Validar que está de turno (trabajando)
-        if (repartidor.getTrabajando() == null || !repartidor.getTrabajando()) {
-            throw new BusinessException("El repartidor no está de turno. Debe activarse para tomar pedidos.");
+        // Validar que está activo
+        if (repartidor.getActivo() == null || !repartidor.getActivo()) {
+            throw new BusinessException("El repartidor no está activo. Debe activar su cuenta para tomar pedidos.");
         }
         // Validar que está disponible (sin pedido actual)
         if (repartidor.getDisponible() == null || !repartidor.getDisponible()) {

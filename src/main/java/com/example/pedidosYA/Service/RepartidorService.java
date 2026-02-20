@@ -176,6 +176,11 @@ public class RepartidorService {
         Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
         
+        System.out.println("🔍 [tomarPedido] Estado del repartidor:");
+        System.out.println("   - Activo: " + repartidor.getActivo());
+        System.out.println("   - Trabajando: " + repartidor.getTrabajando());
+        System.out.println("   - Disponible: " + repartidor.getDisponible());
+        
         repartidorValidations.validarDisponible(repartidor.getId());
         repartidorValidations.validarPedidoDisponible(pedidoId);
         Pedido pedido = pedidoRepository.findById(pedidoId)
@@ -354,8 +359,14 @@ public class RepartidorService {
         Repartidor repartidor = repartidorRepository.findByUsuario(usuario)
                 .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
         
+        System.out.println("🔄 [activarCuenta] Usuario: " + usuario);
+        System.out.println("❌ ANTES - Activo: " + repartidor.getActivo() + ", Disponible: " + repartidor.getDisponible());
+        
         repartidor.setActivo(true);
+        repartidor.setDisponible(true);
         repartidorRepository.save(repartidor);
+        
+        System.out.println("✅ DESPUÉS - Activo: " + repartidor.getActivo() + ", Disponible: " + repartidor.getDisponible());
     }
 
     @Transactional
