@@ -8,12 +8,9 @@ public class AuthUtil {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
         if (authentication != null && authentication.isAuthenticated()) {
-            String usuario = authentication.getPrincipal().toString();
-            System.out.println("👤 [AuthUtil] Usuario logueado: " + usuario);
-            return usuario;
+            return authentication.getPrincipal().toString();
         }
         
-        System.out.println("❌ [AuthUtil] No hay usuario autenticado");
         throw new RuntimeException("No hay usuario autenticado. Necesita iniciar sesión.");
     }
 }

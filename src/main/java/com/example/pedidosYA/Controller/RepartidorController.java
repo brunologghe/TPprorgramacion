@@ -35,16 +35,9 @@ public class RepartidorController {
     public ResponseEntity<?> actualizarPerfil(@Valid @RequestBody ActualizarPerfilRepartidorDTO perfilDTO) {
         try {
             String usuario = AuthUtil.getUsuarioLogueado();
-            System.out.println("✅ [RepartidorController] Actualizando perfil");
-            System.out.println("👤 Usuario: " + usuario);
-
             RepartidorDetailDTO perfilActualizado = repartidorService.actualizarPerfil(usuario, perfilDTO);
-
-            System.out.println("✅ Perfil actualizado exitosamente");
             return ResponseEntity.status(HttpStatus.OK).body(perfilActualizado);
         } catch (Exception e) {
-            System.out.println("❌ Error: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ResponseBuilder.error(e.getMessage()));
         }
@@ -55,17 +48,10 @@ public class RepartidorController {
     public ResponseEntity<?> cambiarContrasenia(@Valid @RequestBody CambiarContraseniaRepartidorDTO contraseniaDTO) {
         try {
             String usuario = AuthUtil.getUsuarioLogueado();
-            System.out.println("✅ [RepartidorController] Cambiando contraseña");
-            System.out.println("👤 Usuario: " + usuario);
-
             repartidorService.cambiarContrasenia(usuario, contraseniaDTO);
-
-            System.out.println("✅ Contraseña cambiada exitosamente");
             return ResponseEntity.status(HttpStatus.OK)
                     .body(ResponseBuilder.success("Contraseña cambiada con éxito!"));
         } catch (Exception e) {
-            System.out.println("❌ Error: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ResponseBuilder.error(e.getMessage()));
         }
@@ -76,18 +62,10 @@ public class RepartidorController {
     public ResponseEntity<?> cambiarDisponibilidad(@RequestParam("disponible") Boolean disponible) {
         try {
             String usuario = AuthUtil.getUsuarioLogueado();
-            System.out.println("✅ [RepartidorController] Cambiando disponibilidad");
-            System.out.println("👤 Usuario: " + usuario);
-            System.out.println("📍 Disponible: " + disponible);
-
             repartidorService.cambiarDisponibilidad(usuario, disponible);
-
-            System.out.println("✅ Disponibilidad cambiada exitosamente");
             return ResponseEntity.status(HttpStatus.OK)
                     .body(ResponseBuilder.successWithProperty("Estado de disponibilidad actualizado!", "disponible", disponible));
         } catch (Exception e) {
-            System.out.println("❌ Error: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ResponseBuilder.error(e.getMessage()));
         }
@@ -104,18 +82,10 @@ public class RepartidorController {
     public ResponseEntity<?> tomarPedido(@PathVariable("id") Long pedidoId) {
         try {
             String usuario = AuthUtil.getUsuarioLogueado();
-            System.out.println("✅ [RepartidorController] Tomando pedido");
-            System.out.println("👤 Usuario: " + usuario);
-            System.out.println("📦 Pedido ID: " + pedidoId);
-
             repartidorService.tomarPedido(usuario, pedidoId);
-
-            System.out.println("✅ Pedido asignado exitosamente");
             return ResponseEntity.status(HttpStatus.OK)
                     .body(ResponseBuilder.success("Pedido asignado exitosamente!"));
         } catch (Exception e) {
-            System.out.println("❌ Error: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ResponseBuilder.error(e.getMessage()));
         }
@@ -132,18 +102,10 @@ public class RepartidorController {
     public ResponseEntity<?> marcarComoEntregado(@PathVariable("id") Long pedidoId) {
         try {
             String usuario = AuthUtil.getUsuarioLogueado();
-            System.out.println("✅ [RepartidorController] Marcando pedido como entregado");
-            System.out.println("👤 Usuario: " + usuario);
-            System.out.println("📦 Pedido ID: " + pedidoId);
-
             repartidorService.marcarComoEntregado(usuario, pedidoId);
-
-            System.out.println("✅ Pedido marcado como entregado exitosamente");
             return ResponseEntity.status(HttpStatus.OK)
                     .body(ResponseBuilder.success("Pedido marcado como entregado!"));
         } catch (Exception e) {
-            System.out.println("❌ Error: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ResponseBuilder.error(e.getMessage()));
         }
@@ -167,20 +129,10 @@ public class RepartidorController {
         try {
             String usuario = AuthUtil.getUsuarioLogueado();
             String estado = requestBody.get("estado");
-            
-            System.out.println("✅ [RepartidorController] Cambiando estado del pedido");
-            System.out.println("👤 Usuario: " + usuario);
-            System.out.println("📦 Pedido ID: " + pedidoId);
-            System.out.println("🔄 Nuevo estado: " + estado);
-
             repartidorService.cambiarEstadoPedido(usuario, pedidoId, estado);
-
-            System.out.println("✅ Estado del pedido actualizado");
             return ResponseEntity.status(HttpStatus.OK)
                     .body(ResponseBuilder.success("Estado del pedido actualizado a: " + estado));
         } catch (Exception e) {
-            System.out.println("❌ Error: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ResponseBuilder.error(e.getMessage()));
         }
@@ -191,17 +143,10 @@ public class RepartidorController {
     public ResponseEntity<?> activarCuenta() {
         try {
             String usuario = AuthUtil.getUsuarioLogueado();
-            System.out.println("✅ [RepartidorController] Activando cuenta");
-            System.out.println("👤 Usuario: " + usuario);
-
             repartidorService.activarCuenta(usuario);
-
-            System.out.println("✅ Cuenta activada exitosamente");
             return ResponseEntity.status(HttpStatus.OK)
                     .body(ResponseBuilder.success("Cuenta activada exitosamente!"));
         } catch (Exception e) {
-            System.out.println("❌ Error: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ResponseBuilder.error(e.getMessage()));
         }
@@ -212,17 +157,10 @@ public class RepartidorController {
     public ResponseEntity<?> desactivarDisponibilidad() {
         try {
             String usuario = AuthUtil.getUsuarioLogueado();
-            System.out.println("✅ [RepartidorController] Desactivando disponibilidad");
-            System.out.println("👤 Usuario: " + usuario);
-
             repartidorService.cambiarDisponibilidad(usuario, false);
-
-            System.out.println("✅ Disponibilidad desactivada exitosamente");
             return ResponseEntity.status(HttpStatus.OK)
                     .body(ResponseBuilder.successWithProperty("Estado de disponibilidad actualizado!", "disponible", false));
         } catch (Exception e) {
-            System.out.println("❌ Error: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ResponseBuilder.error(e.getMessage()));
         }

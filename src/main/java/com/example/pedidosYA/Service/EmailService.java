@@ -221,7 +221,6 @@ public class EmailService {
         return email.contains("@") && email.indexOf("@") > 0 && email.indexOf("@") < email.length() - 1;
     }
 
-    // Método privado preparado para enviar HTML si se necesita en el futuro
     private void enviarHtml(String to, String subject, String htmlBody) throws MessagingException {
         if (!mailEnabled) {
             logger.info("Email disabled - skip sending html email to {}", to);

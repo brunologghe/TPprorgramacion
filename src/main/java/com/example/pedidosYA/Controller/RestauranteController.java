@@ -131,16 +131,6 @@ public class RestauranteController {
         return ResponseEntity.ok(restauranteService.obtenerEstadisticas(AuthUtil.getUsuarioLogueado()));
     }
 
-    @PostMapping("/agregar-combo")
-    public ResponseEntity<ComboResponseDTO>agregarCombo(@Valid @RequestBody ComboRequestDTO comboRequestDTO){
-        return ResponseEntity.status(HttpStatus.OK).body(restauranteService.agregarCombo(AuthUtil.getUsuarioLogueado(), comboRequestDTO));
-    }
-
-    @GetMapping("/combos")
-    public ResponseEntity<List<ComboResponseDTO>>verCombos(){
-        return ResponseEntity.status(HttpStatus.OK).body(restauranteService.verCombos(AuthUtil.getUsuarioLogueado()));
-    }
-
     @PostMapping("/balance")
     @PreAuthorize("hasRole('RESTAURANTE')")
     public ResponseEntity<BalanceResponseDTO> obtenerBalance(@Valid @RequestBody BalanceFiltroDTO filtro) {

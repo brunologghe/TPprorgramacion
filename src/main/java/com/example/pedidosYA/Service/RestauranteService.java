@@ -77,20 +77,6 @@ public class RestauranteService {
                         direccion.getCodigoPostal()))
                 .collect(Collectors.toList());
 
-        List<ComboResponseDTO> comboResponseDTOS = restaurante.getCombos().stream()
-                .map(combo -> new ComboResponseDTO(
-                        combo.getNombre(),
-                        combo.getProductos().stream()
-                                .map(producto -> new ProductoResumenDTO(
-                                        producto.getId(),
-                                        producto.getNombre(),
-                                        producto.getPrecio(),
-                                        producto.getStock()))
-                                .collect(Collectors.toSet()),
-                        combo.getDescuento(),
-                        combo.getPrecio()))
-                .collect(Collectors.toList());
-
         String horaApertura = restaurante.getHoraApertura() != null
                 ? restaurante.getHoraApertura().format(HORA_FORMATTER)
                 : null;
@@ -106,7 +92,6 @@ public class RestauranteService {
                 restaurante.getNombre(),
                 restaurante.getEmail(),
                 menuDTO,
-                comboResponseDTOS,
                 reseniaDTO,
                 direccionDTOS,
                 horaApertura,
@@ -269,59 +254,6 @@ public class RestauranteService {
         return new EstadisticasDTO(cantidadPedidos, ingresos, calificacionPromedio);
     }
 
-    public ComboResponseDTO agregarCombo(String usuario, ComboRequestDTO comboRequestDTO)
-    {
-        Restaurante restaurante = restauranteRepository.findByUsuario(usuario).orElseThrow(()-> new RuntimeException("Restaurante no encontrado"));
-
-        Combo combo = new Combo();
-
-        combo.setNombre(comboRequestDTO.getNombre());
-        combo.setDescuento(comboRequestDTO.getDescuento());
-        combo.setRestaurante(restaurante);
-
-        Set<Producto> productoSet = new HashSet<>();
-
-        for(Long id : comboRequestDTO.getProductoIds())
-        {
-            Producto producto = productoRepository.findById(id).orElseThrow(()-> new RuntimeException("Producto con id: "+id+" no encontrado"));
-            productoSet.add(producto);
-        }
-        combo.setProductos(productoSet);
-        double precioProductos = productoSet.stream().mapToDouble(Producto::getPrecio).sum();
-        combo.setPrecio(precioProductos * (1 - (comboRequestDTO.getDescuento() / 100)));
-
-        restaurante.getCombos().add(combo);
-        restauranteRepository.save(restaurante);
-
-        Set<ProductoResumenDTO> productosResumen = productoSet.stream()
-                .map(producto -> new ProductoResumenDTO(producto.getId(),producto.getNombre(),producto.getPrecio(), producto.getStock()))
-                .collect(Collectors.toSet());
-
-        return new ComboResponseDTO(combo.getNombre(), productosResumen, comboRequestDTO.getDescuento(), combo.getPrecio());
-    }
-
-    public List<ComboResponseDTO> verCombos(String usuario) {
-        Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
-                .orElseThrow(() -> new RuntimeException("Restaurante no encontrado"));
-
-        List<ComboResponseDTO> listaCombos = restaurante.getCombos().stream().map(combo -> {
-            Set<ProductoResumenDTO> productosResumen = combo.getProductos().stream()
-                    .map(producto -> new ProductoResumenDTO(
-                            producto.getId(),
-                            producto.getNombre(),
-                            producto.getPrecio(),
-                            producto.getStock()))
-                    .collect(Collectors.toSet());
-            return new ComboResponseDTO(
-                    combo.getNombre(),
-                    productosResumen,
-                    combo.getDescuento(),
-                    combo.getPrecio());
-        }).collect(Collectors.toList());
-
-        return listaCombos;
-    }
-
     @Transactional
     public void actualizarPerfilRestaurante(String usuario, ActualizarPerfilRestauranteDTO perfilDTO) {
         Restaurante restaurante = restauranteRepository.findByUsuario(usuario)
@@ -408,7 +340,6 @@ public class RestauranteService {
         return new BalanceResponseDTO(totalRecaudado, cantidadPedidos, promedioVenta);
     }
 
-    // Obtener pendientes
     public List<RestauranteEstadoDTO> getRestaurantesPendientes() {
         return restauranteRepository.findByEstado(EstadoRestaurante.PENDIENTE)
                 .stream()

@@ -240,13 +240,10 @@ public class ClienteService {
         resenia.setPuntuacion(calificacion);
         resenia.setDescripcion("Calificación de entrega");
         
-        // GUARDAR LA RESEÑA PRIMERO
         reseniaRepository.save(resenia);
 
-        // LUEGO actualizar promedio de calificación del repartidor
         Repartidor repartidor = pedido.getRepartidor();
         
-        // Obtener todas las reseñas (ahora incluye la nueva)
         List<Resenia> reseniasRepartidor = reseniaRepository.findAll().stream()
                 .filter(r -> r.getRepartidor() != null && 
                            r.getRepartidor().getId().equals(repartidor.getId()))
@@ -259,7 +256,6 @@ public class ClienteService {
                     .orElse(0.0);
             repartidor.setCalificacionPromedio(promedio);
             repartidorRepository.save(repartidor);
-            System.out.println("✅ Repartidor ID " + repartidor.getId() + " calificado. Nuevo promedio: " + promedio);
         }
     }
 }
