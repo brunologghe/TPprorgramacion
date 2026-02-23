@@ -1,5 +1,6 @@
 package com.example.pedidosYA.DTO.PedidoDTO;
 
+import com.example.pedidosYA.DTO.RepartidorDTO.RepartidorResumenDTO;
 import com.example.pedidosYA.Model.EstadoPedido;
 
 import java.time.LocalDateTime;
@@ -12,5 +13,6 @@ public record PedidoDetailDTO(
         Double total,
         String nombreRestaurante,
         Long idCliente,
-        List<DetallePedidoDTO> detalles
+        List<DetallePedidoDTO> detalles,
+        RepartidorResumenDTO repartidor
 ) {}

@@ -38,7 +38,7 @@ public class Pedido {
     @JoinColumn(name = "direccion_entrega_id")
     private Direccion direccionEntrega;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "repartidor_id")
     private Repartidor repartidor;
 

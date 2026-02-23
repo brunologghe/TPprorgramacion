@@ -4,6 +4,7 @@ import com.example.pedidosYA.DTO.PedidoDTO.DetallePedidoDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoCreateDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoDetailDTO;
 import com.example.pedidosYA.DTO.PedidoDTO.PedidoResumenDTO;
+import com.example.pedidosYA.DTO.RepartidorDTO.RepartidorResumenDTO;
 import com.example.pedidosYA.Exceptions.BusinessException;
 import com.example.pedidosYA.Model.*;
 import com.example.pedidosYA.Repository.*;
@@ -120,8 +121,22 @@ public class PedidoService {
                     pp.getCantidad()
             ));
         }
-        return new PedidoDetailDTO(pedidohecho.getId(), pedidohecho.getFechaPedido(), pedidohecho.getEstado(),
-        pedidohecho.getTotal(), pedidohecho.getRestaurante().getNombre(), cliente.getId(), detalles);
+        return new PedidoDetailDTO(
+                pedidohecho.getId(),
+                pedidohecho.getFechaPedido(),
+                pedidohecho.getEstado(),
+                pedidohecho.getTotal(),
+                pedidohecho.getRestaurante().getNombre(),
+                cliente.getId(),
+                detalles,
+                pedidohecho.getRepartidor() != null ? new RepartidorResumenDTO(
+                        pedidohecho.getRepartidor().getId(),
+                        pedidohecho.getRepartidor().getNombreYapellido(),
+                        pedidohecho.getRepartidor().getEmail(),
+                        pedidohecho.getRepartidor().getPais(),
+                        pedidohecho.getRepartidor().getTipoVehiculo()
+                ) : null
+        );
 
     }
 
@@ -142,7 +157,22 @@ public class PedidoService {
                     detallePedidoDTO.setCantidad(p.getCantidad());
                     detalles.add(detallePedidoDTO);
                 }
-                listaDetallePedidos.add(new PedidoDetailDTO(d.getId(), d.getFechaPedido(), d.getEstado(), d.getTotal(), d.getRestaurante().getNombre(), d.getCliente().getId(), detalles));
+                listaDetallePedidos.add(new PedidoDetailDTO(
+                        d.getId(),
+                        d.getFechaPedido(),
+                        d.getEstado(),
+                        d.getTotal(),
+                        d.getRestaurante().getNombre(),
+                        d.getCliente().getId(),
+                        detalles,
+                        d.getRepartidor() != null ? new RepartidorResumenDTO(
+                                d.getRepartidor().getId(),
+                                d.getRepartidor().getNombreYapellido(),
+                                d.getRepartidor().getEmail(),
+                                d.getRepartidor().getPais(),
+                                d.getRepartidor().getTipoVehiculo()
+                        ) : null
+                ));
             }
         }
 
@@ -178,7 +208,14 @@ public class PedidoService {
                     pedido.getTotal(),
                     pedido.getRestaurante().getNombre(),
                     pedido.getCliente().getId(),
-                    detalles
+                    detalles,
+                    pedido.getRepartidor() != null ? new RepartidorResumenDTO(
+                            pedido.getRepartidor().getId(),
+                            pedido.getRepartidor().getNombreYapellido(),
+                            pedido.getRepartidor().getEmail(),
+                            pedido.getRepartidor().getPais(),
+                            pedido.getRepartidor().getTipoVehiculo()
+                    ) : null
             ));
         }
 
@@ -209,7 +246,14 @@ public class PedidoService {
                 pedido.getTotal(),
                 pedido.getRestaurante().getNombre(),
                 pedido.getCliente().getId(),
-                detallePedido
+                detallePedido,
+                pedido.getRepartidor() != null ? new RepartidorResumenDTO(
+                        pedido.getRepartidor().getId(),
+                        pedido.getRepartidor().getNombreYapellido(),
+                        pedido.getRepartidor().getEmail(),
+                        pedido.getRepartidor().getPais(),
+                        pedido.getRepartidor().getTipoVehiculo()
+                ) : null
         );
     }
 
@@ -292,7 +336,14 @@ public class PedidoService {
                 pedido.getTotal(),
                 pedido.getRestaurante().getNombre(),
                 pedido.getCliente().getId(),
-                detallePedido
+                detallePedido,
+                pedido.getRepartidor() != null ? new RepartidorResumenDTO(
+                        pedido.getRepartidor().getId(),
+                        pedido.getRepartidor().getNombreYapellido(),
+                        pedido.getRepartidor().getEmail(),
+                        pedido.getRepartidor().getPais(),
+                        pedido.getRepartidor().getTipoVehiculo()
+                ) : null
         );
     }
 
@@ -321,7 +372,14 @@ public class PedidoService {
                                         pp.getProducto().getPrecio(),
                                         pp.getCantidad()
                                 ))
-                                .toList()
+                                .toList(),
+                        pedido.getRepartidor() != null ? new RepartidorResumenDTO(
+                                pedido.getRepartidor().getId(),
+                                pedido.getRepartidor().getNombreYapellido(),
+                                pedido.getRepartidor().getEmail(),
+                                pedido.getRepartidor().getPais(),
+                                pedido.getRepartidor().getTipoVehiculo()
+                        ) : null
                 ))
                 .toList();
     }
@@ -332,15 +390,28 @@ public class PedidoService {
 
         return pedidoRepository.findByRestauranteId(restaurante.getId()).stream()
                 .filter(pedido -> pedido.getEstado() == EstadoPedido.ENTREGADO || pedido.getEstado() == EstadoPedido.PREPARACION || pedido.getEstado() == EstadoPedido.ENVIADO)
-                .map(pedido -> new PedidoDetailDTO(pedido.getId(), pedido.getFechaPedido(),
-                        pedido.getEstado(),  pedido.getTotal(), pedido.getRestaurante().getNombre(), pedido.getCliente().getId(),
+                .map(pedido -> new PedidoDetailDTO(
+                        pedido.getId(),
+                        pedido.getFechaPedido(),
+                        pedido.getEstado(),
+                        pedido.getTotal(),
+                        pedido.getRestaurante().getNombre(),
+                        pedido.getCliente().getId(),
                         pedido.getProductosPedidos().stream()
-                        .map(productoPedido -> new DetallePedidoDTO(
-                                productoPedido.getProducto().getId(),
-                                productoPedido.getProducto().getNombre(),
-                                productoPedido.getProducto().getPrecio(),
-                                productoPedido.getCantidad()
-                        )).toList())).toList();
+                                .map(productoPedido -> new DetallePedidoDTO(
+                                        productoPedido.getProducto().getId(),
+                                        productoPedido.getProducto().getNombre(),
+                                        productoPedido.getProducto().getPrecio(),
+                                        productoPedido.getCantidad()
+                                )).toList(),
+                        pedido.getRepartidor() != null ? new RepartidorResumenDTO(
+                                pedido.getRepartidor().getId(),
+                                pedido.getRepartidor().getNombreYapellido(),
+                                pedido.getRepartidor().getEmail(),
+                                pedido.getRepartidor().getPais(),
+                                pedido.getRepartidor().getTipoVehiculo()
+                        ) : null
+                )).toList();
     }
 
     public List<PedidoDetailDTO> verPedidosCompleto(String usuario) {
@@ -364,7 +435,14 @@ public class PedidoService {
                             pedido.getTotal(),
                             restaurante.getNombre(),
                             pedido.getCliente().getId(),
-                            detalles
+                            detalles,
+                            pedido.getRepartidor() != null ? new RepartidorResumenDTO(
+                                    pedido.getRepartidor().getId(),
+                                    pedido.getRepartidor().getNombreYapellido(),
+                                    pedido.getRepartidor().getEmail(),
+                                    pedido.getRepartidor().getPais(),
+                                    pedido.getRepartidor().getTipoVehiculo()
+                            ) : null
                     );
                 }).toList();
     }
