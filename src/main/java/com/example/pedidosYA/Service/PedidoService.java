@@ -357,6 +357,7 @@ public class PedidoService {
                         pedido.getEstado() == EstadoPedido.PENDIENTE
                                 || pedido.getEstado() == EstadoPedido.PREPARACION
                                 || pedido.getEstado() == EstadoPedido.ENVIADO
+                                || pedido.getEstado() == EstadoPedido.EN_ENTREGA
                 )
                 .map(pedido -> new PedidoDetailDTO(
                         pedido.getId(),
@@ -373,15 +374,23 @@ public class PedidoService {
                                         pp.getCantidad()
                                 ))
                                 .toList(),
-                        pedido.getRepartidor() != null ? new RepartidorResumenDTO(
-                                pedido.getRepartidor().getId(),
-                                pedido.getRepartidor().getNombreYapellido(),
-                                pedido.getRepartidor().getEmail(),
-                                pedido.getRepartidor().getPais(),
-                                pedido.getRepartidor().getTipoVehiculo()
-                        ) : null
+                        toRepartidorResumenDTO(pedido)
                 ))
                 .toList();
+    }
+
+    private RepartidorResumenDTO toRepartidorResumenDTO(Pedido pedido) {
+        if (pedido.getRepartidor() == null) {
+            return null;
+        }
+
+        return new RepartidorResumenDTO(
+                pedido.getRepartidor().getId(),
+                pedido.getRepartidor().getNombreYapellido(),
+                pedido.getRepartidor().getEmail(),
+                pedido.getRepartidor().getPais(),
+                pedido.getRepartidor().getTipoVehiculo()
+        );
     }
 
     public List<PedidoDetailDTO> verHistorialPedidosDeRestaurante (String usuario){
