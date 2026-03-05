@@ -162,6 +162,7 @@ public class RepartidorService {
                 .orElseThrow(() -> new BusinessException("Repartidor no encontrado"));
         
         repartidorValidations.validarDisponible(repartidor.getId());
+        repartidorValidations.validarNoTienePedidoEnCurso(repartidor.getId());
         repartidorValidations.validarPedidoDisponible(pedidoId);
         Pedido pedido = pedidoRepository.findById(pedidoId)
                 .orElseThrow(() -> new BusinessException("Pedido no encontrado"));
@@ -169,7 +170,6 @@ public class RepartidorService {
         pedido.setEstado(EstadoPedido.ENVIADO);
         pedido.setRepartidor(repartidor);
         repartidor.setPedidoActual(pedido);
-        repartidor.setDisponible(false);
 
         pedidoRepository.save(pedido);
         repartidorRepository.save(repartidor);
